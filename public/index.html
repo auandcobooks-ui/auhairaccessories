@@ -338,12 +338,12 @@ fetch("lgas.json").then((r) => r.json()).then((d) => { LGAS = d; }).catch(() => 
 // Prices are per dozen. "big" is the bag or carton, which gets the bulk price.
 const PRODUCTS = [
   { id: "regular", name: "Regular Wig Cap", kind: "Regular wig cap", tagline: "Wear it under your wig for a flat, secure base. 2 caps per pack.",
-    big: "bag", bigDz: 100, dz: 1500, bulk: 1400,
+    big: "bag", bigDz: 100, dz: 1500, bulk: 1400, bigColours: ["black"],
     colours: [["black","Black","#161616"],["brown","Brown","#4A4033"],["dark-brown","Dark Brown","#3A2A1F"],["nude","Nude","#A98B6B"],["wine","Wine","#4E1C2E"],["red","Red","#B3202E"],["pink","Pink","#C3307F"],["purple","Purple","#3B1BA0"],["royal-blue","Royal Blue","#1B3CC6"],["sky-blue","Sky Blue","#4FA6E6"],["white","White","#ECEAE6"]],
     turn: ["front","side","back"], views: [["front","Front"],["side","Side"],["back","Back"],["pack","Pack"]],
     img: (c, v) => (v === "pack" ? `img/p/wearing-cap-${c}.jpg` : `img/p/model-${c}-${v}.jpg`) },
   { id: "mixed", name: "Mixed Colour Bag", kind: "Regular wig cap · bag", tagline: "10 dozen each of 10 colours in one bag: Wine, Red, Pink, Purple, Royal Blue, Sky Blue, White, Nude, Brown and Dark Brown. Black is sold separately.",
-    big: "bag", bigDz: 100, dz: null, bulk: 1400, colours: [["mixed","10 colours",""]], bigOnly: true,
+    big: "bag", bigDz: 100, dz: null, bulk: 1400, colours: [["mixed","10 colours",""]], bigOnly: true, stock: 2,
     views: [["pack","Bag"]], img: () => "img/p/wearing-cap-mixed-bag.jpg" },
   { id: "diy", name: "DIY Mesh Dome Cap", kind: "Wig-making cap", tagline: "A.U. Collection black spandex dome cap you sew wefts onto to make a wig. Breathable, high and tight band. Not for wearing under a wig.",
     big: "carton", bigDz: 50, dz: 5500, bulk: 5200, colours: [["black","Black","#161616"]],
@@ -353,6 +353,8 @@ const PRODUCTS = [
     views: [["head","On block"],["howto","How to make a wig"],["pack","Pack"]], img: (c, v) => `img/p/making-cap-stretch-mesh${v === "head" ? "-3d" : v === "howto" ? "-howto" : ""}.jpg` },
 ];
 const bigPrice = (p) => p.bulk * p.bigDz;
+const bigOK = (p, colour) => !p.bigColours || p.bigColours.includes(colour);
+const maxQty = (p, id) => { if (!p.stock) return 999; const inCart = cart.filter((i) => i.id === id).reduce((a, i) => a + i.qty, 0); return Math.max(0, p.stock - inCart); };
 const cap = (w) => w[0].toUpperCase() + w.slice(1);
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : w === "dozen" ? "" : "s"}`;
 const state = Object.fromEntries(PRODUCTS.map((p) => [p.id, { colour: p.colours[0][0], unit: p.bigOnly ? "big" : "dozen", qty: 1, view: p.views[0][0] }]));
@@ -372,7 +374,9 @@ function cardHTML(p) {
       ${p.colours.length > 1 ? `<div><div class="lbl" style="margin-bottom:8px">Colour · <span class="sw-name">${esc(col[1])}</span></div><div class="swatches">${p.colours.map((c) => `<button type="button" class="sw" data-c="${c[0]}" style="background:${c[2]}" aria-label="${esc(c[1])}" aria-pressed="${c[0] === s.colour}"></button>`).join("")}</div></div>` : p.bigOnly ? "" : `<div class="lbl">Colour · <span class="sw-name">Black only</span></div>`}
       <div><div class="lbl" style="margin-bottom:8px">Buy by</div>
       <div class="unitseg">${p.bigOnly ? "" : `<button type="button" data-unit="dozen" aria-pressed="${s.unit === "dozen"}">Dozen<b>${naira(p.dz)}</b>per dozen</button>`}
-        <button type="button" data-unit="big" aria-pressed="${s.unit === "big"}"${p.bigOnly ? ' style="grid-column:1/-1"' : ""}>${cap(p.big)} · ${p.bigDz} dozen<b>${naira(bigPrice(p))}</b>per ${p.big} (${naira(p.bulk)}/dz)</button></div></div>
+        ${bigOK(p, s.colour) ? `<button type="button" data-unit="big" aria-pressed="${s.unit === "big"}"${p.bigOnly ? ' style="grid-column:1/-1"' : ""}>${cap(p.big)} · ${p.bigDz} dozen<b>${naira(bigPrice(p))}</b>per ${p.big} (${naira(p.bulk)}/dz)</button>` : `<button type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed">${cap(p.big)} · ${p.bigDz} dozen<b>Out of stock</b>in ${esc(col[1])}</button>`}</div>
+      ${bigOK(p, s.colour) ? "" : `<p class="tg" style="margin:8px 0 0;font-size:12.5px">Full bags are Black only right now. Want every colour? Get the <a href="#" data-mixed style="color:var(--plum);font-weight:700">Mixed Colour Bag</a>.</p>`}
+      ${p.stock ? `<p style="margin:8px 0 0;font-size:13px;font-weight:700;color:#B3202E">Only ${p.stock} bags left${maxQty(p, p.id) < p.stock ? (maxQty(p, p.id) === 0 ? " · all in your cart" : ` · ${maxQty(p, p.id)} more available`) : ""}</p>` : ""}</div>
       <div class="buyrow">
         <div class="qty"><button type="button" data-q="-1" aria-label="Fewer">−</button><input type="number" inputmode="numeric" min="1" max="999" value="${s.qty}" aria-label="How many ${unitName(p, s.unit)}s" data-qin><button type="button" data-q="1" aria-label="More">+</button></div>
         <div class="qty-l">${s.unit === "big" ? plural(s.qty, p.big) : "dozen"}${s.unit === "big" ? `<br>${(s.qty * p.bigDz).toLocaleString()} dozen in total` : ""}</div>
@@ -403,11 +407,13 @@ $("#grid").addEventListener("click", (e) => {
   const card = e.target.closest(".card"); if (!card) return;
   const id = card.dataset.id, p = PRODUCTS.find((x) => x.id === id), s = state[id];
   const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.c) { s.colour = b.dataset.c; renderCard(id); preload(id); }
+  if (b.dataset.c) { s.colour = b.dataset.c; if (s.unit === "big" && !bigOK(p, s.colour)) { s.unit = "dozen"; s.qty = 1; } renderCard(id); preload(id); }
   else if (b.dataset.view) { s.view = b.dataset.view; renderCard(id); }
   else if (b.dataset.unit) { if (s.unit !== b.dataset.unit) { s.unit = b.dataset.unit; s.qty = 1; } renderCard(id); }
-  else if (b.dataset.q) { s.qty = Math.min(999, Math.max(1, s.qty + Number(b.dataset.q))); renderCard(id); }
+  else if (b.dataset.q) { s.qty = Math.min(Math.max(1, maxQty(p, id)), Math.max(1, s.qty + Number(b.dataset.q))); renderCard(id); }
   else if (b.hasAttribute("data-add")) {
+    if (s.unit === "big" && !bigOK(p, s.colour)) return;
+    if (p.stock) { const left = maxQty(p, id); if (left <= 0) { toast(`All ${p.stock} ${p.name}s are already in your cart`); return; } s.qty = Math.min(s.qty, left); }
     const ex = cart.find((i) => i.id === id && i.colour === s.colour && i.unit === s.unit);
     if (ex) ex.qty = Math.min(999, ex.qty + s.qty); else cart.push({ id, colour: s.colour, unit: s.unit, qty: s.qty });
     const col = p.colours.length > 1 ? p.colours.find((c) => c[0] === s.colour)[1] + " " : "";
@@ -415,9 +421,10 @@ $("#grid").addEventListener("click", (e) => {
     s.qty = 1; renderCard(id); updateBar(true);
   }
 });
+$("#grid").addEventListener("click", (e) => { const m = e.target.closest("[data-mixed]"); if (!m) return; e.preventDefault(); document.querySelector('.card[data-id="mixed"]')?.scrollIntoView({ behavior: "smooth", block: "start" }); });
 $("#grid").addEventListener("change", (e) => {
   if (!e.target.matches("[data-qin]")) return;
-  const id = e.target.closest(".card").dataset.id; state[id].qty = Math.min(999, Math.max(1, parseInt(e.target.value) || 1)); renderCard(id);
+  const id = e.target.closest(".card").dataset.id, pp = PRODUCTS.find((x) => x.id === id); state[id].qty = Math.min(Math.max(1, maxQty(pp, id)), Math.max(1, parseInt(e.target.value) || 1)); renderCard(id);
 });
 $("#grid").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-qin]")) e.target.blur(); });
 
@@ -487,7 +494,7 @@ $("#cSheet").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b || b.type === "submit" && b.closest("form")) return;
   if (b.classList.contains("x") || b.hasAttribute("data-close")) return closeSheet();
   if (b.dataset.rm) { cart.splice(Number(b.dataset.rm), 1); updateBar(); renderCart(); }
-  if (b.dataset.l) { const i = cart[Number(b.dataset.l)]; i.qty = Math.min(999, Math.max(1, i.qty + Number(b.dataset.d))); updateBar(); renderCart(); }
+  if (b.dataset.l) { const i = cart[Number(b.dataset.l)]; const ip = PRODUCTS.find((x) => x.id === i.id); const cap = ip.stock ? i.qty + maxQty(ip, i.id) : 999; i.qty = Math.min(cap, Math.max(1, i.qty + Number(b.dataset.d))); updateBar(); renderCart(); if (ip.stock) renderCard(i.id); }
 });
 const openCart = () => { renderCart(); openSheet(); };
 $("#openCart").onclick = openCart; $("#barBtn").onclick = openCart; $("#scrim").onclick = closeSheet;
