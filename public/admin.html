@@ -23,7 +23,14 @@ a{color:var(--ink)}
 .top img{height:30px}
 .top .sp{flex:1}
 .top select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:7px 10px}
+.top select{width:auto;max-width:170px}
 .top select option{color:#111}
+.rbtn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--plum);border:0;border-radius:10px;padding:7px 12px;font-weight:700;cursor:pointer}
+.rbtn svg{width:16px;height:16px}
+.rbtn.spin svg{animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.upd{font-size:11.5px;color:#E9CFE8;white-space:nowrap}
+@media(max-width:520px){.upd{display:none}.rbtn span{display:none}}
 .tabs{display:flex;gap:4px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:50px;z-index:19;overflow-x:auto}
 .tabs button{border:0;background:none;padding:9px 14px;border-radius:999px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tabs button[aria-selected=true]{background:var(--blush);color:var(--plum)}
@@ -134,17 +141,24 @@ function showLogin(msg = "") {
 // ---------- shell ----------
 const S = { tab: "overview", days: 30, status: "", q: "", catalog: null, draft: null, orders: [] };
 function shell() {
-  $("#app").innerHTML = `<div class="top"><img src="img/au-logo-reverse.png" alt="AU"><b style="font-size:13px;opacity:.85">Admin</b><span class="sp"></span>
+  $("#app").innerHTML = `<div class="top"><img src="img/au-logo-reverse.png" alt="AU"><b style="font-size:13px;opacity:.85">Admin</b><span class="sp"></span><span class="upd" id="upd"></span><button class="rbtn" id="rfr" type="button" aria-label="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span>Refresh</span></button>
     <select id="days" aria-label="Date range"><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option></select></div>
   <nav class="tabs" role="tablist">${[["overview","Overview"],["orders","Orders"],["products","Products & stock"],["visitors","Visitors"],["activity","Activity & undo"],["settings","Settings"]].map(([k,l]) => `<button role="tab" data-tab="${k}" aria-selected="${S.tab === k}">${l}</button>`).join("")}</nav>
   <main id="main"></main><div class="savebar" id="savebar"></div>
   <div class="drawer" id="drawer"><div class="sc" data-close></div><div class="pn" id="dpn"></div></div>`;
   $("#days").value = String(S.days);
   $("#days").onchange = () => { S.days = Number($("#days").value); render(); };
+  $("#rfr").onclick = refresh;
   $$(".tabs button").forEach((b) => (b.onclick = () => { if (S.draft && S.tab === "products" && diffSummary(S.catalog, S.draft).length && !confirm("Discard unsaved product changes?")) return; S.draft = null; S.tab = b.dataset.tab; $$(".tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b))); render(); }));
   $("#drawer").addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeDrawer(); });
 }
-function render() { $("#savebar").classList.remove("on"); $("#savebar").innerHTML = ""; ({ overview, orders, products, visitors, activity, settings })[S.tab](); }
+async function render() { $("#savebar").classList.remove("on"); $("#savebar").innerHTML = ""; await ({ overview, orders, products, visitors, activity, settings })[S.tab](); stamp(); }
+function stamp() { const u = $("#upd"); if (u) u.textContent = "Updated " + new Date().toLocaleTimeString("en-NG", { timeZone: "Africa/Lagos", hour: "numeric", minute: "2-digit" }); }
+async function refresh() {
+  if (S.tab === "products" && S.draft && S.catalog && diffSummary(S.catalog, S.draft).length && !confirm("Refreshing will discard your unsaved product changes. Continue?")) return;
+  const b = $("#rfr"); if (b.classList.contains("spin")) return; b.classList.add("spin"); closeDrawer();
+  try { await render(); toast("Up to date"); } catch (e) { toast(e.message); } finally { b.classList.remove("spin"); }
+}
 async function boot() { try { await api("me"); shell(); render(); } catch (e) { if (e.message !== "Not signed in") showLogin(e.message); } }
 
 // ---------- charts ----------
@@ -200,11 +214,10 @@ async function overview() {
     <div class="card"><h3>Top ordered items</h3>${d.topOrdered.length ? `<ul class="lst">${d.topOrdered.map((r) => `<li><span>${esc(r.item)}<br><span class="muted">${num(r.dozens)} dozen · ${r.orders} order${r.orders === 1 ? "" : "s"}</span></span><b>${naira(r.value)}</b></li>`).join("")}</ul>` : `<p class="muted">No orders yet.</p>`}</div>
     <div class="card"><h3>Busiest hours (Lagos time)</h3>${(() => { const mx = Math.max(1, ...hours.map((h) => h.v)); return `<svg class="chart" viewBox="0 0 480 130">${hours.map((h) => `<rect x="${h.h * 20 + 2}" y="${105 - (h.v / mx) * 95}" width="16" height="${(h.v / mx) * 95}" rx="2" fill="${h.v === mx && h.v ? "#410440" : "#E58BE3"}"><title>${h.h}:00 — ${h.v} visitors</title></rect>${h.h % 3 === 0 ? `<text x="${h.h * 20 + 10}" y="122" font-size="10" text-anchor="middle" fill="#7A6479">${h.h}</text>` : ""}`).join("")}</svg>`; })()}</div>
   </div>
-  <div class="card" style="margin-top:12px"><div class="row"><h3 style="margin:0">Live activity</h3><span class="sp" style="flex:1"></span><button class="btn o" id="rf" style="padding:6px 12px">Refresh</button></div>
+  <div class="card" style="margin-top:12px"><h3>Live activity</h3>
     ${d.live.length ? d.live.map((e) => `<div class="ev"><span class="ty">${esc(EVLABEL[e.type] || e.type)}</span><span>${esc(evDetail(e))}<br><span class="muted">${esc([e.city, e.device, e.source].filter(Boolean).join(" · "))}</span></span><span class="muted">${ago(e.ts)}</span></div>`).join("") : `<p class="muted">No visits recorded yet. They'll appear here as people browse the store.</p>`}
   </div>
   <p class="hint">All time: ${num(d.allTime?.n)} orders worth ${naira(d.allTime?.v)}.</p>`;
-  $("#rf").onclick = overview;
 }
 function evDetail(e) {
   let x = {}; try { x = JSON.parse(e.data || "{}") || {}; } catch {}
@@ -227,7 +240,7 @@ async function orders() {
   let t; $("#q").oninput = () => { clearTimeout(t); t = setTimeout(() => { S.q = $("#q").value; loadOrders(); }, 250); };
   $("#exp").onclick = () => (location.href = "/api/admin/export/orders.csv");
   $("#add").onclick = () => orderForm();
-  loadOrders();
+  await loadOrders();
 }
 async function loadOrders() {
   const qs = new URLSearchParams(); if (S.status === "deleted") qs.set("deleted", "1"); else if (S.status) qs.set("status", S.status); if (S.q) qs.set("q", S.q);
