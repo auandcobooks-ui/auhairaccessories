@@ -1,0 +1,13 @@
+{
+  "name": "AU Hair Accessories",
+  "short_name": "AU Hair",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#410440",
+  "theme_color": "#410440",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
