@@ -314,9 +314,50 @@ async function adminApi(req, env, url) {
   return json({ error: "Not found" }, 404);
 }
 
+// Store page with the ad pixels written straight into <head> (standard Meta / TikTok base code)
+let pxCache = { t: 0, v: null };
+async function pixelIds(env) {
+  if (Date.now() - pxCache.t < 30000 && pxCache.v) return pxCache.v;
+  let v = { meta: "", tt: "" };
+  try { const c = await getCatalog(env); v = { meta: String(c.store.metaPixel || ""), tt: String(c.store.tiktokPixel || "") }; } catch {}
+  pxCache = { t: Date.now(), v }; return v;
+}
+async function servePage(req, env) {
+  const res = await env.ASSETS.fetch(req);
+  if (!(res.headers.get("content-type") || "").includes("text/html")) return res;
+  const { meta, tt } = await pixelIds(env);
+  let head = "";
+  if (/^\d{8,20}$/.test(meta)) head += `<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${meta}');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=${meta}&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+`;
+  if (/^[A-Z0-9]{10,30}$/i.test(tt)) head += `<script>
+!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=r+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load('${tt}');ttq.page();}(window,document,'ttq');
+</script>
+`;
+  const headers = new Headers(res.headers); headers.set("cache-control", "no-cache");
+  if (!head) return new Response(res.body, { status: res.status, headers });
+  return new HTMLRewriter().on("meta[charset]", { element(el) { el.after(head, { html: true }); } }).transform(new Response(res.body, { status: res.status, headers }));
+}
+
 export default {
   async fetch(req, env, ctx) {
     const url = new URL(req.url);
+    if (url.pathname === "/" || url.pathname === "/index.html") return servePage(req, env);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(req);
     try {
       if (url.pathname.startsWith("/api/admin/")) return await adminApi(req, env, url);
