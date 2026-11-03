@@ -1,0 +1,471 @@
+<meta charset="utf-8">
+<title>AU Hair Accessories Store</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap">
+<style>
+/* Layout: plum hero with real mannequin shots, blush shop floor of tap-to-add cards, floating cart bar that checks out on WhatsApp. One light brand look by design. */
+:root{--plum:#410440;--orchid:#C73CC5;--orchid-ink:#A0229E;--orchid-soft:#E58BE3;--blush:#FFE7FF;--night:#24021F;--white:#FFFFFF;--ink:#2A0429;--muted:#6E4A6C;--line:#EBD6EA;--mist:#E9D3E8;--ok:#1F7A4D;--wa:#1C8D4E;
+--sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;--accent:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+--r-sm:8px;--r-md:16px;--r-lg:28px;--shadow:0 10px 30px rgba(65,4,64,.10);color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--white);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--white)}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+h1,h2,h3{text-wrap:balance}
+img{max-width:100%;display:block}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1160px;margin:0 auto}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--orchid-ink)}
+.acc{font-family:var(--accent);font-style:italic;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:13px 22px;font-weight:600;font-size:15px;border:1.5px solid transparent;cursor:pointer;text-decoration:none;transition:transform .15s;min-height:46px}
+.btn:active{transform:scale(.97)}
+.btn-plum{background:var(--plum);color:var(--white)}
+.btn-orchid{background:var(--orchid);color:var(--plum);font-weight:700}
+.btn-line{background:var(--white);border-color:var(--line);color:var(--ink)}
+.btn-glass{background:transparent;border-color:rgba(255,255,255,.35);color:var(--white)}
+.btn-wa{background:var(--wa);color:var(--white)}
+:focus-visible{outline:2px solid var(--orchid);outline-offset:2px}
+.mono{position:absolute;pointer-events:none;user-select:none;opacity:.08;height:auto}
+.mono-soft{opacity:.06}
+.demo{background:var(--night);color:var(--mist);font-size:12.5px;text-align:center;padding-block:7px}
+.demo b{color:var(--orchid-soft)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;justify-content:space-between;height:66px;gap:12px}
+.hd img{height:38px;width:auto}
+.nav{display:flex;align-items:center;gap:20px;font-size:14px;font-weight:500}
+.nav a{text-decoration:none}.nav .lnk{display:none}
+@media(min-width:760px){.nav .lnk{display:inline}}
+.cartbtn{background:var(--plum);color:var(--white);border:0;border-radius:999px;height:44px;padding:0 16px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.cartbtn .n{background:var(--orchid);color:var(--plum);border-radius:999px;min-width:22px;height:22px;font-size:12px;display:grid;place-items:center;font-weight:700;font-variant-numeric:tabular-nums}
+/* hero */
+.hero{background:var(--plum);color:var(--white);position:relative;overflow:hidden}
+.hero .mono{width:min(78vw,640px);right:-12%;top:-6%}
+.hero .in{position:relative;display:grid;gap:32px;padding-block:48px 56px;align-items:center}
+.hero .eyebrow{color:var(--orchid-soft)}
+.hero h1{font-size:clamp(36px,7vw,64px);line-height:1.03;margin:14px 0 16px;letter-spacing:-.02em;font-weight:700}
+.hero h1 .acc{color:var(--orchid-soft);font-size:1.1em}
+.hero p{font-size:17px;color:var(--mist);max-width:470px;margin:0 0 26px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero-shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:520px;width:100%;justify-self:center}
+.hero-shots img{border-radius:var(--r-md);aspect-ratio:4/5;object-fit:cover;width:100%;box-shadow:0 14px 30px rgba(0,0,0,.25)}
+.hero-shots img:nth-child(2){transform:translateY(-18px)}
+@media(min-width:900px){.hero .in{grid-template-columns:1.05fr .95fr;padding-block:72px 84px}}
+section{padding-block:56px}
+.sec-h{text-align:center;max-width:640px;margin:0 auto 26px}
+.sec-h h2{font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:8px 0 10px;color:var(--plum)}
+.sec-h p{color:var(--muted);margin:0}
+.shop{background:var(--blush);position:relative;overflow:hidden}
+.shop .mono{width:520px;left:-180px;bottom:-120px}
+.grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));position:relative}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.ph{position:relative;aspect-ratio:4/5;background:var(--blush);max-width:100%}
+.ph img{width:100%;height:100%;object-fit:cover}
+.view-tog{position:absolute;left:12px;top:12px;display:flex;background:rgba(255,255,255,.92);border-radius:999px;padding:3px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.view-tog button{border:0;background:transparent;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;min-height:32px}
+.view-tog button[aria-pressed="true"]{background:var(--plum);color:var(--white)}
+.tag{position:absolute;left:12px;bottom:12px;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:6px 9px;border-radius:var(--r-sm);background:var(--white);color:var(--plum)}
+.tag.dark{background:var(--plum);color:var(--white)}
+.bd{padding:18px;display:flex;flex-direction:column;gap:12px;flex:1}
+.card h3{margin:0;font-size:19px;line-height:1.3}
+.card .tg{color:var(--muted);font-size:13.5px;margin:2px 0 0}
+.lbl{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:34px;height:34px;border-radius:999px;border:2px solid var(--white);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--plum)}
+.sw-name{font-size:13px;font-weight:600;color:var(--ink)}
+.rates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rate{border:1.5px solid var(--line);border-radius:12px;padding:9px 11px;font-size:12px;color:var(--muted);line-height:1.35}
+.rate b{display:block;font-size:17px;color:var(--plum);font-variant-numeric:tabular-nums}
+.rate.on{border-color:var(--plum);background:var(--blush)}
+.buyrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:auto}
+.qty{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:999px}
+.qty button{border:0;background:transparent;width:42px;height:42px;font-size:20px;cursor:pointer;color:var(--plum)}
+.qty output{min-width:38px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.qty-l{font-size:12px;color:var(--muted);line-height:1.3}
+.quick{border:0;background:none;color:var(--orchid-ink);font-weight:600;font-size:13px;cursor:pointer;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.addbtn{flex:0 0 auto;width:100%;margin-top:auto}
+.total-line{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted)}
+.total-line b{font-size:19px;color:var(--plum);font-variant-numeric:tabular-nums}
+/* wholesale band */
+.whole{background:var(--plum);color:var(--white);border-radius:var(--r-lg);padding:36px 22px;display:grid;gap:26px;position:relative;overflow:hidden}
+.whole .mono{width:420px;right:-120px;bottom:-140px}
+.whole h2{font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:8px 0 12px}
+.whole .eyebrow{color:var(--orchid-soft)}.whole p{color:var(--mist);margin:0 0 20px}
+.ptable{position:relative;display:grid;gap:12px}
+.prow{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:16px 18px}
+.prow .u{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--orchid-soft);font-weight:600}
+.prow .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:8px}
+.prow .cols div{font-size:13px;color:var(--mist);line-height:1.35}
+.prow .cols b{display:block;font-size:20px;color:var(--white);font-variant-numeric:tabular-nums}
+@media(min-width:860px){.whole{grid-template-columns:1fr 1.1fr;padding:52px}}
+.steps{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.step{border:1px solid var(--line);border-radius:var(--r-md);padding:20px}
+.step .k{display:grid;place-items:center;width:34px;height:34px;border-radius:999px;background:var(--blush);color:var(--plum);font-weight:700;margin-bottom:10px}
+.step h3{margin:0 0 4px;font-size:16.5px}.step p{margin:0;color:var(--muted);font-size:14px}
+.visit{display:grid;gap:18px;align-items:center;background:var(--blush);border-radius:var(--r-lg);padding:32px 24px;position:relative;overflow:hidden}
+.visit .mono{width:300px;right:-60px;top:-40px}
+.visit h2{color:var(--plum);margin:6px 0 8px;font-size:clamp(25px,4vw,34px);line-height:1.15}
+.visit p{margin:0;color:var(--muted)}
+@media(min-width:860px){.visit{grid-template-columns:1.4fr 1fr;padding:44px}}
+footer{background:var(--night);color:var(--mist);padding-block:44px calc(110px + env(safe-area-inset-bottom,0px));font-size:14px;position:relative;overflow:hidden}
+footer .mono{width:360px;right:-90px;bottom:-110px}
+footer .fr{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;position:relative}
+footer img.lg{height:42px;width:auto;margin-bottom:12px}
+/* floating cart bar */
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:35;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.cartbar.on{transform:none}
+.cartbar .in{max-width:640px;margin:0 auto;background:var(--plum);color:var(--white);border-radius:999px;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 20px;box-shadow:0 14px 40px rgba(36,2,31,.35);cursor:pointer;border:0;width:100%;text-align:left}
+.cartbar .t{flex:1;min-width:0;font-size:13px;color:var(--mist);line-height:1.3}
+.cartbar .t b{display:block;color:var(--white);font-size:17px;font-variant-numeric:tabular-nums}
+.cartbar .go{background:var(--orchid);color:var(--plum);font-weight:700;border-radius:999px;padding:11px 18px;white-space:nowrap}
+.bump{animation:bump .35s}
+@keyframes bump{40%{transform:scale(1.04)}}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(36,2,31,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:50;background:var(--white);left:0;right:0;bottom:0;max-height:90vh;overflow:auto;border-radius:var(--r-lg) var(--r-lg) 0 0;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet.on{transform:none}
+@media(min-width:860px){.sheet{left:auto;top:0;bottom:0;width:460px;max-height:none;border-radius:var(--r-lg) 0 0 var(--r-lg);transform:translateX(105%)}.sheet.on{transform:none}}
+.sh-top{position:sticky;top:0;background:var(--white);display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line);z-index:2}
+.sh-top h3{margin:0;font-size:18px}
+.x{border:0;background:var(--blush);width:40px;height:40px;border-radius:999px;cursor:pointer;font-size:20px;line-height:1;color:var(--plum)}
+.sh-body{padding:8px 20px 20px}
+.line{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);align-items:center}
+.line img{width:60px;height:75px;object-fit:cover;border-radius:var(--r-sm)}
+.line h4{margin:0;font-size:15px}.line small{color:var(--muted);display:block;font-size:12.5px;line-height:1.4}
+.line .ctl{display:flex;align-items:center;gap:10px;margin-top:4px}
+.line .qty button{width:34px;height:34px;font-size:17px}.line .qty output{min-width:30px;font-size:14px}
+.rm{border:0;background:none;color:var(--orchid-ink);font-size:13px;cursor:pointer;padding:6px 0}
+.tot{display:flex;justify-content:space-between;padding:16px 0 6px;font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+.saving{color:var(--ok);font-size:13px;font-weight:600;margin:0 0 10px}
+.note{background:var(--blush);border-radius:var(--r-md);padding:13px 14px;font-size:13.5px;margin:10px 0 14px}
+.empty{text-align:center;color:var(--muted);padding:36px 0}
+.wa-msg{background:#E7F6EC;border:1px solid #BFE5CC;border-radius:var(--r-md);padding:14px;font-size:13px;white-space:pre-line;margin:12px 0}
+.toast{position:fixed;left:50%;top:calc(80px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--night);color:var(--white);padding:10px 18px;border-radius:999px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;font-size:14px;white-space:nowrap}
+.toast.on{opacity:1}
+.prow2{position:relative;display:flex;justify-content:space-between;align-items:center;gap:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-md);padding:16px 18px}
+.prow2 b{display:block;font-size:17px}.prow2 span{display:block;font-size:13px;color:var(--mist)}
+.prow2 strong{font-size:24px;font-variant-numeric:tabular-nums;color:var(--white);white-space:nowrap}
+.pnote{position:relative;margin:4px 0 0;font-size:13px;color:var(--mist)}
+.unitseg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.unitseg button{border:1.5px solid var(--line);background:var(--white);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-size:12px;color:var(--muted);line-height:1.35;min-height:62px}
+.unitseg button b{display:block;font-size:16px;color:var(--plum);font-variant-numeric:tabular-nums}
+.unitseg button[aria-pressed="true"]{border-color:var(--plum);background:var(--blush);box-shadow:inset 0 0 0 1px var(--plum)}
+.qty input{width:56px;text-align:center;font-weight:700;border:0;background:transparent;font-size:16px;font-variant-numeric:tabular-nums;-moz-appearance:textfield}
+.qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.view-tog{flex-wrap:wrap}
+.ph[data-turn]{cursor:grab;touch-action:pan-y;user-select:none}
+.ph[data-turn]:active{cursor:grabbing}
+.turnhint{position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:6px;background:rgba(36,2,31,.72);color:#fff;font-size:12px;font-weight:600;padding:6px 10px;border-radius:999px;pointer-events:none}
+form.co{display:grid;gap:12px;margin-top:4px}
+form.co label{font-size:13px;font-weight:600;display:grid;gap:6px}
+form.co input,form.co select,form.co textarea{border:1.5px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;font-size:16px;background:var(--white);width:100%;font-family:inherit}
+form.co input:focus,form.co select:focus,form.co textarea:focus{outline:2px solid var(--orchid);outline-offset:1px;border-color:transparent}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.err{color:#B00020;font-size:13.5px;min-height:1em}
+.shipnote{display:grid;gap:6px;background:var(--blush);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;font-size:13.5px;line-height:1.5;margin:6px 0 4px}
+.shipnote>b{font-size:14px;color:var(--plum)}
+.hint{font-weight:400;font-size:12.5px;color:var(--muted)}
+.lblh{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted);margin:18px 0 4px}
+.wacard{display:flex;flex-wrap:wrap;align-items:center;gap:20px;background:#E7F6EC;border:1px solid #BFE5CC;border-radius:var(--r-lg);padding:26px 24px}
+.wacard h2{margin:4px 0 2px;color:var(--ink);font-size:clamp(22px,3.4vw,30px);line-height:1.2}
+.wanum{margin:0;font-size:20px;font-weight:700;color:var(--wa);font-variant-numeric:tabular-nums;user-select:all}
+.wai{width:64px;height:64px;border-radius:999px;background:var(--wa);display:grid;place-items:center;flex:none}
+.wai svg{width:34px;height:34px;fill:#fff}
+.gen-grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.gen{margin:0;background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow)}
+.gen img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.gen figcaption{padding:14px 16px;font-size:14px;color:var(--muted)}.gen figcaption b{display:block;color:var(--plum);font-size:16px}
+.visit2{display:grid;gap:20px;background:var(--blush);border-radius:var(--r-lg);padding:28px 22px;align-items:center}
+.visit2 h2{color:var(--plum);margin:6px 0 8px;font-size:clamp(25px,4vw,34px);line-height:1.15}
+.addr{margin:0 0 16px;color:var(--muted)}
+.mapcard{position:relative;display:block;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);aspect-ratio:400/260;max-width:100%}
+.mapcard svg{width:100%;height:100%;display:block}
+.mapcta{position:absolute;left:12px;bottom:12px;background:var(--plum);color:#fff;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px}
+@media(min-width:860px){.visit2{grid-template-columns:1fr 1.1fr;padding:40px}}
+.socials{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.soc{display:flex;align-items:center;gap:14px;padding:18px;border-radius:var(--r-lg);text-decoration:none;color:#fff;min-width:0}
+.soc.ig{background:linear-gradient(135deg,#7A1FA2,#C13584 55%,#F77737)}
+.soc.tt{background:#111}
+.si{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none}.si svg{width:28px;height:28px}
+.st{flex:1;min-width:0}.st small{display:block;font-size:12.5px;opacity:.85}.st b{display:block;font-size:clamp(14px,4.2vw,18px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sgo{background:#fff;color:#111;font-weight:700;font-size:14px;padding:9px 14px;border-radius:999px;flex:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="demo gut"><b>Preview</b> · checkout opens WhatsApp</div>
+<header><div class="wrap hd gut">
+  <a href="#shop" aria-label="AU Hair Accessories home"><img src="img/au-logo-primary.png" alt="AU Hair Accessories" width="136" height="38"></a>
+  <nav class="nav"><a class="lnk" href="#shop">Shop</a><a class="lnk" href="#prices">Prices</a><a class="lnk" href="#whatsapp">WhatsApp</a>
+  <button class="cartbtn" id="openCart" type="button" aria-label="Open cart"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg><span>Cart</span><span class="n" id="cartN">0</span></button></nav>
+</div></header>
+
+<main>
+<div class="hero"><img class="mono" src="img/au-icon-white.png" alt="" aria-hidden="true">
+  <div class="wrap in gut">
+    <div>
+      <div class="eyebrow">Wig caps · Wholesale &amp; retail</div>
+      <h1>The perfect <span class="acc">base</span> for every wig.</h1>
+      <p>Regular wig caps in 11 colours, mixed colour bags, and wig-making dome caps. Buy by the dozen, or by the bag and carton. Delivered anywhere in Nigeria.</p>
+      <div class="ctas"><a class="btn btn-orchid" href="#shop">Shop wig caps</a><a class="btn btn-glass" href="#prices">See bulk prices</a></div>
+    </div>
+    <div class="hero-shots" aria-hidden="true">
+      <img src="img/p/model-nude-side.jpg" alt="">
+      <img src="img/p/making-cap-diy-mesh-3d.jpg" alt="" style="object-position:70% 50%">
+      <img src="img/p/model-pink-front.jpg" alt="">
+    </div>
+  </div>
+</div>
+
+<section class="shop" id="shop"><img class="mono mono-soft" src="img/au-icon-primary.png" alt="" aria-hidden="true">
+  <div class="wrap gut" style="position:relative">
+    <div class="sec-h"><div class="eyebrow">Shop</div><h2>Pick, add, done.</h2><p>Choose a colour, then buy by the dozen or by the bag or carton for the bulk price.</p></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section id="prices"><div class="wrap gut"><div class="whole"><img class="mono" src="img/au-icon-white.png" alt="" aria-hidden="true">
+  <div style="position:relative">
+    <div class="eyebrow">Bulk prices</div>
+    <h2>Buy in bulk. <span class="acc" style="color:var(--orchid-soft)">Sell with margin.</span></h2>
+    <p>Steady stock at Trade Fair. Dispatch within Lagos or waybill to your state.</p>
+    <a class="btn btn-orchid" href="#shop">Start an order</a>
+  </div>
+  <div class="ptable">
+    <div class="prow2"><div><b>Regular Wig Cap</b><span>1 bag · 100 dozen</span></div><strong>₦140,000</strong></div>
+    <div class="prow2"><div><b>Mixed Colour Bag</b><span>Regular wig cap · 10 colours · 100 dozen</span></div><strong>₦140,000</strong></div>
+    <div class="prow2"><div><b>Wig-Making Mesh Dome Cap</b><span>Black · 1 carton · 50 dozen</span></div><strong>₦260,000</strong></div>
+    <p class="pnote">By the dozen: Regular ₦1,500 · Wig-making ₦5,500</p>
+  </div>
+</div></div></section>
+
+<section style="padding-top:0"><div class="wrap gut">
+  <div class="sec-h"><div class="eyebrow">How ordering works</div><h2>From cart to WhatsApp</h2></div>
+  <div class="steps">
+    <div class="step"><div class="k">1</div><h3>Add to cart</h3><p>Pick your cap and colour, then how many dozens, bags or cartons.</p></div>
+    <div class="step"><div class="k">2</div><h3>Add your delivery details</h3><p>Name, phone, state and local government. Outside Lagos, the motor park for your waybill.</p></div>
+    <div class="step"><div class="k">3</div><h3>Send on WhatsApp</h3><p>We confirm your order and stock, then you pay by transfer.</p></div>
+    <div class="step"><div class="k">4</div><h3>We deliver</h3><p>Rider to your door in Lagos. Waybill to a motor park in your area for other states.</p></div>
+  </div>
+</div></section>
+
+<section id="whatsapp" style="padding-top:0"><div class="wrap gut"><div class="wacard">
+  <div class="wai" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg></div>
+  <div style="flex:1;min-width:200px"><div class="eyebrow" style="color:var(--wa)">Questions or custom orders?</div><h2>Send us a message on WhatsApp</h2><p class="wanum">0912 643 3425</p></div>
+  <a class="btn btn-wa" href="https://wa.me/2349126433425?text=Hello%20AU%20Hair%20Accessories%2C%20I%27d%20like%20to%20ask%20about%20your%20wig%20caps." target="_blank" rel="noopener">Chat on WhatsApp</a>
+</div></div></section>
+
+<section id="visit" style="padding-top:0"><div class="wrap gut"><div class="visit2">
+  <div class="v-txt"><div class="eyebrow">Visit the shop</div><h2>See every colour in person.</h2>
+    <p class="addr">Shop A1, by Bayelsa Plaza,<br>BBA Trade Fair Complex, Lagos</p>
+    <a class="btn btn-plum" href="https://www.google.com/maps/search/?api=1&amp;query=Bayelsa+Plaza%2C+Trade+Fair+Complex%2C+Lagos" target="_blank" rel="noopener">Get directions</a></div>
+  <a class="mapcard" href="https://www.google.com/maps/search/?api=1&amp;query=Bayelsa+Plaza%2C+Trade+Fair+Complex%2C+Lagos" target="_blank" rel="noopener" aria-label="Open Bayelsa Plaza, Trade Fair Complex in Google Maps">
+    <svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="260" fill="#F4E9F3"/>
+      <g fill="#E7D5E5"><rect x="20" y="20" width="110" height="70" rx="6"/><rect x="150" y="20" width="90" height="70" rx="6"/><rect x="260" y="20" width="120" height="70" rx="6"/><rect x="20" y="170" width="150" height="70" rx="6"/><rect x="190" y="170" width="70" height="70" rx="6"/><rect x="280" y="170" width="100" height="70" rx="6"/><rect x="20" y="108" width="80" height="44" rx="6"/><rect x="300" y="108" width="80" height="44" rx="6"/></g>
+      <g stroke="#FFFFFF" stroke-width="12" fill="none"><path d="M0 100H400"/><path d="M0 160H400"/><path d="M140 0V260"/><path d="M250 0V260"/></g>
+      <path d="M0 230 C120 210 260 245 400 220" stroke="#D9C3D7" stroke-width="16" fill="none"/>
+      <rect x="112" y="110" width="168" height="40" rx="8" fill="#FFFFFF" stroke="#C73CC5" stroke-width="2"/>
+      <text x="196" y="135" text-anchor="middle" font-family="Poppins,sans-serif" font-size="13" font-weight="600" fill="#410440">Bayelsa Plaza</text>
+      <text x="70" y="62" text-anchor="middle" font-family="Poppins,sans-serif" font-size="10" fill="#6E4A6C">Trade Fair</text>
+      <text x="320" y="238" text-anchor="middle" font-family="Poppins,sans-serif" font-size="10" fill="#6E4A6C">Lagos–Badagry Expy</text>
+      <g transform="translate(196 104)"><path d="M0 0C-14-18-20-26-20-36a20 20 0 0140 0c0 10-6 18-20 36z" fill="#410440"/><circle cx="0" cy="-36" r="8" fill="#C73CC5"/></g>
+    </svg>
+    <span class="mapcta">Tap to open in Google Maps</span>
+  </a>
+</div></div></section>
+
+<section id="follow" style="padding-top:0"><div class="wrap gut"><div class="socials">
+  <a class="soc ig" href="https://www.instagram.com/auhairaccessories" target="_blank" rel="noopener">
+    <span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg></span>
+    <span class="st"><small>Follow us on Instagram</small><b>@auhairaccessories</b></span><span class="sgo">Follow</span></a>
+  <a class="soc tt" href="https://www.tiktok.com/@auhairaccessories" target="_blank" rel="noopener">
+    <span class="si"><svg viewBox="0 0 24 24" fill="#fff"><path d="M16.6 3c.4 2.2 1.8 3.6 4 3.8v3.1c-1.5 0-2.8-.4-4-1.1v6.1A5.9 5.9 0 1110.7 9v3.2a2.8 2.8 0 102 2.7V3h3.9z"/></svg></span>
+    <span class="st"><small>Watch us on TikTok</small><b>@auhairaccessories</b></span><span class="sgo">Follow</span></a>
+</div></div></section>
+</main>
+
+<footer><img class="mono" src="img/au-icon-white.png" alt="" aria-hidden="true"><div class="wrap gut fr">
+  <div><img class="lg" src="img/au-logo-reverse.png" alt="AU Hair Accessories" width="153" height="42"><div>Wig caps, wholesale &amp; retail.<br>BBA Trade Fair Complex, Lagos</div></div>
+  <div><b style="color:var(--white)">Contact</b><br>WhatsApp · 0912 643 3425<br>Instagram · @auhairaccessories<br>TikTok · @auhairaccessories<br>Facebook · AU Hair Accessories</div>
+  <div style="opacity:.75">© 2026 AU Hair Accessories</div>
+</div></footer>
+
+<div class="cartbar" id="cartbar"><button class="in" type="button" id="barBtn"><span class="t"><span id="barItems">0 items</span><b id="barTotal">₦0</b></span><span class="go">View cart &amp; checkout</span></button></div>
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="cSheet" role="dialog" aria-modal="true" aria-label="Cart"></aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const naira = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
+const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 1800); };
+const WHATSAPP = "2349126433425";
+let LGAS = {};
+fetch("lgas.json").then((r) => r.json()).then((d) => { LGAS = d; }).catch(() => {});
+
+// Prices are per dozen. "big" is the bag or carton, which gets the bulk price.
+const PRODUCTS = [
+  { id: "regular", name: "Regular Wig Cap", kind: "Regular wig cap", tagline: "Wear it under your wig for a flat, secure base. 2 caps per pack.",
+    big: "bag", bigDz: 100, dz: 1500, bulk: 1400,
+    colours: [["black","Black","#161616"],["brown","Brown","#4A4033"],["dark-brown","Dark Brown","#3A2A1F"],["nude","Nude","#A98B6B"],["wine","Wine","#4E1C2E"],["red","Red","#B3202E"],["pink","Pink","#C3307F"],["purple","Purple","#3B1BA0"],["royal-blue","Royal Blue","#1B3CC6"],["sky-blue","Sky Blue","#4FA6E6"],["white","White","#ECEAE6"]],
+    turn: ["front","side","back"], views: [["front","Front"],["side","Side"],["back","Back"],["pack","Pack"]],
+    img: (c, v) => (v === "pack" ? `img/p/wearing-cap-${c}.jpg` : `img/p/model-${c}-${v}.jpg`) },
+  { id: "mixed", name: "Mixed Colour Bag", kind: "Regular wig cap · bag", tagline: "10 dozen each of 10 colours in one bag: Wine, Red, Pink, Purple, Royal Blue, Sky Blue, White, Nude, Brown and Dark Brown. Black is sold separately.",
+    big: "bag", bigDz: 100, dz: null, bulk: 1400, colours: [["mixed","10 colours",""]], bigOnly: true,
+    views: [["pack","Bag"]], img: () => "img/p/wearing-cap-mixed-bag.jpg" },
+  { id: "diy", name: "DIY Mesh Dome Cap", kind: "Wig-making cap", tagline: "A.U. Collection black spandex dome cap you sew wefts onto to make a wig. Breathable, high and tight band. Not for wearing under a wig.",
+    big: "carton", bigDz: 50, dz: 5500, bulk: 5200, colours: [["black","Black","#161616"]],
+    views: [["head","On block"],["howto","How to make a wig"],["pack","Pack"]], img: (c, v) => `img/p/making-cap-diy-mesh${v === "head" ? "-3d" : v === "howto" ? "-howto" : ""}.jpg` },
+  { id: "stretch", name: "Stretch Mesh Dome Cap", kind: "Wig-making cap", tagline: "A.U. Collection black stretch mesh dome cap for building closure and U-part wigs. Lightweight, tight band. Not for wearing under a wig.",
+    big: "carton", bigDz: 50, dz: 5500, bulk: 5200, colours: [["black","Black","#161616"]],
+    views: [["head","On block"],["howto","How to make a wig"],["pack","Pack"]], img: (c, v) => `img/p/making-cap-stretch-mesh${v === "head" ? "-3d" : v === "howto" ? "-howto" : ""}.jpg` },
+];
+const bigPrice = (p) => p.bulk * p.bigDz;
+const cap = (w) => w[0].toUpperCase() + w.slice(1);
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : w === "dozen" ? "" : "s"}`;
+const state = Object.fromEntries(PRODUCTS.map((p) => [p.id, { colour: p.colours[0][0], unit: p.bigOnly ? "big" : "dozen", qty: 1, view: p.views[0][0] }]));
+let cart = []; // {id, colour, unit:'dozen'|'big', qty}
+const unitPrice = (p, unit) => (unit === "big" ? bigPrice(p) : p.dz);
+const unitName = (p, unit) => (unit === "big" ? p.big : "dozen");
+
+function cardHTML(p) {
+  const s = state[p.id], col = p.colours.find((c) => c[0] === s.colour), price = unitPrice(p, s.unit);
+  return `<article class="card" data-id="${p.id}">
+    <div class="ph"${p.turn && s.view !== "pack" ? ' data-turn' : ""}><img src="${p.img(s.colour, s.view)}" draggable="false" alt="${esc(p.name)}${p.colours.length > 1 ? " in " + esc(col[1]) : ""}" loading="lazy">
+      <span class="tag ${p.id === "regular" ? "" : "dark"}">${esc(p.kind)}</span>
+      ${p.turn && s.view !== "pack" ? `<span class="turnhint" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0115.5-6.2M21 12a9 9 0 01-15.5 6.2"/><path d="M18 2v4h-4M6 22v-4h4"/></svg>Drag to turn</span>` : ""}
+      ${p.views.length > 1 ? `<div class="view-tog" role="group" aria-label="Photo">${p.views.map(([k, l]) => `<button type="button" data-view="${k}" aria-pressed="${s.view === k || (k === "front" && s.view === "angle")}">${l}</button>`).join("")}</div>` : ""}</div>
+    <div class="bd">
+      <div><h3>${esc(p.name)}</h3><p class="tg">${esc(p.tagline)}</p></div>
+      ${p.colours.length > 1 ? `<div><div class="lbl" style="margin-bottom:8px">Colour · <span class="sw-name">${esc(col[1])}</span></div><div class="swatches">${p.colours.map((c) => `<button type="button" class="sw" data-c="${c[0]}" style="background:${c[2]}" aria-label="${esc(c[1])}" aria-pressed="${c[0] === s.colour}"></button>`).join("")}</div></div>` : p.bigOnly ? "" : `<div class="lbl">Colour · <span class="sw-name">Black only</span></div>`}
+      <div><div class="lbl" style="margin-bottom:8px">Buy by</div>
+      <div class="unitseg">${p.bigOnly ? "" : `<button type="button" data-unit="dozen" aria-pressed="${s.unit === "dozen"}">Dozen<b>${naira(p.dz)}</b>per dozen</button>`}
+        <button type="button" data-unit="big" aria-pressed="${s.unit === "big"}"${p.bigOnly ? ' style="grid-column:1/-1"' : ""}>${cap(p.big)} · ${p.bigDz} dozen<b>${naira(bigPrice(p))}</b>per ${p.big} (${naira(p.bulk)}/dz)</button></div></div>
+      <div class="buyrow">
+        <div class="qty"><button type="button" data-q="-1" aria-label="Fewer">−</button><input type="number" inputmode="numeric" min="1" max="999" value="${s.qty}" aria-label="How many ${unitName(p, s.unit)}s" data-qin><button type="button" data-q="1" aria-label="More">+</button></div>
+        <div class="qty-l">${s.unit === "big" ? plural(s.qty, p.big) : "dozen"}${s.unit === "big" ? `<br>${(s.qty * p.bigDz).toLocaleString()} dozen in total` : ""}</div>
+      </div>
+      <div class="total-line"><span>${s.qty} × ${naira(price)}</span><b>${naira(price * s.qty)}</b></div>
+      <button type="button" class="btn btn-plum addbtn" data-add>Add to cart</button>
+    </div></article>`;
+}
+function renderCard(id, focusQty) { const el = document.querySelector(`.card[data-id="${id}"]`); el.outerHTML = cardHTML(PRODUCTS.find((x) => x.id === id)); if (focusQty) { const i = document.querySelector(`.card[data-id="${id}"] [data-qin]`); i.focus(); i.setSelectionRange(99, 99); } }
+function renderGrid() { $("#grid").innerHTML = PRODUCTS.map(cardHTML).join(""); preload("regular"); }
+function preload(id) { const p = PRODUCTS.find((x) => x.id === id); if (!p.turn) return; p.turn.forEach((v) => { const i = new Image(); i.src = p.img(state[id].colour, v); }); }
+// drag / swipe to turn the model
+let drag = null;
+$("#grid").addEventListener("pointerdown", (e) => {
+  const ph = e.target.closest(".ph[data-turn]"); if (!ph || e.target.closest("button")) return;
+  const id = ph.closest(".card").dataset.id; drag = { id, x: e.clientX, moved: false }; ph.setPointerCapture?.(e.pointerId);
+});
+$("#grid").addEventListener("pointermove", (e) => {
+  if (!drag) return; const dx = e.clientX - drag.x; if (Math.abs(dx) < 36) return;
+  const p = PRODUCTS.find((x) => x.id === drag.id), s = state[drag.id]; const i = Math.max(0, p.turn.indexOf(s.view));
+  const n = (i + (dx < 0 ? 1 : -1) + p.turn.length) % p.turn.length; s.view = p.turn[n]; drag.x = e.clientX; drag.moved = true;
+  const img = document.querySelector(`.card[data-id="${drag.id}"] .ph img`); img.src = p.img(s.colour, s.view);
+  document.querySelectorAll(`.card[data-id="${drag.id}"] .view-tog button`).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === s.view || (b.dataset.view === "front" && s.view === "angle"))));
+});
+["pointerup", "pointercancel"].forEach((t) => $("#grid").addEventListener(t, () => { drag = null; }));
+
+$("#grid").addEventListener("click", (e) => {
+  const card = e.target.closest(".card"); if (!card) return;
+  const id = card.dataset.id, p = PRODUCTS.find((x) => x.id === id), s = state[id];
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.c) { s.colour = b.dataset.c; renderCard(id); preload(id); }
+  else if (b.dataset.view) { s.view = b.dataset.view; renderCard(id); }
+  else if (b.dataset.unit) { if (s.unit !== b.dataset.unit) { s.unit = b.dataset.unit; s.qty = 1; } renderCard(id); }
+  else if (b.dataset.q) { s.qty = Math.min(999, Math.max(1, s.qty + Number(b.dataset.q))); renderCard(id); }
+  else if (b.hasAttribute("data-add")) {
+    const ex = cart.find((i) => i.id === id && i.colour === s.colour && i.unit === s.unit);
+    if (ex) ex.qty = Math.min(999, ex.qty + s.qty); else cart.push({ id, colour: s.colour, unit: s.unit, qty: s.qty });
+    const col = p.colours.length > 1 ? p.colours.find((c) => c[0] === s.colour)[1] + " " : "";
+    toast(`Added ${s.unit === "big" ? plural(s.qty, p.big) : s.qty + " dozen"} · ${col}${p.name}`);
+    s.qty = 1; renderCard(id); updateBar(true);
+  }
+});
+$("#grid").addEventListener("change", (e) => {
+  if (!e.target.matches("[data-qin]")) return;
+  const id = e.target.closest(".card").dataset.id; state[id].qty = Math.min(999, Math.max(1, parseInt(e.target.value) || 1)); renderCard(id);
+});
+$("#grid").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-qin]")) e.target.blur(); });
+
+function lines() { return cart.map((i, idx) => { const p = PRODUCTS.find((x) => x.id === i.id); const col = p.colours.find((c) => c[0] === i.colour); const price = unitPrice(p, i.unit); return { ...i, idx, p, col, price, line: price * i.qty, dz: i.unit === "big" ? i.qty * p.bigDz : i.qty }; }); }
+function updateBar(bump) {
+  const L = lines(), tot = L.reduce((a, l) => a + l.line, 0), n = L.length;
+  $("#cartN").textContent = L.reduce((a, l) => a + l.qty, 0); $("#barItems").textContent = `${n} item${n === 1 ? "" : "s"} in cart`; $("#barTotal").textContent = naira(tot);
+  $("#cartbar").classList.toggle("on", n > 0);
+  if (bump) { const b = $("#barBtn"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
+}
+const lineLabel = (l) => `${l.p.name}${l.p.colours.length > 1 ? " – " + l.col[1] : ""}`;
+const qtyLabel = (l) => (l.unit === "big" ? `${plural(l.qty, l.p.big)} (${l.dz} dozen)` : `${l.qty} dozen`);
+function waMessage(L, tot, f) {
+  return "Hello AU Hair Accessories, I'd like to order:\n\n" + L.map((l) => `• ${lineLabel(l)}: ${qtyLabel(l)} × ${naira(l.price)} = ${naira(l.line)}`).join("\n") +
+    `\n\nTotal: ${naira(tot)} (excluding logistics)\n\nDelivery details\nName: ${f.name}\nPhone: ${f.phone}\nState: ${f.state}\nLocal government: ${f.lga}\n` + (f.state === "Lagos" ? `Delivery address: ${f.address}` : `Waybill to motor park: ${f.park}\nAddress: ${f.address}`);
+}
+let form = { name: "", phone: "", state: "", lga: "", address: "", park: "" };
+function openSheet() { $("#scrim").classList.add("on"); $("#cSheet").classList.add("on"); document.body.style.overflow = "hidden"; setTimeout(() => $("#cSheet .x")?.focus(), 60); }
+function closeSheet() { $("#scrim").classList.remove("on"); $("#cSheet").classList.remove("on"); document.body.style.overflow = ""; }
+function renderCart() {
+  const L = lines(), tot = L.reduce((a, l) => a + l.line, 0);
+  const states = Object.keys(LGAS), lgas = LGAS[form.state] || [];
+  $("#cSheet").innerHTML = `<div class="sh-top"><h3>Your cart</h3><button class="x" type="button" aria-label="Close">×</button></div>
+  <div class="sh-body">${!L.length ? '<div class="empty">Your cart is empty.<br><br><button class="btn btn-plum" type="button" data-close>Shop wig caps</button></div>' :
+    L.map((l) => `<div class="line"><img src="${l.p.img(l.colour, "pack")}" alt="">
+      <div style="min-width:0"><h4>${esc(l.p.name)}</h4><small>${l.p.colours.length > 1 ? esc(l.col[1]) + " · " : ""}${naira(l.price)} per ${unitName(l.p, l.unit)}${l.unit === "big" ? ` (${l.p.bigDz} dz)` : ""}</small>
+      <div class="ctl"><div class="qty"><button type="button" data-l="${l.idx}" data-d="-1" aria-label="Fewer">−</button><output>${l.qty}</output><button type="button" data-l="${l.idx}" data-d="1" aria-label="More">+</button></div><span style="font-size:12px;color:var(--muted)">${l.unit === "big" ? l.p.big + (l.qty === 1 ? "" : "s") : "dozen"}</span><button class="rm" type="button" data-rm="${l.idx}">Remove</button></div></div>
+      <b style="color:var(--plum);font-variant-numeric:tabular-nums">${naira(l.line)}</b></div>`).join("") +
+    `<div class="tot"><span>Total <small style="font-weight:500;opacity:.7">(excluding logistics)</small></span><span>${naira(tot)}</span></div>
+     <div class="shipnote"><b>How delivery works</b><span><b>Lagos:</b> dispatch rider to your address.</span><span><b>Other states:</b> sent by waybill to a motor park in your area, not to your home or office. You pick it up at the park.</span><span>Prices exclude logistics.</span></div>
+     <div class="lblh">Delivery details</div>
+     <form class="co" id="coForm" novalidate>
+       <label for="f-name">Full name<input id="f-name" name="name" autocomplete="name" value="${esc(form.name)}"></label>
+       <label for="f-phone">Phone number<input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="080..." value="${esc(form.phone)}"></label>
+       <div class="row2">
+         <label for="f-state">State<select id="f-state" name="state"><option value="">Choose state</option>${states.map((x) => `<option ${x === form.state ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></label>
+         <label for="f-lga">Local government<select id="f-lga" name="lga" ${lgas.length ? "" : "disabled"}><option value="">${form.state ? "Choose LGA" : "Pick state first"}</option>${lgas.map((x) => `<option ${x === form.lga ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></label>
+       </div>
+       ${form.state && form.state !== "Lagos" ? `<label for="f-park">Motor park for waybill pickup<input id="f-park" name="park" placeholder="e.g. Peace Park, Mile 1" value="${esc(form.park)}"><span class="hint">Waybill goes to a park, not your home or office. Name the park you'll pick up from.</span></label>` : ""}
+       <label for="f-addr">${form.state && form.state !== "Lagos" ? "Your address (for our records)" : "Delivery address"}<textarea id="f-addr" name="address" rows="2" autocomplete="street-address" placeholder="House number, street, area, landmark">${esc(form.address)}</textarea></label>
+       <div class="err" id="coErr" role="alert"></div>
+       <button class="btn btn-wa" style="width:100%">Send order on WhatsApp</button>
+     </form>
+     <button class="btn btn-line" type="button" style="width:100%;margin-top:10px" data-close>Keep shopping</button>`}
+  </div>`;
+}
+$("#cSheet").addEventListener("input", (e) => { if (e.target.name && e.target.name in form) form[e.target.name] = e.target.value; });
+$("#cSheet").addEventListener("change", (e) => {
+  if (e.target.id === "f-state") { form.state = e.target.value; form.lga = ""; const sc = $("#cSheet").scrollTop; renderCart(); $("#cSheet").scrollTop = sc; $("#f-lga")?.focus(); }
+  if (e.target.id === "f-lga") form.lga = e.target.value;
+});
+$("#cSheet").addEventListener("submit", (e) => {
+  e.preventDefault(); const err = $("#coErr");
+  if (form.name.trim().length < 2) return (err.textContent = "Enter your full name.");
+  if (form.phone.replace(/\D/g, "").length < 10) return (err.textContent = "Enter a phone number we can reach you on.");
+  if (!form.state) return (err.textContent = "Choose your state.");
+  if (!form.lga) return (err.textContent = "Choose your local government.");
+  if (form.state !== "Lagos" && form.park.trim().length < 3) return (err.textContent = "Enter the motor park where you'll pick up your waybill.");
+  if (form.address.trim().length < 5) return (err.textContent = "Enter your address.");
+  err.textContent = "";
+  const L = lines(), tot = L.reduce((a, l) => a + l.line, 0);
+  const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(waMessage(L, tot, form))}`;
+  const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+  toast("Opening WhatsApp with your order");
+});
+$("#cSheet").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b || b.type === "submit" && b.closest("form")) return;
+  if (b.classList.contains("x") || b.hasAttribute("data-close")) return closeSheet();
+  if (b.dataset.rm) { cart.splice(Number(b.dataset.rm), 1); updateBar(); renderCart(); }
+  if (b.dataset.l) { const i = cart[Number(b.dataset.l)]; i.qty = Math.min(999, Math.max(1, i.qty + Number(b.dataset.d))); updateBar(); renderCart(); }
+});
+const openCart = () => { renderCart(); openSheet(); };
+$("#openCart").onclick = openCart; $("#barBtn").onclick = openCart; $("#scrim").onclick = closeSheet;
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+renderGrid(); updateBar();
+})();
+</script>
