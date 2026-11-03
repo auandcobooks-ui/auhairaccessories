@@ -1,5 +1,15 @@
 {
   "name": "auhairaccessories",
+  "main": "src/worker.js",
   "compatibility_date": "2026-11-01",
-  "assets": { "directory": "./public", "not_found_handling": "single-page-application" }
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "auhairaccessories", "database_id": "1d647b2f-cac8-46d1-bc7b-583fa86b63b6", "migrations_dir": "migrations" }
+  ],
+  "observability": { "enabled": true }
 }

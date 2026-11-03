@@ -24,7 +24,7 @@
 <meta name="twitter:image" content="https://auhairaccessories.com/og.jpg?v=2">
 <link rel="canonical" href="https://auhairaccessories.com/">
 
-<style>html,body{margin:0}.demo{display:none!important}</style>
+<style>html,body{margin:0}.demo{display:none!important}.sw[data-oos]{opacity:.32;position:relative}.sw[data-oos]::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:#410440;transform:rotate(45deg)}.annbar{background:#C73CC5;color:#fff;text-align:center;font:600 13px/1.4 Poppins,sans-serif;padding:9px 14px}</style>
 <title>AU Hair Accessories · Wig caps in 11 colours</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -331,9 +331,19 @@ const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const naira = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
 const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 1800); };
-const WHATSAPP = "2349126433425";
+let WHATSAPP = "2349126433425";
 let LGAS = {};
 fetch("lgas.json").then((r) => r.json()).then((d) => { LGAS = d; }).catch(() => {});
+// ---- visit tracking (anonymous: random visitor id, no personal data)
+const rid = () => Array.from(crypto.getRandomValues(new Uint8Array(8)), (x) => x.toString(16).padStart(2, "0")).join("");
+const store = (k, area, make) => { try { let v = area.getItem(k); if (!v) { v = make(); area.setItem(k, v); } return v; } catch { return make(); } };
+const VID = store("au_vid", window.localStorage, rid), SID = store("au_sid", window.sessionStorage, rid);
+const UTM = new URLSearchParams(location.search).get("utm_source") || new URLSearchParams(location.search).get("fbclid") && "facebook" || "";
+const SRC = (() => { const r = document.referrer || ""; if (UTM) return UTM; if (!r) return "direct"; try { const h = new URL(r).hostname; return /facebook|fb\./.test(h) ? "facebook" : /instagram/.test(h) ? "instagram" : /whatsapp|wa\.me/.test(h) ? "whatsapp" : /tiktok/.test(h) ? "tiktok" : /google/.test(h) ? "google" : h; } catch { return "direct"; } })();
+function sendJSON(url, body) { const s = JSON.stringify(body); try { if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([s], { type: "application/json" }))) return; } catch {} fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: s, keepalive: true }).catch(() => {}); }
+function track(type, data) { sendJSON("/api/event", { type, path: location.pathname + location.hash, referrer: document.referrer, utm: UTM, visitor: VID, session: SID, data }); }
+track("page_view", null);
+document.addEventListener("click", (e) => { const a = e.target.closest("a[href]"); if (!a) return; const h = a.getAttribute("href"); if (/wa\.me/.test(h)) track("click_whatsapp", { href: h.slice(0, 80) }); else if (/instagram|tiktok|facebook|google\.com\/maps/.test(h)) track("click_social", { href: h.slice(0, 80) }); });
 
 // Prices are per dozen. "big" is the bag or carton, which gets the bulk price.
 const PRODUCTS = [
@@ -353,7 +363,9 @@ const PRODUCTS = [
     views: [["head","On block"],["howto","How to make a wig"],["pack","Pack"]], img: (c, v) => `img/p/making-cap-stretch-mesh${v === "head" ? "-3d" : v === "howto" ? "-howto" : ""}.jpg` },
 ];
 const bigPrice = (p) => p.bulk * p.bigDz;
-const bigOK = (p, colour) => !p.bigColours || p.bigColours.includes(colour);
+const bigOK = (p, colour) => p.avail ? !!(p.avail[colour] && p.avail[colour].big) : (!p.bigColours || p.bigColours.includes(colour));
+const dozenOK = (p, colour) => !p.bigOnly && (p.avail ? !!(p.avail[colour] && p.avail[colour].dozen) : true);
+const anyOK = (p, colour) => bigOK(p, colour) || dozenOK(p, colour);
 const maxQty = (p, id) => { if (!p.stock) return 999; const inCart = cart.filter((i) => i.id === id).reduce((a, i) => a + i.qty, 0); return Math.max(0, p.stock - inCart); };
 const cap = (w) => w[0].toUpperCase() + w.slice(1);
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : w === "dozen" ? "" : "s"}`;
@@ -371,22 +383,23 @@ function cardHTML(p) {
       ${p.views.length > 1 ? `<div class="view-tog" role="group" aria-label="Photo">${p.views.map(([k, l]) => `<button type="button" data-view="${k}" aria-pressed="${s.view === k || (k === "front" && s.view === "angle")}">${l}</button>`).join("")}</div>` : ""}</div>
     <div class="bd">
       <div><h3>${esc(p.name)}</h3><p class="tg">${esc(p.tagline)}</p></div>
-      ${p.colours.length > 1 ? `<div><div class="lbl" style="margin-bottom:8px">Colour · <span class="sw-name">${esc(col[1])}</span></div><div class="swatches">${p.colours.map((c) => `<button type="button" class="sw" data-c="${c[0]}" style="background:${c[2]}" aria-label="${esc(c[1])}" aria-pressed="${c[0] === s.colour}"></button>`).join("")}</div></div>` : p.bigOnly ? "" : `<div class="lbl">Colour · <span class="sw-name">Black only</span></div>`}
+      ${p.colours.length > 1 ? `<div><div class="lbl" style="margin-bottom:8px">Colour · <span class="sw-name">${esc(col[1])}</span></div><div class="swatches">${p.colours.map((c) => `<button type="button" class="sw" data-c="${c[0]}" style="background:${c[2]}" aria-label="${esc(c[1])}${anyOK(p, c[0]) ? "" : " (out of stock)"}" aria-pressed="${c[0] === s.colour}"${anyOK(p, c[0]) ? "" : " data-oos"}></button>`).join("")}</div></div>` : p.bigOnly ? "" : `<div class="lbl">Colour · <span class="sw-name">Black only</span></div>`}
       <div><div class="lbl" style="margin-bottom:8px">Buy by</div>
-      <div class="unitseg">${p.bigOnly ? "" : `<button type="button" data-unit="dozen" aria-pressed="${s.unit === "dozen"}">Dozen<b>${naira(p.dz)}</b>per dozen</button>`}
+      <div class="unitseg">${p.bigOnly ? "" : dozenOK(p, s.colour) ? `<button type="button" data-unit="dozen" aria-pressed="${s.unit === "dozen"}">Dozen<b>${naira(p.dz)}</b>per dozen</button>` : `<button type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed">Dozen<b>Out of stock</b>${p.colours.length > 1 ? "in " + esc(col[1]) : "right now"}</button>`}
         ${bigOK(p, s.colour) ? `<button type="button" data-unit="big" aria-pressed="${s.unit === "big"}"${p.bigOnly ? ' style="grid-column:1/-1"' : ""}>${cap(p.big)} · ${p.bigDz} dozen<b>${naira(bigPrice(p))}</b>per ${p.big} (${naira(p.bulk)}/dz)</button>` : `<button type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed">${cap(p.big)} · ${p.bigDz} dozen<b>Out of stock</b>in ${esc(col[1])}</button>`}</div>
-      ${bigOK(p, s.colour) ? "" : `<p class="tg" style="margin:8px 0 0;font-size:12.5px">Full bags are Black only right now. Want every colour? Get the <a href="#" data-mixed style="color:var(--plum);font-weight:700">Mixed Colour Bag</a>.</p>`}
-      ${p.stock ? `<p style="margin:8px 0 0;font-size:13px;font-weight:700;color:#B3202E">Only ${p.stock} bags left${maxQty(p, p.id) < p.stock ? (maxQty(p, p.id) === 0 ? " · all in your cart" : ` · ${maxQty(p, p.id)} more available`) : ""}</p>` : ""}</div>
+      ${bigOK(p, s.colour) || p.id !== "regular" ? "" : `<p class="tg" style="margin:8px 0 0;font-size:12.5px">Full bags in ${esc(col[1])} are out of stock right now. Want every colour? Get the <a href="#" data-mixed style="color:var(--plum);font-weight:700">Mixed Colour Bag</a>.</p>`}
+      ${p.stock ? `<p style="margin:8px 0 0;font-size:13px;font-weight:700;color:#B3202E">Only ${p.stock} ${p.big}${p.stock === 1 ? "" : "s"} left${maxQty(p, p.id) < p.stock ? (maxQty(p, p.id) === 0 ? " · all in your cart" : ` · ${maxQty(p, p.id)} more available`) : ""}</p>` : ""}</div>
       <div class="buyrow">
         <div class="qty"><button type="button" data-q="-1" aria-label="Fewer">−</button><input type="number" inputmode="numeric" min="1" max="999" value="${s.qty}" aria-label="How many ${unitName(p, s.unit)}s" data-qin><button type="button" data-q="1" aria-label="More">+</button></div>
         <div class="qty-l">${s.unit === "big" ? plural(s.qty, p.big) : "dozen"}${s.unit === "big" ? `<br>${(s.qty * p.bigDz).toLocaleString()} dozen in total` : ""}</div>
       </div>
       <div class="total-line"><span>${s.qty} × ${naira(price)}</span><b>${naira(price * s.qty)}</b></div>
-      <button type="button" class="btn btn-plum addbtn" data-add>Add to cart</button>
+      ${anyOK(p, s.colour) && !(p.stock && maxQty(p, p.id) <= 0 && s.unit === "big") ? `<button type="button" class="btn btn-plum addbtn" data-add>Add to cart</button>` : `<button type="button" class="btn btn-plum addbtn" disabled style="opacity:.5;cursor:not-allowed">${anyOK(p, s.colour) ? "All in your cart" : "Out of stock"}</button>`}
     </div></article>`;
 }
 function renderCard(id, focusQty) { const el = document.querySelector(`.card[data-id="${id}"]`); el.outerHTML = cardHTML(PRODUCTS.find((x) => x.id === id)); if (focusQty) { const i = document.querySelector(`.card[data-id="${id}"] [data-qin]`); i.focus(); i.setSelectionRange(99, 99); } }
-function renderGrid() { $("#grid").innerHTML = PRODUCTS.map(cardHTML).join(""); preload("regular"); }
+function renderGrid() { $("#grid").innerHTML = PRODUCTS.filter((p) => !p.hidden).map(cardHTML).join(""); preload("regular"); }
+function fixUnit(p, s) { if (s.unit === "big" && !bigOK(p, s.colour) && dozenOK(p, s.colour)) { s.unit = "dozen"; s.qty = 1; } else if (s.unit === "dozen" && !dozenOK(p, s.colour) && bigOK(p, s.colour)) { s.unit = "big"; s.qty = 1; } }
 function preload(id) { const p = PRODUCTS.find((x) => x.id === id); if (!p.turn) return; p.turn.forEach((v) => { const i = new Image(); i.src = p.img(state[id].colour, v); }); }
 // drag / swipe to turn the model
 let drag = null;
@@ -407,17 +420,18 @@ $("#grid").addEventListener("click", (e) => {
   const card = e.target.closest(".card"); if (!card) return;
   const id = card.dataset.id, p = PRODUCTS.find((x) => x.id === id), s = state[id];
   const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.c) { s.colour = b.dataset.c; if (s.unit === "big" && !bigOK(p, s.colour)) { s.unit = "dozen"; s.qty = 1; } renderCard(id); preload(id); }
+  if (b.dataset.c) { s.colour = b.dataset.c; fixUnit(p, s); renderCard(id); preload(id); track("select_colour", { id, colour: s.colour }); }
   else if (b.dataset.view) { s.view = b.dataset.view; renderCard(id); }
-  else if (b.dataset.unit) { if (s.unit !== b.dataset.unit) { s.unit = b.dataset.unit; s.qty = 1; } renderCard(id); }
+  else if (b.dataset.unit) { if (s.unit !== b.dataset.unit) { s.unit = b.dataset.unit; s.qty = 1; track("select_unit", { id, unit: s.unit }); } renderCard(id); }
   else if (b.dataset.q) { s.qty = Math.min(Math.max(1, maxQty(p, id)), Math.max(1, s.qty + Number(b.dataset.q))); renderCard(id); }
   else if (b.hasAttribute("data-add")) {
-    if (s.unit === "big" && !bigOK(p, s.colour)) return;
+    if (s.unit === "big" ? !bigOK(p, s.colour) : !dozenOK(p, s.colour)) return;
     if (p.stock) { const left = maxQty(p, id); if (left <= 0) { toast(`All ${p.stock} ${p.name}s are already in your cart`); return; } s.qty = Math.min(s.qty, left); }
     const ex = cart.find((i) => i.id === id && i.colour === s.colour && i.unit === s.unit);
     if (ex) ex.qty = Math.min(999, ex.qty + s.qty); else cart.push({ id, colour: s.colour, unit: s.unit, qty: s.qty });
     const col = p.colours.length > 1 ? p.colours.find((c) => c[0] === s.colour)[1] + " " : "";
     toast(`Added ${s.unit === "big" ? plural(s.qty, p.big) : s.qty + " dozen"} · ${col}${p.name}`);
+    track("add_to_cart", { id, colour: s.colour, unit: s.unit, qty: s.qty, value: unitPrice(p, s.unit) * s.qty });
     s.qty = 1; renderCard(id); updateBar(true);
   }
 });
@@ -486,19 +500,37 @@ $("#cSheet").addEventListener("submit", (e) => {
   if (form.address.trim().length < 5) return (err.textContent = "Enter your address.");
   err.textContent = "";
   const L = lines(), tot = L.reduce((a, l) => a + l.line, 0);
-  const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(waMessage(L, tot, form))}`;
+  const ref = "AU-" + Array.from(crypto.getRandomValues(new Uint8Array(5)), (x) => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[x % 32]).join("");
+  sendJSON("/api/order", { ref, visitor: VID, source: SRC, customer: { ...form }, items: L.map((l) => ({ id: l.p.id, name: l.p.name, colour: l.colour, colourName: l.col ? l.col[1] : "", unit: l.unit, unitName: unitName(l.p, l.unit), qty: l.qty, dozens: l.dz, price: l.price, line: l.line })) });
+  track("order_sent", { ref, value: tot, items: L.length });
+  const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Order ${ref}\n` + waMessage(L, tot, form))}`;
   const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
   toast("Opening WhatsApp with your order");
 });
 $("#cSheet").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b || b.type === "submit" && b.closest("form")) return;
   if (b.classList.contains("x") || b.hasAttribute("data-close")) return closeSheet();
-  if (b.dataset.rm) { cart.splice(Number(b.dataset.rm), 1); updateBar(); renderCart(); }
+  if (b.dataset.rm) { const it = cart[Number(b.dataset.rm)]; track("remove_from_cart", { id: it.id, colour: it.colour, unit: it.unit, qty: it.qty }); cart.splice(Number(b.dataset.rm), 1); updateBar(); renderCart(); }
   if (b.dataset.l) { const i = cart[Number(b.dataset.l)]; const ip = PRODUCTS.find((x) => x.id === i.id); const cap = ip.stock ? i.qty + maxQty(ip, i.id) : 999; i.qty = Math.min(cap, Math.max(1, i.qty + Number(b.dataset.d))); updateBar(); renderCart(); if (ip.stock) renderCard(i.id); }
 });
-const openCart = () => { renderCart(); openSheet(); };
+const openCart = () => { renderCart(); openSheet(); track("open_cart", { items: cart.length }); };
 $("#openCart").onclick = openCart; $("#barBtn").onclick = openCart; $("#scrim").onclick = closeSheet;
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
 renderGrid(); updateBar();
+// live catalog: prices, stock and availability set from the admin dashboard
+fetch("/api/catalog", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((c) => {
+  if (!c || !c.products) return;
+  for (const p of PRODUCTS) {
+    const cp = c.products[p.id]; if (!cp) continue;
+    p.hidden = !!cp.hidden; if (cp.dz != null) p.dz = cp.dz; if (cp.bulk != null) p.bulk = cp.bulk;
+    p.stock = cp.stockBig == null ? null : Number(cp.stockBig); p.avail = cp.colours || null;
+    fixUnit(p, state[p.id]);
+  }
+  if (c.store && c.store.whatsapp) WHATSAPP = String(c.store.whatsapp).replace(/\D/g, "");
+  const ann = c.store && c.store.announcement && String(c.store.announcement).trim();
+  if (ann) { const bar = document.createElement("div"); bar.className = "annbar"; bar.textContent = ann; document.body.prepend(bar); }
+  cart = cart.filter((i) => { const p = PRODUCTS.find((x) => x.id === i.id); return p && !p.hidden; });
+  renderGrid(); updateBar();
+}).catch(() => {});
 })();
 </script>

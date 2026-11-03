@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#410440">
+<title>AU Admin · Dashboard</title>
+<link rel="icon" href="img/au-icon-primary.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--plum:#410440;--orchid:#C73CC5;--ink:#A0229E;--soft:#E58BE3;--blush:#FFE7FF;--night:#24021F;--bg:#F7F1F7;--card:#fff;--line:#EADCEA;--muted:#7A6479;--text:#24021F;--ok:#1E9E5A;--warn:#C9851A;--bad:#C22F3B}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Poppins,system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--ink)}
+.top{position:sticky;top:0;z-index:20;background:var(--plum);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top))}
+.top img{height:30px}
+.top .sp{flex:1}
+.top select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:7px 10px}
+.top select option{color:#111}
+.tabs{display:flex;gap:4px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:50px;z-index:19;overflow-x:auto}
+.tabs button{border:0;background:none;padding:9px 14px;border-radius:999px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{background:var(--blush);color:var(--plum)}
+main{max-width:1180px;margin:0 auto;padding:16px 16px 120px}
+h2{font-size:20px;margin:6px 0 12px}
+h3{font-size:15px;margin:0 0 10px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:760px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:1fr 1fr 1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.kpi small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.kpi b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.hi{background:var(--plum);color:#fff;border-color:var(--plum)}.kpi.hi small,.kpi.hi span{color:#E9CFE8}
+.row{display:flex;align-items:center;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(110px,1.3fr) 1fr 56px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.bar i{display:block;height:10px;border-radius:6px;background:var(--orchid);min-width:2px}
+.bar .t{height:10px;background:#F3E6F3;border-radius:6px;overflow:hidden}
+.bar em{font-style:normal;text-align:right;font-weight:600}
+.lst{margin:0;padding:0;list-style:none}
+.lst li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F3E9F3;font-size:13px}
+.lst li:last-child{border:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;text-transform:capitalize}
+.s-new{background:#FFF2D9;color:#8A5A00}.s-confirmed{background:#E5EEFF;color:#1B3CC6}.s-paid{background:#DDF6E8;color:#147A43}.s-dispatched{background:#EFE4FF;color:#5B2BB5}.s-delivered{background:#D9F2EE;color:#0F6E61}.s-cancelled{background:#F5E1E3;color:#9B1E2A}
+.btn{border:0;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;background:var(--plum);color:#fff}
+.btn.o{background:#fff;color:var(--plum);border:1.5px solid var(--line)}
+.btn.g{background:#1DAA61}.btn.r{background:#fff;color:var(--bad);border:1.5px solid #F0C9CD}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chips button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:600;cursor:pointer;font-size:12.5px}
+.chips button[aria-pressed=true]{background:var(--plum);color:#fff;border-color:var(--plum)}
+input[type=text],input[type=number],input[type=password],input[type=tel],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+textarea{min-height:80px;resize:vertical}
+label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 4px}
+.order{display:grid;grid-template-columns:1fr auto;gap:4px 10px;cursor:pointer}
+.order:hover{border-color:var(--soft)}
+.order b{font-size:15px}
+.chart{width:100%;height:auto;display:block}
+.drawer{position:fixed;inset:0;z-index:50;display:none}
+.drawer.on{display:block}
+.drawer .sc{position:absolute;inset:0;background:rgba(36,2,31,.45)}
+.drawer .pn{position:absolute;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--bg);overflow:auto;padding:16px 16px 100px;box-shadow:-20px 0 40px rgba(0,0,0,.2)}
+.items{width:100%;border-collapse:collapse;font-size:13px}
+.items td,.items th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+.items th{color:var(--muted);font-size:11.5px;font-weight:600}
+.items td.n{text-align:right;font-variant-numeric:tabular-nums}
+.tog{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:600;user-select:none}
+.tog input{appearance:none;width:40px;height:23px;border-radius:999px;background:#E2D2E1;position:relative;margin:0;cursor:pointer;transition:.15s}
+.tog input::after{content:"";position:absolute;left:3px;top:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog input:checked{background:var(--ok)}.tog input:checked::after{left:20px}
+.cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.col{border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:8px}
+.col .nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.col .nm i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));display:none;gap:10px;align-items:center;box-shadow:0 -10px 30px rgba(65,4,64,.1)}
+.savebar.on{display:flex}
+.savebar .sp{flex:1;font-size:13px;color:var(--muted)}
+.audit{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.audit.dn{opacity:.55}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--night);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;z-index:60;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(120% 90% at 70% 10%,#62105F,#410440 50%,#24021F);padding:20px}
+.login .card{width:min(380px,100%);text-align:center;padding:28px}
+.login img{height:44px;margin-bottom:10px}
+.ev{font-size:12.5px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:7px 0;border-bottom:1px solid #F3E9F3;align-items:center}
+.ev .ty{font-weight:700;color:var(--plum)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th,.tbl td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th{color:var(--muted);font-weight:600;font-size:11.5px}
+.scroll{overflow-x:auto}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const naira = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
+const num = (n) => Number(n || 0).toLocaleString("en-NG");
+const when = (iso) => iso ? new Date(iso).toLocaleString("en-NG", { timeZone: "Africa/Lagos", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "";
+const ago = (iso) => { const s = (Date.now() - new Date(iso)) / 1000; if (s < 60) return "just now"; if (s < 3600) return Math.floor(s / 60) + "m ago"; if (s < 86400) return Math.floor(s / 3600) + "h ago"; return Math.floor(s / 86400) + "d ago"; };
+const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 2200); };
+const STATUSES = ["new", "confirmed", "paid", "dispatched", "delivered", "cancelled"];
+const COLOURS = [["black","Black","#161616"],["brown","Brown","#4A4033"],["dark-brown","Dark Brown","#3A2A1F"],["nude","Nude","#A98B6B"],["wine","Wine","#4E1C2E"],["red","Red","#B3202E"],["pink","Pink","#C3307F"],["purple","Purple","#3B1BA0"],["royal-blue","Royal Blue","#1B3CC6"],["sky-blue","Sky Blue","#4FA6E6"],["white","White","#ECEAE6"]];
+const PRODUCTS = { regular: { name: "Regular Wig Cap", big: "bag", bigDz: 100 }, mixed: { name: "Mixed Colour Bag", big: "bag", bigDz: 100 }, diy: { name: "DIY Mesh Dome Cap", big: "carton", bigDz: 50 }, stretch: { name: "Stretch Mesh Dome Cap", big: "carton", bigDz: 50 } };
+const EVLABEL = { page_view: "Visited", select_colour: "Picked colour", select_unit: "Switched unit", add_to_cart: "Added to cart", remove_from_cart: "Removed item", open_cart: "Opened cart", order_sent: "Sent order", click_whatsapp: "Tapped WhatsApp", click_social: "Tapped social link" };
+
+async function api(path, opt = {}) {
+  const r = await fetch("/api/admin/" + path, { credentials: "same-origin", headers: { "content-type": "application/json" }, ...opt, body: opt.body ? JSON.stringify(opt.body) : undefined });
+  if (r.status === 401 && path !== "login") { showLogin(); throw new Error("Not signed in"); }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || "Request failed");
+  return d;
+}
+
+// ---------- login ----------
+function showLogin(msg = "") {
+  $("#app").innerHTML = `<div class="login"><form class="card" id="lf"><img src="img/au-logo-primary.png" alt="AU Hair Accessories"><h2 style="margin:4px 0 4px">Admin dashboard</h2><p class="muted" style="margin:0 0 16px">Enter your admin password.</p>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="Password" autofocus><p id="le" style="color:var(--bad);min-height:18px;margin:8px 0">${esc(msg)}</p><button class="btn" style="width:100%">Sign in</button></form></div>`;
+  $("#lf").onsubmit = async (e) => { e.preventDefault(); try { await api("login", { method: "POST", body: { password: $("#pw").value } }); boot(); } catch (er) { $("#le").textContent = er.message; } };
+}
+
+// ---------- shell ----------
+const S = { tab: "overview", days: 30, status: "", q: "", catalog: null, draft: null, orders: [] };
+function shell() {
+  $("#app").innerHTML = `<div class="top"><img src="img/au-logo-reverse.png" alt="AU"><b style="font-size:13px;opacity:.85">Admin</b><span class="sp"></span>
+    <select id="days" aria-label="Date range"><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option></select></div>
+  <nav class="tabs" role="tablist">${[["overview","Overview"],["orders","Orders"],["products","Products & stock"],["visitors","Visitors"],["activity","Activity & undo"],["settings","Settings"]].map(([k,l]) => `<button role="tab" data-tab="${k}" aria-selected="${S.tab === k}">${l}</button>`).join("")}</nav>
+  <main id="main"></main><div class="savebar" id="savebar"></div>
+  <div class="drawer" id="drawer"><div class="sc" data-close></div><div class="pn" id="dpn"></div></div>`;
+  $("#days").value = String(S.days);
+  $("#days").onchange = () => { S.days = Number($("#days").value); render(); };
+  $$(".tabs button").forEach((b) => (b.onclick = () => { if (S.draft && S.tab === "products" && diffSummary(S.catalog, S.draft).length && !confirm("Discard unsaved product changes?")) return; S.draft = null; S.tab = b.dataset.tab; $$(".tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b))); render(); }));
+  $("#drawer").addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeDrawer(); });
+}
+function render() { $("#savebar").classList.remove("on"); $("#savebar").innerHTML = ""; ({ overview, orders, products, visitors, activity, settings })[S.tab](); }
+async function boot() { try { await api("me"); shell(); render(); } catch (e) { if (e.message !== "Not signed in") showLogin(e.message); } }
+
+// ---------- charts ----------
+function bars(rows, { label, value, fmt = num, max }) {
+  const m = max || Math.max(1, ...rows.map(value));
+  return rows.length ? rows.map((r) => `<div class="bar"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(label(r))}</span><span class="t"><i style="width:${(value(r) / m) * 100}%"></i></span><em>${fmt(value(r))}</em></div>`).join("") : `<p class="muted">No data yet.</p>`;
+}
+function dailyChart(daily, dailyOrders, days) {
+  const map = {}; const d0 = new Date(Date.now() + 3600e3); const keys = [];
+  for (let i = days - 1; i >= 0; i--) { const d = new Date(d0); d.setUTCDate(d.getUTCDate() - i); const k = d.toISOString().slice(0, 10); keys.push(k); map[k] = { v: 0, n: 0 }; }
+  daily.forEach((r) => { if (map[r.d]) map[r.d].v = r.v; }); dailyOrders.forEach((r) => { if (map[r.d]) map[r.d].n = r.n; });
+  const W = 700, H = 190, P = 26, mv = Math.max(1, ...keys.map((k) => map[k].v)), mo = Math.max(1, ...keys.map((k) => map[k].n));
+  const bw = (W - P * 2) / keys.length;
+  const barsSvg = keys.map((k, i) => { const h = (map[k].v / mv) * (H - 50); return `<rect x="${P + i * bw + bw * .15}" y="${H - 24 - h}" width="${Math.max(1, bw * .7)}" height="${h}" rx="2" fill="#E58BE3"><title>${k}: ${map[k].v} visitors, ${map[k].n} orders</title></rect>`; }).join("");
+  const pts = keys.map((k, i) => `${P + i * bw + bw / 2},${H - 24 - (map[k].n / mo) * (H - 50)}`).join(" ");
+  const step = Math.ceil(keys.length / 7);
+  const lbl = keys.map((k, i) => i % step === 0 ? `<text x="${P + i * bw + bw / 2}" y="${H - 6}" font-size="10" text-anchor="middle" fill="#7A6479">${k.slice(5)}</text>` : "").join("");
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily visitors and orders">${barsSvg}<polyline points="${pts}" fill="none" stroke="#410440" stroke-width="2.5"/>${keys.map((k, i) => map[k].n ? `<circle cx="${P + i * bw + bw / 2}" cy="${H - 24 - (map[k].n / mo) * (H - 50)}" r="3.5" fill="#410440"/>` : "").join("")}${lbl}</svg>
+  <div class="row muted" style="font-size:12px;gap:16px"><span><i style="display:inline-block;width:10px;height:10px;background:#E58BE3;border-radius:3px"></i> Visitors (max ${mv})</span><span><i style="display:inline-block;width:14px;height:3px;background:#410440;vertical-align:middle"></i> Orders (max ${mo})</span></div>`;
+}
+
+// ---------- overview ----------
+async function overview() {
+  const m = $("#main"); m.innerHTML = `<p class="muted">Loading…</p>`;
+  const d = await api("summary?days=" + S.days);
+  const f = Object.fromEntries(d.funnel.map((r) => [r.type, r]));
+  const v = d.visitors?.v || 0, ord = d.orders?.n || 0;
+  const paid = d.byStatus.filter((s) => ["paid", "dispatched", "delivered"].includes(s.status)).reduce((a, s) => a + s.v, 0);
+  const open = d.byStatus.filter((s) => ["new", "confirmed"].includes(s.status)).reduce((a, s) => a + s.v, 0);
+  const funnel = [["Visited the store", f.page_view?.v || 0], ["Picked a colour", f.select_colour?.v || 0], ["Added to cart", f.add_to_cart?.v || 0], ["Opened cart", f.open_cart?.v || 0], ["Sent order on WhatsApp", f.order_sent?.v || 0]];
+  const hours = Array.from({ length: 24 }, (_, h) => ({ h, v: (d.hours.find((x) => x.h === h) || {}).v || 0 }));
+  const label = S.days === 1 ? "today" : `last ${S.days} days`;
+  m.innerHTML = `
+  <div class="grid kpis">
+    <div class="card kpi"><small>Visitors · ${label}</small><b>${num(v)}</b><span>${num(d.today?.v)} today · ${num(d.visitors?.pv)} page views</span></div>
+    <div class="card kpi"><small>Added to cart</small><b>${num(f.add_to_cart?.v)}</b><span>${v ? Math.round(((f.add_to_cart?.v || 0) / v) * 100) : 0}% of visitors</span></div>
+    <div class="card kpi"><small>Orders sent</small><b>${num(ord)}</b><span>${v ? (ord / v * 100).toFixed(1) : 0}% of visitors ordered</span></div>
+    <div class="card kpi hi"><small>Order value</small><b>${naira(d.orders?.v)}</b><span>${naira(paid)} paid · ${naira(open)} open</span></div>
+  </div>
+  <div class="grid two" style="margin-top:12px">
+    <div class="card"><h3>Visitors and orders per day</h3>${dailyChart(d.daily, d.dailyOrders, Math.min(S.days === 1 ? 7 : S.days, 90))}</div>
+    <div class="card"><h3>From visit to order</h3>${bars(funnel, { label: (r) => r[0], value: (r) => r[1], max: Math.max(1, funnel[0][1]) })}<p class="hint">Unique visitors who reached each step.</p></div>
+  </div>
+  <div class="grid three" style="margin-top:12px">
+    <div class="card"><h3>Orders by status</h3>${bars(STATUSES.map((s) => d.byStatus.find((x) => x.status === s) || { status: s, n: 0, v: 0 }), { label: (r) => r.status, value: (r) => r.n })}</div>
+    <div class="card"><h3>Where visitors come from</h3>${bars(d.sources, { label: (r) => r.source, value: (r) => r.v })}</div>
+    <div class="card"><h3>Devices</h3>${bars(d.devices, { label: (r) => r.device || "unknown", value: (r) => r.v })}</div>
+    <div class="card"><h3>Orders by state</h3>${bars(d.states, { label: (r) => r.state, value: (r) => r.n })}</div>
+    <div class="card"><h3>Visitor cities</h3>${bars(d.cities, { label: (r) => `${r.city}${r.country && r.country !== "NG" ? " (" + r.country + ")" : ""}`, value: (r) => r.v })}</div>
+    <div class="card"><h3>Most added to cart</h3>${bars(d.topAdds, { label: (r) => `${PRODUCTS[r.pid]?.name || r.pid}${r.pid === "regular" ? " – " + (COLOURS.find((c) => c[0] === r.pcolour)?.[1] || r.pcolour) : ""} · ${r.punit === "big" ? PRODUCTS[r.pid]?.big || "bag" : "dozen"}`, value: (r) => r.n })}</div>
+  </div>
+  <div class="grid two" style="margin-top:12px">
+    <div class="card"><h3>Top ordered items</h3>${d.topOrdered.length ? `<ul class="lst">${d.topOrdered.map((r) => `<li><span>${esc(r.item)}<br><span class="muted">${num(r.dozens)} dozen · ${r.orders} order${r.orders === 1 ? "" : "s"}</span></span><b>${naira(r.value)}</b></li>`).join("")}</ul>` : `<p class="muted">No orders yet.</p>`}</div>
+    <div class="card"><h3>Busiest hours (Lagos time)</h3>${(() => { const mx = Math.max(1, ...hours.map((h) => h.v)); return `<svg class="chart" viewBox="0 0 480 130">${hours.map((h) => `<rect x="${h.h * 20 + 2}" y="${105 - (h.v / mx) * 95}" width="16" height="${(h.v / mx) * 95}" rx="2" fill="${h.v === mx && h.v ? "#410440" : "#E58BE3"}"><title>${h.h}:00 — ${h.v} visitors</title></rect>${h.h % 3 === 0 ? `<text x="${h.h * 20 + 10}" y="122" font-size="10" text-anchor="middle" fill="#7A6479">${h.h}</text>` : ""}`).join("")}</svg>`; })()}</div>
+  </div>
+  <div class="card" style="margin-top:12px"><div class="row"><h3 style="margin:0">Live activity</h3><span class="sp" style="flex:1"></span><button class="btn o" id="rf" style="padding:6px 12px">Refresh</button></div>
+    ${d.live.length ? d.live.map((e) => `<div class="ev"><span class="ty">${esc(EVLABEL[e.type] || e.type)}</span><span>${esc(evDetail(e))}<br><span class="muted">${esc([e.city, e.device, e.source].filter(Boolean).join(" · "))}</span></span><span class="muted">${ago(e.ts)}</span></div>`).join("") : `<p class="muted">No visits recorded yet. They'll appear here as people browse the store.</p>`}
+  </div>
+  <p class="hint">All time: ${num(d.allTime?.n)} orders worth ${naira(d.allTime?.v)}.</p>`;
+  $("#rf").onclick = overview;
+}
+function evDetail(e) {
+  let x = {}; try { x = JSON.parse(e.data || "{}") || {}; } catch {}
+  const p = PRODUCTS[x.id]?.name || "", c = COLOURS.find((k) => k[0] === x.colour)?.[1] || "";
+  if (e.type === "add_to_cart" || e.type === "remove_from_cart") return `${x.qty || ""} ${x.unit === "big" ? PRODUCTS[x.id]?.big || "bag" : "dozen"} · ${p}${c && x.id === "regular" ? " – " + c : ""}`;
+  if (e.type === "select_colour") return `${p} – ${c}`;
+  if (e.type === "order_sent") return `${x.ref || ""} · ${naira(x.value)}`;
+  if (e.type === "page_view") return e.source === "direct" ? "Opened the store" : `From ${e.source}`;
+  return x.href || "";
+}
+
+// ---------- orders ----------
+async function orders() {
+  const m = $("#main");
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0">Orders</h2><span style="flex:1"></span><button class="btn o" id="exp">Export CSV</button><button class="btn" id="add">+ Add order</button></div>
+  <div class="chips" style="margin-top:12px">${[["", "All"], ...STATUSES.map((s) => [s, s[0].toUpperCase() + s.slice(1)]), ["deleted", "Deleted"]].map(([k, l]) => `<button data-st="${k}" aria-pressed="${S.status === k}">${l}</button>`).join("")}</div>
+  <input type="text" id="q" placeholder="Search order no., name, phone, state…" value="${esc(S.q)}" style="margin-bottom:12px">
+  <div id="olist"><p class="muted">Loading…</p></div>`;
+  $$(".chips button", m).forEach((b) => (b.onclick = () => { S.status = b.dataset.st; orders(); }));
+  let t; $("#q").oninput = () => { clearTimeout(t); t = setTimeout(() => { S.q = $("#q").value; loadOrders(); }, 250); };
+  $("#exp").onclick = () => (location.href = "/api/admin/export/orders.csv");
+  $("#add").onclick = () => orderForm();
+  loadOrders();
+}
+async function loadOrders() {
+  const qs = new URLSearchParams(); if (S.status === "deleted") qs.set("deleted", "1"); else if (S.status) qs.set("status", S.status); if (S.q) qs.set("q", S.q);
+  const d = await api("orders?" + qs); S.orders = d.orders;
+  const total = d.orders.reduce((a, o) => a + (o.total || 0), 0);
+  $("#olist").innerHTML = d.orders.length ? `<p class="muted" style="margin:0 0 8px">${d.orders.length} order${d.orders.length === 1 ? "" : "s"} · ${naira(total)}</p><div class="grid">${d.orders.map((o) => `<div class="card order" data-ref="${o.ref}">
+      <div><b>${esc(o.name || "No name")}</b> <span class="muted">· ${esc(o.ref)}</span><br><span class="muted">${esc([o.state, o.lga].filter(Boolean).join(", "))} · ${when(o.created_at)}</span><br><span style="font-size:12.5px">${esc(o.items.map((i) => `${i.qty} ${i.unit === "big" ? i.unitName || "bag" : "dz"} ${i.name}${i.colourName && i.id === "regular" ? " (" + i.colourName + ")" : ""}`).join(" · "))}</span></div>
+      <div style="text-align:right"><b>${naira(o.total)}</b><br><span class="pill s-${o.status}">${o.status}</span></div></div>`).join("")}</div>` : `<div class="card empty">No orders here yet.</div>`;
+  $$("#olist .order").forEach((c) => (c.onclick = () => openOrder(c.dataset.ref)));
+}
+function waLink(phone) { let p = String(phone || "").replace(/\D/g, ""); if (p.startsWith("0")) p = "234" + p.slice(1); return `https://wa.me/${p}`; }
+function openDrawer(html) { $("#dpn").innerHTML = html; $("#drawer").classList.add("on"); document.body.style.overflow = "hidden"; }
+function closeDrawer() { $("#drawer").classList.remove("on"); document.body.style.overflow = ""; }
+function openOrder(ref) {
+  const o = S.orders.find((x) => x.ref === ref); if (!o) return;
+  openDrawer(`<div class="row"><button class="btn o" data-close style="padding:6px 12px">← Back</button><span style="flex:1"></span><span class="pill s-${o.status}">${o.status}</span></div>
+   <h2 style="margin:14px 0 2px">${esc(o.name || "No name")}</h2><p class="muted" style="margin:0">${esc(o.ref)} · ${when(o.created_at)} · from ${esc(o.source || "website")}</p>
+   <div class="card" style="margin-top:12px"><table class="items"><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Total</th></tr>
+     ${o.items.map((i) => `<tr><td>${esc(i.name)}${i.colourName && i.id === "regular" ? `<br><span class="muted">${esc(i.colourName)}</span>` : ""}</td><td class="n">${i.qty} ${i.unit === "big" ? esc(i.unitName || "bag") : "dz"}${i.dozens && i.unit === "big" ? `<br><span class="muted">${i.dozens} dz</span>` : ""}</td><td class="n">${naira(i.price)}</td><td class="n">${naira(i.line)}</td></tr>`).join("")}
+     <tr><td colspan="3"><b>Total</b> <span class="muted">(excluding logistics)</span></td><td class="n"><b>${naira(o.total)}</b></td></tr></table></div>
+   <div class="card" style="margin-top:12px"><h3>Customer</h3><ul class="lst">
+     <li><span class="muted">Phone</span><span>${esc(o.phone || "—")}</span></li><li><span class="muted">State</span><span>${esc(o.state || "—")}</span></li><li><span class="muted">LGA</span><span>${esc(o.lga || "—")}</span></li>
+     ${o.park ? `<li><span class="muted">Waybill park</span><span>${esc(o.park)}</span></li>` : ""}<li><span class="muted">Address</span><span style="text-align:right">${esc(o.address || "—")}</span></li></ul>
+     ${o.phone ? `<div class="row" style="margin-top:10px"><a class="btn g" style="text-decoration:none;flex:1;text-align:center" href="${waLink(o.phone)}" target="_blank" rel="noopener">Chat on WhatsApp</a><a class="btn o" style="text-decoration:none;flex:1;text-align:center" href="tel:${esc(o.phone)}">Call</a></div>` : ""}</div>
+   <div class="card" style="margin-top:12px"><h3>Status</h3><div class="chips">${STATUSES.map((s) => `<button data-set="${s}" aria-pressed="${o.status === s}">${s[0].toUpperCase() + s.slice(1)}</button>`).join("")}</div>
+     <label class="f" for="nt">Notes (only you see these)</label><textarea id="nt" placeholder="e.g. Paid ₦145,000 by transfer, logistics ₦5,000">${esc(o.notes || "")}</textarea>
+     <div class="row" style="margin-top:10px"><button class="btn" id="svn">Save notes</button><span style="flex:1"></span>${o.deleted ? `<button class="btn o" id="rst">Restore order</button>` : `<button class="btn r" id="del">Delete order</button>`}</div></div>`);
+  $$("[data-set]", $("#dpn")).forEach((b) => (b.onclick = () => patchOrder(o.ref, { status: b.dataset.set }, `Marked ${o.ref} as ${b.dataset.set}`)));
+  $("#svn").onclick = () => patchOrder(o.ref, { notes: $("#nt").value }, "Notes saved");
+  $("#del") && ($("#del").onclick = () => { if (confirm(`Delete order ${o.ref}? You can restore it or undo this later.`)) patchOrder(o.ref, { deleted: true }, "Order deleted", true); });
+  $("#rst") && ($("#rst").onclick = () => patchOrder(o.ref, { deleted: false }, "Order restored", true));
+}
+async function patchOrder(ref, body, msg, close) {
+  try { const d = await api("orders/" + ref, { method: "PATCH", body }); const i = S.orders.findIndex((x) => x.ref === ref); if (i >= 0) S.orders[i] = d.order; toast(msg + " · undo in Activity"); if (close) { closeDrawer(); loadOrders(); } else { openOrder(ref); loadOrders(); } } catch (e) { toast(e.message); }
+}
+function orderForm() {
+  const opts = Object.entries(PRODUCTS).map(([k, p]) => `<option value="${k}">${p.name}</option>`).join("");
+  openDrawer(`<div class="row"><button class="btn o" data-close style="padding:6px 12px">← Back</button></div><h2 style="margin:14px 0 4px">Add an order</h2><p class="muted" style="margin:0 0 10px">For orders that came in by WhatsApp, phone or walk-in, so all your sales are in one place.</p>
+  <div class="card"><label class="f">Customer name</label><input type="text" id="o-name"><label class="f">Phone</label><input type="tel" id="o-phone">
+  <div class="grid two"><div><label class="f">State</label><input type="text" id="o-state"></div><div><label class="f">LGA</label><input type="text" id="o-lga"></div></div>
+  <label class="f">Address / waybill park</label><input type="text" id="o-address">
+  <label class="f">Source</label><select id="o-source"><option>whatsapp</option><option>walk-in</option><option>phone</option><option>instagram</option><option>facebook</option><option>other</option></select></div>
+  <div class="card" style="margin-top:12px"><h3>Items</h3><div id="o-items"></div><button class="btn o" id="o-addi" style="margin-top:8px">+ Add item</button><p id="o-tot" style="font-weight:800;margin:12px 0 0"></p></div>
+  <div class="card" style="margin-top:12px"><label class="f">Status</label><select id="o-status">${STATUSES.map((s) => `<option>${s}</option>`).join("")}</select><label class="f">Notes</label><textarea id="o-notes"></textarea></div>
+  <button class="btn" id="o-save" style="width:100%;margin-top:12px">Save order</button>`);
+  const row = () => { const d = document.createElement("div"); d.className = "card"; d.style.cssText = "padding:10px;margin-bottom:8px;display:grid;gap:6px;grid-template-columns:1fr 1fr";
+    d.innerHTML = `<select class="i-p" style="grid-column:1/-1">${opts}</select><select class="i-c">${COLOURS.map((c) => `<option value="${c[0]}">${c[1]}</option>`).join("")}<option value="mixed">Mixed (10 colours)</option></select><select class="i-u"><option value="dozen">Dozen</option><option value="big">Bag / carton</option></select><input type="number" class="i-q" min="1" value="1" placeholder="Qty"><input type="number" class="i-pr" min="0" placeholder="Price each (₦)">`;
+    $("#o-items").appendChild(d); d.oninput = tot; d.onchange = tot; };
+  const items = () => $$("#o-items > div").map((d) => { const id = $(".i-p", d).value, unit = $(".i-u", d).value, qty = Number($(".i-q", d).value) || 1, price = Number($(".i-pr", d).value) || 0, c = $(".i-c", d).value;
+    return { id, name: PRODUCTS[id].name, colour: c, colourName: (COLOURS.find((x) => x[0] === c) || [, "Mixed"])[1], unit, unitName: unit === "big" ? PRODUCTS[id].big : "dozen", qty, price, line: qty * price, dozens: unit === "big" ? qty * PRODUCTS[id].bigDz : qty }; });
+  const tot = () => ($("#o-tot").textContent = "Total: " + naira(items().reduce((a, i) => a + i.line, 0)));
+  row(); tot(); $("#o-addi").onclick = row;
+  $("#o-save").onclick = async () => { try { const b = { name: $("#o-name").value, phone: $("#o-phone").value, state: $("#o-state").value, lga: $("#o-lga").value, address: $("#o-address").value, source: $("#o-source").value, status: $("#o-status").value, notes: $("#o-notes").value, items: items() };
+    if (!b.items.length) return toast("Add at least one item"); await api("orders", { method: "POST", body: b }); toast("Order added"); closeDrawer(); loadOrders(); } catch (e) { toast(e.message); } };
+}
+
+// ---------- products & stock ----------
+async function products() {
+  const m = $("#main"); m.innerHTML = `<p class="muted">Loading…</p>`;
+  S.catalog = await api("catalog"); S.draft = JSON.parse(JSON.stringify(S.catalog));
+  drawProducts();
+}
+function drawProducts() {
+  const c = S.draft, m = $("#main");
+  m.innerHTML = `<h2>Products &amp; stock</h2><p class="muted" style="margin:-6px 0 12px">Changes go live on the store as soon as you save. Every save can be undone from Activity.</p>
+  ${Object.entries(PRODUCTS).map(([id, P]) => { const p = c.products[id]; const cols = id === "regular" ? COLOURS : id === "mixed" ? [["mixed", "10 colours", "conic-gradient(#4E1C2E,#B3202E,#C3307F,#3B1BA0,#1B3CC6,#4FA6E6,#ECEAE6,#A98B6B,#4A4033,#3A2A1F)"]] : [["black", "Black", "#161616"]];
+    return `<div class="card" style="margin-bottom:12px" data-p="${id}">
+    <div class="row" style="flex-wrap:wrap"><h3 style="margin:0;flex:1">${P.name}</h3><label class="tog"><input type="checkbox" data-k="visible" ${p.hidden ? "" : "checked"}>Show on store</label></div>
+    <div class="grid three" style="margin-top:8px">
+      ${id === "mixed" ? "" : `<div><label class="f">Price per dozen (₦)</label><input type="number" min="0" data-k="dz" value="${p.dz ?? ""}"></div>`}
+      <div><label class="f">${P.big[0].toUpperCase() + P.big.slice(1)} price per dozen (₦)</label><input type="number" min="0" data-k="bulk" value="${p.bulk ?? ""}"><p class="hint">= ${naira((p.bulk || 0) * P.bigDz)} per ${P.big} of ${P.bigDz} dozen</p></div>
+      <div><label class="f">${P.big[0].toUpperCase() + P.big.slice(1)}s left (blank = no limit)</label><input type="number" min="0" data-k="stockBig" value="${p.stockBig ?? ""}" placeholder="No limit"><p class="hint">Shows "Only X left" and stops orders above it.</p></div>
+    </div>
+    <div class="cols">${cols.map(([k, n, h]) => { const a = p.colours[k] || { dozen: false, big: false }; return `<div class="col" data-c="${k}"><span class="nm"><i style="background:${h}"></i>${n}</span>
+      ${id === "mixed" ? "" : `<label class="tog"><input type="checkbox" data-a="dozen" ${a.dozen ? "checked" : ""}>Dozen</label>`}<label class="tog"><input type="checkbox" data-a="big" ${a.big ? "checked" : ""}>${P.big[0].toUpperCase() + P.big.slice(1)}</label></div>`; }).join("")}</div>
+    ${id === "regular" ? `<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:6px"><button class="btn o" data-all="dozen:1" style="padding:6px 10px;font-size:12px">All dozens on</button><button class="btn o" data-all="dozen:0" style="padding:6px 10px;font-size:12px">All dozens off</button><button class="btn o" data-all="big:1" style="padding:6px 10px;font-size:12px">All bags on</button><button class="btn o" data-all="big:0" style="padding:6px 10px;font-size:12px">All bags off</button></div>` : ""}
+    </div>`; }).join("")}`;
+  m.oninput = m.onchange = (e) => {
+    const card = e.target.closest("[data-p]"); if (!card) return; const p = S.draft.products[card.dataset.p];
+    if (e.target.dataset.k === "visible") p.hidden = !e.target.checked;
+    else if (e.target.dataset.k) { const v = e.target.value.trim(); p[e.target.dataset.k] = v === "" ? null : Math.max(0, Number(v)); if (e.target.dataset.k === "bulk") e.target.nextElementSibling.textContent = `= ${naira((p.bulk || 0) * PRODUCTS[card.dataset.p].bigDz)} per ${PRODUCTS[card.dataset.p].big} of ${PRODUCTS[card.dataset.p].bigDz} dozen`; }
+    else if (e.target.dataset.a) { const k = e.target.closest("[data-c]").dataset.c; p.colours[k] = { ...(p.colours[k] || {}), [e.target.dataset.a]: e.target.checked }; }
+    dirty();
+  };
+  $$("[data-all]", m).forEach((b) => (b.onclick = () => { const [k, v] = b.dataset.all.split(":"); const p = S.draft.products.regular; for (const c of COLOURS) p.colours[c[0]] = { ...(p.colours[c[0]] || {}), [k]: v === "1" }; drawProducts(); dirty(); }));
+  dirty();
+}
+function diffSummary(a, b) {
+  const out = [];
+  for (const [id, P] of Object.entries(PRODUCTS)) { const x = a.products[id], y = b.products[id];
+    if (x.hidden !== y.hidden) out.push(`${P.name} ${y.hidden ? "hidden" : "shown"}`);
+    for (const k of ["dz", "bulk", "stockBig"]) if (x[k] !== y[k]) out.push(`${P.name} ${k === "dz" ? "dozen price" : k === "bulk" ? P.big + " price" : P.big + "s left"} ${x[k] ?? "none"} → ${y[k] ?? "none"}`);
+    for (const ck of Object.keys(y.colours)) for (const u of ["dozen", "big"]) if (!!(x.colours[ck] || {})[u] !== !!y.colours[ck][u]) out.push(`${P.name}${id === "regular" ? " " + (COLOURS.find((c) => c[0] === ck) || [, ck])[1] : ""} ${u === "big" ? P.big : "dozen"} ${y.colours[ck][u] ? "in stock" : "out of stock"}`);
+  }
+  return out;
+}
+function dirty() {
+  const d = diffSummary(S.catalog, S.draft), bar = $("#savebar");
+  if (!d.length) return bar.classList.remove("on");
+  if (!$("#sav", bar)) {
+    bar.innerHTML = `<span class="sp" id="sdesc"></span><button class="btn o" id="dsc">Discard</button><button class="btn" id="sav">Save &amp; publish</button>`;
+    $("#dsc").onclick = () => { S.draft = JSON.parse(JSON.stringify(S.catalog)); drawProducts(); };
+    $("#sav").onclick = async () => { const dd = diffSummary(S.catalog, S.draft); if (!dd.length) return; $("#sav").disabled = true;
+      try { const r = await api("catalog", { method: "PUT", body: { catalog: S.draft, summary: dd.join("; ").slice(0, 300) } }); S.catalog = r.catalog; S.draft = JSON.parse(JSON.stringify(r.catalog)); drawProducts(); toast("Saved · live on the store now"); }
+      catch (e) { toast(e.message); } finally { const sb = $("#sav"); if (sb) sb.disabled = false; } };
+  }
+  $("#sdesc").textContent = `${d.length} change${d.length === 1 ? "" : "s"}: ${d.slice(0, 3).join("; ")}${d.length > 3 ? "…" : ""}`;
+  bar.classList.add("on");
+}
+
+// ---------- visitors ----------
+async function visitors() {
+  const m = $("#main");
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0">Visitor activity</h2><span style="flex:1"></span><button class="btn o" id="exe">Export CSV</button></div>
+  <div class="chips" style="margin-top:12px">${[["", "Everything"], ...Object.entries(EVLABEL)].map(([k, l]) => `<button data-t="${k}" aria-pressed="${(S.evt || "") === k}">${l}</button>`).join("")}</div>
+  <div class="card scroll" id="evs"><p class="muted">Loading…</p></div>`;
+  $$(".chips button", m).forEach((b) => (b.onclick = () => { S.evt = b.dataset.t; visitors(); }));
+  $("#exe").onclick = () => (location.href = "/api/admin/export/events.csv");
+  const d = await api("events?limit=300" + (S.evt ? "&type=" + S.evt : ""));
+  $("#evs").innerHTML = d.events.length ? `<table class="tbl"><tr><th>When</th><th>What</th><th>Detail</th><th>Source</th><th>Location</th><th>Device</th><th>Visitor</th></tr>${d.events.map((e) => `<tr><td>${when(e.ts)}</td><td><b>${esc(EVLABEL[e.type] || e.type)}</b></td><td>${esc(evDetail(e))}</td><td>${esc(e.source || "")}</td><td>${esc([e.city, e.region, e.country].filter(Boolean).join(", "))}</td><td>${esc(e.device || "")}</td><td class="muted">${esc((e.visitor || "").slice(0, 6))}</td></tr>`).join("")}</table>` : `<p class="empty">No visitor activity yet.</p>`;
+}
+
+// ---------- activity & undo ----------
+async function activity() {
+  const m = $("#main"); m.innerHTML = `<h2>Activity &amp; undo</h2><p class="muted" style="margin:-6px 0 12px">Every change made in this dashboard. Undo puts things back exactly as they were before that change. You can also undo an undo.</p><div id="al"><p class="muted">Loading…</p></div>`;
+  const d = await api("audit");
+  $("#al").innerHTML = d.audit.length ? `<div class="grid">${d.audit.map((a) => `<div class="card audit ${a.undone ? "dn" : ""}"><div><b>${esc(a.summary || a.action)}</b><br><span class="muted">${when(a.ts)} · ${esc(a.entity)}${a.undone ? " · undone" : ""}${a.action === "undo" ? " · undo" : ""}</span></div>
+    <button class="btn o" data-u="${a.id}" ${a.undone ? "disabled" : ""}>Undo</button></div>`).join("")}</div>` : `<div class="card empty">No changes yet.</div>`;
+  $$("[data-u]", m).forEach((b) => (b.onclick = async () => { if (!confirm("Undo this change?")) return; try { await api(`audit/${b.dataset.u}/undo`, { method: "POST" }); toast("Undone"); activity(); } catch (e) { toast(e.message); } }));
+}
+
+// ---------- settings ----------
+async function settings() {
+  const m = $("#main"); m.innerHTML = `<p class="muted">Loading…</p>`;
+  const c = await api("catalog"); S.catalog = c;
+  m.innerHTML = `<h2>Settings</h2>
+  <div class="card"><h3>Announcement bar</h3><p class="muted" style="margin:-4px 0 8px">A short message across the top of the store. Leave empty to hide it.</p>
+    <input type="text" id="ann" maxlength="140" placeholder="e.g. Colours are back in stock! Order by the bag today." value="${esc(c.store.announcement || "")}">
+    <label class="f">Orders WhatsApp number (international format, digits only)</label><input type="tel" id="wa" value="${esc(c.store.whatsapp || "")}">
+    <button class="btn" id="sst" style="margin-top:12px">Save &amp; publish</button></div>
+  <div class="card" style="margin-top:12px"><h3>Links</h3><ul class="lst"><li><span>Store</span><a href="/" target="_blank">auhairaccessories.com</a></li><li><span>Orders export</span><a href="/api/admin/export/orders.csv">Download CSV</a></li><li><span>Visitor export</span><a href="/api/admin/export/events.csv">Download CSV</a></li></ul></div>
+  <div class="card" style="margin-top:12px"><h3>Account</h3><button class="btn r" id="out">Sign out</button></div>`;
+  $("#sst").onclick = async () => { const next = JSON.parse(JSON.stringify(c)); next.store.announcement = $("#ann").value.trim(); next.store.whatsapp = $("#wa").value.replace(/\D/g, "");
+    if (next.store.whatsapp.length < 10) return toast("Check the WhatsApp number");
+    const ch = []; if (next.store.announcement !== (c.store.announcement || "")) ch.push(next.store.announcement ? `Announcement: "${next.store.announcement}"` : "Announcement removed"); if (next.store.whatsapp !== c.store.whatsapp) ch.push(`WhatsApp number → ${next.store.whatsapp}`);
+    if (!ch.length) return toast("Nothing changed");
+    try { await api("catalog", { method: "PUT", body: { catalog: next, summary: ch.join("; ") } }); toast("Saved · live on the store now"); settings(); } catch (e) { toast(e.message); } };
+  $("#out").onclick = async () => { await api("logout", { method: "POST" }).catch(() => {}); showLogin(); };
+}
+
+boot();
+})();
+</script>
+</body>
+</html>
