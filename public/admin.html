@@ -381,6 +381,12 @@ async function settings() {
     <input type="text" id="ann" maxlength="140" placeholder="e.g. Colours are back in stock! Order by the bag today." value="${esc(c.store.announcement || "")}">
     <label class="f">Orders WhatsApp number (international format, digits only)</label><input type="tel" id="wa" value="${esc(c.store.whatsapp || "")}">
     <button class="btn" id="sst" style="margin-top:12px">Save &amp; publish</button></div>
+  <div class="card" style="margin-top:12px"><h3>Ads tracking (pixels)</h3><p class="muted" style="margin:-4px 0 8px">Paste your Pixel IDs so Facebook, Instagram and TikTok ads can see who visits, adds to cart and sends orders. Leave empty to switch a pixel off.</p>
+    <label class="f">Meta Pixel ID (Facebook &amp; Instagram)</label><input type="text" inputmode="numeric" id="mpx" placeholder="e.g. 1234567890123456" value="${esc(c.store.metaPixel || "")}">
+    <p class="hint">Meta Events Manager → Data sources → your pixel → the number under its name.</p>
+    <label class="f">TikTok Pixel ID (optional)</label><input type="text" id="tpx" placeholder="e.g. CABC123DEF456GHI789" value="${esc(c.store.tiktokPixel || "")}">
+    <p class="hint">Events sent: page view, product view (colour picked), add to cart, checkout started (cart opened), lead (order sent on WhatsApp), contact (WhatsApp tapped).</p>
+    <button class="btn" id="spx" style="margin-top:12px">Save &amp; publish</button></div>
   <div class="card" style="margin-top:12px"><h3>Links</h3><ul class="lst"><li><span>Store</span><a href="/" target="_blank">auhairaccessories.com</a></li><li><span>Orders export</span><a href="/api/admin/export/orders.csv">Download CSV</a></li><li><span>Visitor export</span><a href="/api/admin/export/events.csv">Download CSV</a></li></ul></div>
   <div class="card" style="margin-top:12px"><h3>Account</h3><button class="btn r" id="out">Sign out</button></div>`;
   $("#sst").onclick = async () => { const next = JSON.parse(JSON.stringify(c)); next.store.announcement = $("#ann").value.trim(); next.store.whatsapp = $("#wa").value.replace(/\D/g, "");
@@ -388,6 +394,13 @@ async function settings() {
     const ch = []; if (next.store.announcement !== (c.store.announcement || "")) ch.push(next.store.announcement ? `Announcement: "${next.store.announcement}"` : "Announcement removed"); if (next.store.whatsapp !== c.store.whatsapp) ch.push(`WhatsApp number → ${next.store.whatsapp}`);
     if (!ch.length) return toast("Nothing changed");
     try { await api("catalog", { method: "PUT", body: { catalog: next, summary: ch.join("; ") } }); toast("Saved · live on the store now"); settings(); } catch (e) { toast(e.message); } };
+  $("#spx").onclick = async () => { const next = JSON.parse(JSON.stringify(c)); const m = $("#mpx").value.replace(/\s/g, ""), t = $("#tpx").value.trim().toUpperCase();
+    if (m && !/^\d{8,20}$/.test(m)) return toast("Meta Pixel ID should be numbers only");
+    if (t && !/^[A-Z0-9]{10,30}$/.test(t)) return toast("Check the TikTok Pixel ID");
+    next.store.metaPixel = m; next.store.tiktokPixel = t;
+    const ch = []; if (m !== (c.store.metaPixel || "")) ch.push(m ? `Meta Pixel set to ${m}` : "Meta Pixel removed"); if (t !== (c.store.tiktokPixel || "")) ch.push(t ? `TikTok Pixel set to ${t}` : "TikTok Pixel removed");
+    if (!ch.length) return toast("Nothing changed");
+    try { await api("catalog", { method: "PUT", body: { catalog: next, summary: ch.join("; ") } }); toast("Saved · pixel live on the store"); settings(); } catch (e) { toast(e.message); } };
   $("#out").onclick = async () => { await api("logout", { method: "POST" }).catch(() => {}); showLogin(); };
 }
 

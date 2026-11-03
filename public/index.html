@@ -344,7 +344,29 @@ const VID = store("au_vid", window.localStorage, rid), SID = store("au_sid", win
 const UTM = new URLSearchParams(location.search).get("utm_source") || new URLSearchParams(location.search).get("fbclid") && "facebook" || "";
 const SRC = (() => { const r = document.referrer || ""; if (UTM) return UTM; if (!r) return "direct"; try { const h = new URL(r).hostname; return /facebook|fb\./.test(h) ? "facebook" : /instagram/.test(h) ? "instagram" : /whatsapp|wa\.me/.test(h) ? "whatsapp" : /tiktok/.test(h) ? "tiktok" : /google/.test(h) ? "google" : h; } catch { return "direct"; } })();
 function sendJSON(url, body) { const s = JSON.stringify(body); try { if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([s], { type: "application/json" }))) return; } catch {} fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: s, keepalive: true }).catch(() => {}); }
-function track(type, data) { sendJSON("/api/event", { type, path: location.pathname + location.hash, referrer: document.referrer, utm: UTM, visitor: VID, session: SID, data }); }
+const PX = { meta: false, tt: false, q: [] };
+function adEvent(type, data) {
+  if (!PX.meta && !PX.tt) { if (PX.q.length < 30) PX.q.push([type, data]); return; }
+  const d = data || {}, val = Number(d.value) || 0, cid = d.id ? [d.id + (d.colour ? "-" + d.colour : "")] : undefined;
+  const base = { currency: "NGN", ...(val ? { value: val } : {}), ...(cid ? { content_ids: cid, content_type: "product" } : {}) };
+  const meta = { select_colour: ["ViewContent", base], add_to_cart: ["AddToCart", base], open_cart: ["InitiateCheckout", { currency: "NGN" }], order_sent: ["Lead", { currency: "NGN", value: val }], click_whatsapp: ["Contact", {}] }[type];
+  if (PX.meta && meta && window.fbq) window.fbq("track", meta[0], meta[1], d.ref ? { eventID: d.ref } : undefined);
+  const tt = { select_colour: "ViewContent", add_to_cart: "AddToCart", open_cart: "InitiateCheckout", order_sent: "SubmitForm", click_whatsapp: "Contact" }[type];
+  if (PX.tt && tt && window.ttq) window.ttq.track(tt, { currency: "NGN", ...(val ? { value: val } : {}), ...(cid ? { content_id: cid[0], content_type: "product" } : {}) });
+}
+function loadPixels(store) {
+  const m = String(store.metaPixel || "").trim(), t = String(store.tiktokPixel || "").trim();
+  if (/^\d{8,20}$/.test(m)) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+    window.fbq("init", m); window.fbq("track", "PageView"); PX.meta = true;
+  }
+  if (/^[A-Z0-9]{10,30}$/i.test(t)) {
+    !function(w,d,n){w.TiktokAnalyticsObject=n;var q=w[n]=w[n]||[];q.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];q.setAndDefer=function(o,e){o[e]=function(){o.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<q.methods.length;i++)q.setAndDefer(q,q.methods[i]);q.instance=function(x){for(var e=q._i[x]||[],k=0;k<q.methods.length;k++)q.setAndDefer(e,q.methods[k]);return e};q.load=function(e,o){var r="https://analytics.tiktok.com/i18n/pixel/events.js";q._i=q._i||{};q._i[e]=[];q._i[e]._u=r;q._t=q._t||{};q._t[e]=+new Date;q._o=q._o||{};q._o[e]=o||{};var s=d.createElement("script");s.type="text/javascript";s.async=!0;s.src=r+"?sdkid="+e+"&lib="+n;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(s,a)};q.load(t);q.page()}(window,document,"ttq");
+    PX.tt = true;
+  }
+  const pend = PX.q.splice(0); if (PX.meta || PX.tt) pend.forEach(([ty, da]) => adEvent(ty, da));
+}
+function track(type, data) { sendJSON("/api/event", { type, path: location.pathname + location.hash, referrer: document.referrer, utm: UTM, visitor: VID, session: SID, data }); adEvent(type, data); }
 track("page_view", null);
 document.addEventListener("click", (e) => { const a = e.target.closest("a[href]"); if (!a) return; const h = a.getAttribute("href"); if (/wa\.me/.test(h)) track("click_whatsapp", { href: h.slice(0, 80) }); else if (/instagram|tiktok|facebook|google\.com\/maps/.test(h)) track("click_social", { href: h.slice(0, 80) }); });
 
@@ -530,6 +552,7 @@ fetch("/api/catalog", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null
     fixUnit(p, state[p.id]);
   }
   if (c.store && c.store.whatsapp) WHATSAPP = String(c.store.whatsapp).replace(/\D/g, "");
+  if (c.store) loadPixels(c.store);
   const ann = c.store && c.store.announcement && String(c.store.announcement).trim();
   if (ann) { const bar = document.createElement("div"); bar.className = "annbar"; bar.textContent = ann; document.body.prepend(bar); }
   cart = cart.filter((i) => { const p = PRODUCTS.find((x) => x.id === i.id); return p && !p.hidden; });

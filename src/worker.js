@@ -6,7 +6,7 @@ const STATUSES = ["new", "confirmed", "paid", "dispatched", "delivered", "cancel
 const EVENT_TYPES = ["page_view", "select_colour", "select_unit", "add_to_cart", "remove_from_cart", "open_cart", "start_checkout", "order_sent", "click_whatsapp", "click_social", "view_section"];
 
 const DEFAULT_CATALOG = {
-  store: { announcement: "", whatsapp: "2349126433425" },
+  store: { announcement: "", whatsapp: "2349126433425", metaPixel: "", tiktokPixel: "" },
   products: {
     regular: { hidden: false, dz: 1500, bulk: 1400, stockBig: null, colours: Object.fromEntries(COLOURS.map((c) => [c, { dozen: true, big: c === "black" }])) },
     mixed: { hidden: false, dz: null, bulk: 1400, stockBig: 2, colours: { mixed: { dozen: false, big: true } } },
