@@ -61,8 +61,20 @@ async function audit(env, { action, entity, entity_id, summary, before, after, u
 
 // ---------- auth ----------
 const enc = new TextEncoder();
+// Password: once changed from the dashboard it is stored hashed (PBKDF2) in settings and replaces the original secret.
+async function storedPw(env) { try { return await getSetting(env, "admin_pw"); } catch { return null; } }
+async function pbkdf2(pw, salt) {
+  const k = await crypto.subtle.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveBits"]);
+  return b64u(await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: enc.encode(salt), iterations: 100000 }, k, 256));
+}
+async function passwordOk(env, pw) {
+  const st = await storedPw(env);
+  if (st && st.hash) return safeEqual(await pbkdf2(String(pw || ""), st.salt), st.hash);
+  return !!env.ADMIN_PASSWORD && safeEqual(String(pw || ""), env.ADMIN_PASSWORD);
+}
 async function hmacKey(env) {
-  const raw = await crypto.subtle.digest("SHA-256", enc.encode("au-admin-session:" + (env.ADMIN_PASSWORD || "")));
+  const st = await storedPw(env);
+  const raw = await crypto.subtle.digest("SHA-256", enc.encode("au-admin-session:" + (env.ADMIN_PASSWORD || "") + ":" + (st?.hash || "")));
   return crypto.subtle.importKey("raw", raw, { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
 }
 const b64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -72,7 +84,7 @@ async function makeToken(env) {
   return `${exp}.${b64u(sig)}`;
 }
 async function checkToken(env, tok) {
-  if (!tok || !env.ADMIN_PASSWORD) return false;
+  if (!tok) return false;
   const [exp, sig] = tok.split(".");
   if (!exp || !sig || Number(exp) < Date.now()) return false;
   const expect = b64u(await crypto.subtle.sign("HMAC", await hmacKey(env), enc.encode(exp)));
@@ -162,7 +174,7 @@ async function adminApi(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p === "/api/admin/login" && m === "POST") {
     const b = await readBody(req, 1000);
-    if (!env.ADMIN_PASSWORD || !(await safeEqual(String(b.password || ""), env.ADMIN_PASSWORD))) {
+    if (!(await passwordOk(env, b.password))) {
       await new Promise((r) => setTimeout(r, 700));
       return json({ error: "Wrong password" }, 401);
     }
@@ -173,6 +185,18 @@ async function adminApi(req, env, url) {
   if (!(await checkToken(env, getCookie(req, "au_admin")))) return json({ error: "Not signed in" }, 401);
 
   if (p === "/api/admin/me") return json({ ok: true });
+  if (p === "/api/admin/password" && m === "POST") {
+    const b = await readBody(req, 2000);
+    if (!(await passwordOk(env, b.current))) { await new Promise((r) => setTimeout(r, 700)); return json({ error: "Your current password is wrong" }, 400); }
+    const next = String(b.next || "");
+    if (next.length < 8) return json({ error: "New password needs at least 8 characters" }, 400);
+    if (next.length > 100) return json({ error: "New password is too long" }, 400);
+    const salt = randTok();
+    await setSetting(env, "admin_pw", { salt, hash: await pbkdf2(next, salt), changed_at: nowISO() });
+    await audit(env, { action: "password", entity: "password", entity_id: "admin", summary: "Admin password changed", before: null, after: null });
+    const tok = await makeToken(env); // new key: every other signed-in device is signed out
+    return json({ ok: true }, 200, { "set-cookie": `au_admin=${tok}; Path=/api/admin; Max-Age=${30 * 24 * 3600}; HttpOnly; Secure; SameSite=Strict` });
+  }
 
   // ---- summary / analytics
   if (p === "/api/admin/summary" && m === "GET") {

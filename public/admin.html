@@ -780,7 +780,7 @@ async function activity() {
   const m = $("#main"); m.innerHTML = `<h2>Activity &amp; undo</h2><p class="muted" style="margin:-6px 0 12px">Every change made in this dashboard. Undo puts things back exactly as they were before that change. You can also undo an undo.</p><div id="al"><p class="muted">Loading…</p></div>`;
   const d = await api("audit");
   $("#al").innerHTML = d.audit.length ? `<div class="grid">${d.audit.map((a) => `<div class="card audit ${a.undone ? "dn" : ""}"><div style="min-width:0"><b style="overflow-wrap:anywhere">${esc(a.summary || a.action)}</b><br><span class="muted">${when(a.ts)} · ${esc(a.entity)}${a.undone ? " · undone" : ""}${a.action === "undo" ? " · undo" : ""}</span></div>
-    ${a.entity === "receipt" ? "" : `<button class="btn o sm" data-u="${a.id}" ${a.undone ? "disabled" : ""}>Undo</button>`}</div>`).join("")}</div>` : `<div class="card empty">No changes yet.</div>`;
+    ${a.entity === "receipt" || a.entity === "password" ? "" : `<button class="btn o sm" data-u="${a.id}" ${a.undone ? "disabled" : ""}>Undo</button>`}</div>`).join("")}</div>` : `<div class="card empty">No changes yet.</div>`;
   $$("[data-u]", m).forEach((b) => (b.onclick = async () => { if (!confirm("Undo this change?")) return; try { await api(`audit/${b.dataset.u}/undo`, { method: "POST" }); toast("Undone"); activity(); badge(); } catch (e) { toast(e.message); } }));
 }
 
@@ -800,7 +800,23 @@ async function settings() {
     <p class="hint">Events sent: page view, product view (colour picked), add to cart, checkout started (cart opened), lead (order sent on WhatsApp), contact (WhatsApp tapped).</p>
     <button class="btn" id="spx" style="margin-top:12px">Save &amp; publish</button></div>
   <div class="card" style="margin-top:12px"><h3>Links</h3><ul class="lst"><li><span>Store</span><a href="/" target="_blank">auhairaccessories.com</a></li><li><span>Orders export</span><a href="/api/admin/export/orders.csv">Download CSV</a></li><li><span>Visitor export</span><a href="/api/admin/export/events.csv">Download CSV</a></li></ul></div>
+  <div class="card" style="margin-top:12px"><h3>Change password</h3><p class="muted" style="margin:-4px 0 8px">Changing it signs out every other phone or computer using the dashboard.</p>
+    <label class="f" for="pw0">Current password</label><input type="password" id="pw0" autocomplete="current-password">
+    <label class="f" for="pw1">New password (at least 8 characters)</label><input type="password" id="pw1" autocomplete="new-password">
+    <label class="f" for="pw2">Type the new password again</label><input type="password" id="pw2" autocomplete="new-password">
+    <label class="tog" style="margin-top:10px"><input type="checkbox" id="pwshow">Show passwords</label>
+    <button class="btn" id="pwsave" style="margin-top:12px;display:flex">Update password</button></div>
   <div class="card" style="margin-top:12px"><h3>Account</h3><button class="btn r" id="out">Sign out</button></div>`;
+  $("#pwshow").onchange = () => ["#pw0", "#pw1", "#pw2"].forEach((k) => ($(k).type = $("#pwshow").checked ? "text" : "password"));
+  $("#pwsave").onclick = async () => {
+    const cur = $("#pw0").value, a = $("#pw1").value, b2 = $("#pw2").value;
+    if (!cur) return toast("Enter your current password");
+    if (a.length < 8) return toast("New password needs at least 8 characters");
+    if (a !== b2) return toast("The two new passwords don't match");
+    $("#pwsave").disabled = true;
+    try { await api("password", { method: "POST", body: { current: cur, next: a } }); ["#pw0", "#pw1", "#pw2"].forEach((k) => ($(k).value = "")); toast("Password updated"); }
+    catch (e) { toast(e.message); } finally { $("#pwsave").disabled = false; }
+  };
   $("#sst").onclick = async () => { const next = JSON.parse(JSON.stringify(c)); next.store.announcement = $("#ann").value.trim(); next.store.whatsapp = $("#wa").value.replace(/\D/g, "");
     if (next.store.whatsapp.length < 10) return toast("Check the WhatsApp number");
     const ch = []; if (next.store.announcement !== (c.store.announcement || "")) ch.push(next.store.announcement ? `Announcement: "${next.store.announcement}"` : "Announcement removed"); if (next.store.whatsapp !== c.store.whatsapp) ch.push(`WhatsApp number → ${next.store.whatsapp}`);
