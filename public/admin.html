@@ -729,7 +729,7 @@ const LCLS = { new: "s-new", contacted: "s-dispatched", replied: "s-confirmed", 
 const PLACES = ["Lagos", "Abuja", "Port Harcourt", "Ibadan", "Enugu", "Benin City", "Warri", "Kano", "Nigeria", "Accra Ghana"];
 const PTYPES = [["wig maker", "Wig makers"], ["wig vendor", "Wig vendors"], ["custom wig units bundles", "Custom units"], ["wig revamp", "Wig revamp"], ["frontal wig install", "Wig stylists"], ["wig making class", "Wig classes"]];
 const KINDS = ["Wig maker", "Wig vendor", "Wig maker & vendor", "Wig revamp / stylist", "Wig academy / trainer", "Hair salon", "Other"];
-const PICO = { naira: "M6 20V4l12 16V4M3 10h18M3 14h18", gift: "M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z", star: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z", truck: "M1 4h14v12H1zM15 8h4l3 3v5h-7zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", cart: "M6 6h15l-1.5 9h-12zM6 6L5 3H2M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z", chat: "M21 12a8 8 0 0 1-11.8 7L3 21l2-6A8 8 0 1 1 21 12z", grad: "M22 10L12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5" };
+const PICO = { naira: "M6 20V4l12 16V4M3 10h18M3 14h18", mesh: "M3 18a9 9 0 0 1 18 0zM7.5 10.5v7.5M12 9v9M16.5 10.5v7.5M4.5 14h15", wind: "M3 8h11a3 3 0 1 0-3-3M3 16h14a3 3 0 1 1-3 3M3 12h17", box: "M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10", down: "M12 4v16M6 14l6 6 6-6", gift: "M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z", star: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z", truck: "M1 4h14v12H1zM15 8h4l3 3v5h-7zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", cart: "M6 6h15l-1.5 9h-12zM6 6L5 3H2M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z", chat: "M21 12a8 8 0 0 1-11.8 7L3 21l2-6A8 8 0 1 1 21 12z", grad: "M22 10L12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5" };
 const PERK_I = ["naira", "gift", "star", "truck", "cart", "chat", "star", "gift"];
 S.leads = []; S.lst = ""; S.ptype = S.ptype || "wig maker"; S.pplace = S.pplace || "Lagos";
 async function partners() {
@@ -862,82 +862,103 @@ async function makeProposal(id) {
 }
 let jspdfP;
 const loadJsPDF = () => jspdfP || (jspdfP = new Promise((res, rej) => { if (window.jspdf) return res(window.jspdf); const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = () => res(window.jspdf); s.onerror = () => { jspdfP = null; rej(new Error("Couldn't load the PDF maker, check your internet")); }; document.head.appendChild(s); }));
-function icon(x, k, cx, cy, size, col) { x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 24, size / 24); x.strokeStyle = col; x.lineWidth = 2; x.lineCap = "round"; x.lineJoin = "round"; x.stroke(new Path2D(PICO[k])); x.restore(); }
+function icon(x, k, cx, cy, size, col, lw = 2) { x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 24, size / 24); x.strokeStyle = col; x.lineWidth = lw; x.lineCap = "round"; x.lineJoin = "round"; x.stroke(new Path2D(PICO[k])); x.restore(); }
 async function buildPdf(id) {
   const D = (await api(`leads/${id}/doc`)).doc;
   await Promise.all(["800 40px Poppins", "700 30px Poppins", "600 30px Poppins", "500 30px Poppins", "400 30px Poppins"].map((f) => document.fonts.load(f))).catch(() => {});
   const [logo, iconW, ...pimg] = await Promise.all(["/img/au-logo-reverse.png", "/img/au-icon-white.png", ...D.products.map((p) => p.img)].map(loadImg));
-  const W = 1240, PX = 72, CW = W - PX * 2, F = "Poppins, Arial, sans-serif";
+  // Laid out like a phone screen (390pt wide) at 2.75x, so it reads comfortably on phones
+  const K = 2.75, W = Math.round(390 * K), u = (n) => n * K, PX = u(20), CW = W - PX * 2, F = "Poppins, Arial, sans-serif";
   const date = new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" });
   const lay = (x, draw) => {
-    const T = (txt, px, py, font, col, maxW, lh, align) => { x.font = font; const ls = wrap(x, txt, maxW); if (draw) { x.fillStyle = col; x.textAlign = align || "left"; ls.forEach((t, i) => x.fillText(t, px, py + i * lh)); x.textAlign = "left"; } return ls.length * lh; };
-    const rr = (px, py, w, h, r, fill) => { if (draw) { x.fillStyle = fill; x.beginPath(); x.roundRect(px, py, w, h, r); x.fill(); } };
-    // 1. hero
-    x.font = `800 64px ${F}`; const tl = wrap(x, `${D.name} × AU Hair Accessories`, CW).length; x.font = `400 31px ${F}`; const il = wrap(x, D.intro, CW - 60).length;
-    const HH = 290 + tl * 76 + 24 + il * 46 + 140;
-    if (draw) { const g = x.createRadialGradient(W * .85, 0, 40, W * .6, HH * .5, W); g.addColorStop(0, "#7A1577"); g.addColorStop(.55, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.fillRect(0, 0, W, HH);
-      x.globalAlpha = .07; x.drawImage(iconW, W - 400, HH - 360, 460, 460 * iconW.height / iconW.width); x.globalAlpha = 1; x.drawImage(logo, PX, 66, 92 * logo.width / logo.height, 92);
-      x.fillStyle = "#E58BE3"; x.font = `700 23px ${F}`; x.letterSpacing = "5px"; x.fillText("BUSINESS PARTNERSHIP PROPOSAL", PX, 236); x.letterSpacing = "0px";
-      x.fillStyle = "#E9CFE8"; x.font = `500 22px ${F}`; x.textAlign = "right"; x.fillText(date, W - PX, 236); x.textAlign = "left"; }
-    x.font = `800 64px ${F}`; if (draw) { const ls = wrap(x, `${D.name} × AU Hair Accessories`, CW); ls.forEach((t, i) => { const yy = 316 + i * 76; const k = t.indexOf("×"); x.fillStyle = "#fff"; if (k < 0) x.fillText(t, PX, yy); else { const a = t.slice(0, k), b = t.slice(k + 1); x.fillText(a, PX, yy); const wa = x.measureText(a).width; x.fillStyle = "#E58BE3"; x.fillText("×", PX + wa, yy); x.fillStyle = "#fff"; x.fillText(b, PX + wa + x.measureText("×").width, yy); } }); }
-    T(D.intro, PX, 316 + tl * 76 + 30, `400 31px ${F}`, "#F2DDF1", CW - 60, 46);
-    // 2. stats overlapping
-    let y = HH - 90; const sw = (CW - 40) / 3;
-    D.stats.forEach((s, i) => { const sx = PX + i * (sw + 20); if (draw) { x.save(); x.shadowColor = "rgba(65,4,64,.18)"; x.shadowBlur = 40; x.shadowOffsetY = 12; rr(sx, y, sw, 170, 26, "#fff"); x.restore(); }
-      T(s[0], sx + sw / 2, y + 82, `800 46px ${F}`, "#410440", sw - 20, 50, "center"); T(s[1], sx + sw / 2, y + 128, `500 22px ${F}`, "#7A6479", sw - 30, 28, "center"); });
-    y += 170 + 90;
-    const head = (lb, h) => { if (draw) { x.fillStyle = "#A0229E"; x.font = `700 22px ${F}`; x.letterSpacing = "5px"; x.fillText(lb, PX, y); x.letterSpacing = "0px"; } y += 56; T(h, PX, y, `800 44px ${F}`, "#24021F", CW, 52); y += 50; };
-    // 3. products
+    const font = (w, s) => `${w} ${u(s)}px ${F}`;
+    const T = (txt, px, py, f, col, maxW, lh, align) => { x.font = f; const ls = wrap(x, txt, maxW); if (draw) { x.fillStyle = col; x.textAlign = align || "left"; ls.forEach((t, i) => x.fillText(t, px, py + i * lh)); x.textAlign = "left"; } return ls.length * lh; };
+    const rr = (px, py, w, h, r, fill, stroke) => { if (!draw) return; x.beginPath(); x.roundRect(px, py, w, h, r); if (fill) { x.fillStyle = fill; x.fill(); } if (stroke) { x.strokeStyle = stroke; x.lineWidth = u(1.5); x.stroke(); } };
+    const track = (t, px, py, s, col) => { if (draw) { x.fillStyle = col; x.font = font(700, s); x.letterSpacing = u(2.2) + "px"; x.fillText(t, px, py); x.letterSpacing = "0px"; } };
+    // 1. header (kept as approved)
+    const HX = u(22); x.font = font(800, 28); const tLines = wrap(x, `${D.name} × AU Hair Accessories`, W - HX * 2); x.font = font(400, 15); const iLines = wrap(x, D.intro, W - HX * 2);
+    const HH = u(24) + u(38) + u(36) + u(26) + tLines.length * u(32) + u(12) + iLines.length * u(23) + u(84);
+    if (draw) { const g = x.createRadialGradient(W * .85, 0, 20, W * .6, HH * .5, W * 1.1); g.addColorStop(0, "#7A1577"); g.addColorStop(.55, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.fillRect(0, 0, W, HH);
+      x.globalAlpha = .07; const iw = u(230); x.drawImage(iconW, W - iw + u(40), HH - iw * iconW.height / iconW.width + u(40), iw, iw * iconW.height / iconW.width); x.globalAlpha = 1;
+      x.drawImage(logo, HX, u(24), u(38) * logo.width / logo.height, u(38)); }
+    let y = u(24) + u(38) + u(34);
+    track("BUSINESS PARTNERSHIP PROPOSAL", HX, y, 11, "#E58BE3"); y += u(20);
+    if (draw) { x.fillStyle = "#E9CFE8"; x.font = font(400, 12.5); x.fillText(date, HX, y); } y += u(40);
+    if (draw) { x.font = font(800, 28); tLines.forEach((t, i) => { const yy = y + i * u(32), k = t.indexOf("×"); x.fillStyle = "#fff"; if (k < 0) x.fillText(t, HX, yy); else { const a = t.slice(0, k); x.fillText(a, HX, yy); const wa = x.measureText(a).width; x.fillStyle = "#E58BE3"; x.fillText("×", HX + wa, yy); x.fillStyle = "#fff"; x.fillText(t.slice(k + 1), HX + wa + x.measureText("×").width, yy); } }); }
+    y += tLines.length * u(32) + u(4);
+    T(D.intro, HX, y, font(400, 15), "#F2DDF1", W - HX * 2, u(23));
+    // 2. four boxes about the caps (2x2), overlapping the header
+    y = HH - u(52); const bxX = u(16), bw = (W - bxX * 2 - u(10)) / 2;
+    const bh = Math.max(...D.boxes.map((b) => { x.font = font(700, 14); const a = wrap(x, b[1], bw - u(28)).length; x.font = font(400, 12); return u(14) + u(36) + u(10) + a * u(18) + wrap(x, b[2], bw - u(28)).length * u(17) + u(14); }));
+    D.boxes.forEach((b, i) => { const bx = bxX + (i % 2) * (bw + u(10)), by = y + Math.floor(i / 2) * (bh + u(10));
+      if (draw) { x.save(); x.shadowColor = "rgba(65,4,64,.16)"; x.shadowBlur = u(26); x.shadowOffsetY = u(8); rr(bx, by, bw, bh, u(18), "#fff"); x.restore(); }
+      rr(bx + u(14), by + u(14), u(36), u(36), u(11), "#FFE7FF"); if (draw) icon(x, b[0], bx + u(32), by + u(32), u(20), "#A0229E", 2.2);
+      const th = T(b[1], bx + u(14), by + u(14) + u(36) + u(22), font(700, 14), "#24021F", bw - u(28), u(18));
+      T(b[2], bx + u(14), by + u(14) + u(36) + u(22) + th, font(400, 12), "#7A6479", bw - u(28), u(17)); });
+    y += bh * 2 + u(10) + u(34);
+    const head = (lb, h) => { track(lb, PX, y, 11, "#A0229E"); y += u(30); y += T(h, PX, y, font(800, 22), "#24021F", CW, u(27)); y += u(4); };
+    // 3. products with partner price
     head("WHAT WE SUPPLY", "The caps behind every wig you make");
-    const pw = (CW - 48) / 3, IH = 400;
-    const ph = Math.max(...D.products.map((p) => { x.font = `700 30px ${F}`; return wrap(x, p.name, pw - 40).length * 38; })) ;
-    const cardH = IH + 34 + ph + 70 + 3 * 36 + 100;
-    D.products.forEach((p, i) => { const cx = PX + i * (pw + 24), im = pimg[i];
-      if (draw) { x.save(); x.beginPath(); x.roundRect(cx, y, pw, cardH, 26); x.fillStyle = "#fff"; x.fill(); x.strokeStyle = "#F0E3EF"; x.lineWidth = 3; x.stroke(); x.clip();
-        const sc = Math.max(pw / im.width, IH / im.height); x.drawImage(im, cx + (pw - im.width * sc) / 2, y + (IH - im.height * sc) / 2, im.width * sc, im.height * sc); x.restore(); }
-      let yy = y + IH + 50; T(p.name, cx + 22, yy, `700 30px ${F}`, "#24021F", pw - 40, 38); yy += ph + 8;
-      x.font = `700 20px ${F}`; const tw = Math.min(pw - 44, x.measureText(p.tag).width + 30); rr(cx + 22, yy - 4, tw, 40, 20, "#FFE7FF"); if (draw) { x.fillStyle = "#A0229E"; x.fillText(p.tag, cx + 37, yy + 23, pw - 70); } yy += 70;
-      p.pts.forEach((t) => { if (draw) { x.fillStyle = "#1E9E5A"; x.font = `800 22px ${F}`; x.fillText("✓", cx + 22, yy); x.fillStyle = "#7A6479"; x.font = `400 22px ${F}`; x.fillText(t, cx + 52, yy, pw - 70); } yy += 36; });
-      yy = y + cardH - 40; if (draw) { x.fillStyle = "#410440"; x.font = `800 40px ${F}`; x.fillText(p.price, cx + 22, yy); const w2 = x.measureText(p.price).width; x.fillStyle = "#7A6479"; x.font = `500 20px ${F}`; x.fillText(" " + p.unit, cx + 22 + w2, yy); } });
-    y += cardH + 100;
+    D.products.forEach((p, i) => { const im = pimg[i], iw = u(118), tx = PX + iw + u(14), tw = CW - iw - u(28);
+      x.font = font(700, 15.5); const nl = wrap(x, p.name, tw).length; const ch = u(13) + nl * u(20) + u(32) + 3 * u(19) + u(10) + u(30) + u(8) + u(30) + u(14);
+      const H2 = Math.max(ch, u(200));
+      if (draw) { x.save(); x.beginPath(); x.roundRect(PX, y, CW, H2, u(20)); x.fillStyle = "#fff"; x.fill(); x.clip(); x.beginPath(); x.rect(PX, y, iw, H2); x.clip(); const sc = Math.max(iw / im.width, H2 / im.height); x.drawImage(im, PX + (iw - im.width * sc) / 2, y + (H2 - im.height * sc) / 2, im.width * sc, im.height * sc); x.restore(); rr(PX, y, CW, H2, u(20), null, "#F0E3EF"); }
+      let yy = y + u(13) + u(16); yy += T(p.name, tx, yy, font(700, 15.5), "#24021F", tw, u(20));
+      x.font = font(700, 11); const tgw = x.measureText(p.tag).width + u(18); rr(tx, yy - u(8), tgw, u(22), u(11), "#FFE7FF"); if (draw) { x.fillStyle = "#A0229E"; x.fillText(p.tag, tx + u(9), yy + u(7)); } yy += u(30);
+      p.pts.forEach((t) => { if (draw) { x.fillStyle = "#1E9E5A"; x.font = font(800, 12); x.fillText("✓", tx, yy); x.fillStyle = "#7A6479"; x.font = font(400, 12); x.fillText(t, tx + u(14), yy); } yy += u(19); });
+      yy += u(16);
+      if (draw) { x.font = font(400, 14); x.fillStyle = "#A895A7"; x.fillText(p.was, tx, yy); const ww = x.measureText(p.was).width; x.strokeStyle = "#A895A7"; x.lineWidth = u(1.3); x.beginPath(); x.moveTo(tx, yy - u(5)); x.lineTo(tx + ww, yy - u(5)); x.stroke();
+        x.font = font(800, 22); x.fillStyle = "#410440"; x.fillText(p.partner, tx + ww + u(8), yy); const w2 = x.measureText(p.partner).width; x.font = font(700, 9.5); x.fillStyle = "#1E9E5A"; x.fillText("PARTNER / DOZEN", tx + ww + u(8) + w2 + u(6), yy - u(1)); }
+      yy += u(12); rr(tx, yy, tw, u(28), u(10), "#F7F1F7"); if (draw) { x.font = font(400, 12); x.fillStyle = "#7A6479"; x.fillText(p.bulkLabel, tx + u(9), yy + u(19)); x.font = font(700, 12.5); x.fillStyle = "#24021F"; x.textAlign = "right"; x.fillText(p.bulk, tx + tw - u(9), yy + u(19)); x.textAlign = "left"; }
+      y += H2 + u(12); });
+    y += u(22);
     // 4. perks
     head("AS OUR PARTNER", "What you get");
-    const kw = (CW - 24) / 2;
-    for (let i = 0; i < D.perks.length; i += 2) {
-      const row = D.perks.slice(i, i + 2), hs = row.map((k) => { x.font = `400 22px ${F}`; return 50 + wrap(x, k.d, kw - 140).length * 31; }), rh = Math.max(130, ...hs) + 34;
-      row.forEach((k, j) => { const kx = PX + j * (kw + 24); rr(kx, y, kw, rh, 24, "#F7F1F7"); rr(kx + 24, y + 26, 72, 72, 20, "#410440"); if (draw) icon(x, PERK_I[i + j], kx + 60, y + 62, 38, "#fff");
-        T(k.t, kx + 120, y + 56, `700 27px ${F}`, "#24021F", kw - 140, 34); T(k.d, kx + 120, y + 92, `400 22px ${F}`, "#7A6479", kw - 140, 31); });
-      y += rh + 20; }
-    if (D.classPerk) { x.font = `400 23px ${F}`; const cl = wrap(x, D.classPerk.d, CW - 170).length; const ch = 110 + cl * 32;
-      if (draw) { const g = x.createLinearGradient(PX, y, PX + CW, y + ch); g.addColorStop(0, "#FFE7FF"); g.addColorStop(1, "#F1E2FF"); x.fillStyle = g; x.beginPath(); x.roundRect(PX, y, CW, ch, 26); x.fill(); x.fillStyle = "#A0229E"; x.beginPath(); x.arc(PX + 64, y + ch / 2, 38, 0, Math.PI * 2); x.fill(); icon(x, "grad", PX + 64, y + ch / 2, 40, "#fff"); }
-      T(`You teach wig making too? ${D.classPerk.t}`, PX + 128, y + 54, `700 27px ${F}`, "#24021F", CW - 150, 34); T(D.classPerk.d, PX + 128, y + 92, `400 23px ${F}`, "#5A3D58", CW - 170, 32); y += ch + 20; }
-    y += 80;
+    D.perks.forEach((k, i) => { const tx = PX + u(58), tw = CW - u(58);
+      x.font = font(700, 15); const th = wrap(x, k.t, tw).length * u(20); x.font = font(400, 13); const dh = k.d ? wrap(x, k.d, tw).length * u(19) : 0; const rh = Math.max(u(46), u(4) + th + dh) + u(24);
+      rr(PX, y + u(12), u(46), u(46), u(14), "#410440"); if (draw) icon(x, PERK_I[i], PX + u(23), y + u(35), u(22), "#fff", 2.2);
+      T(k.t, tx, y + u(28), font(700, 15), "#24021F", tw, u(20)); if (k.d) T(k.d, tx, y + u(28) + th, font(400, 13), "#7A6479", tw, u(19));
+      if (draw && i < D.perks.length - 1) { x.fillStyle = "#F3E9F3"; x.fillRect(PX, y + rh, CW, u(1)); } y += rh; });
+    if (D.classPerk) { const tw = CW - u(84); x.font = font(700, 14.5); const t1 = wrap(x, `You teach wig making too? ${D.classPerk.t}`, tw).length * u(19); x.font = font(400, 13); const t2 = wrap(x, D.classPerk.d, tw).length * u(18); const ch = Math.max(u(72), t1 + t2 + u(30)); y += u(10);
+      if (draw) { const g = x.createLinearGradient(PX, y, PX + CW, y + ch); g.addColorStop(0, "#FFE7FF"); g.addColorStop(1, "#F1E2FF"); x.fillStyle = g; x.beginPath(); x.roundRect(PX, y, CW, ch, u(18)); x.fill(); x.fillStyle = "#A0229E"; x.beginPath(); x.arc(PX + u(36), y + ch / 2, u(22), 0, Math.PI * 2); x.fill(); icon(x, "grad", PX + u(36), y + ch / 2, u(22), "#fff", 2.2); }
+      T(`You teach wig making too? ${D.classPerk.t}`, PX + u(70), y + u(24), font(700, 14.5), "#24021F", tw, u(19)); T(D.classPerk.d, PX + u(70), y + u(24) + t1, font(400, 13), "#5A3D58", tw, u(18)); y += ch; }
+    y += u(36);
     // 5. price sheet
-    head("PRICES", "Your price sheet");
-    const cols = [PX, PX + 430, PX + 650, PX + 900];
-    if (draw) { x.fillStyle = "#7A6479"; x.font = `600 21px ${F}`; x.fillText("Cap", cols[0], y); x.textAlign = "right"; x.fillText("Per dozen", cols[2] - 20, y); x.fillText("Bulk pack", cols[3] - 20, y); x.fillText("Works out to", W - PX, y); x.textAlign = "left"; x.fillStyle = "#F0E3EF"; x.fillRect(PX, y + 18, CW, 3); }
-    y += 26;
-    D.prices.forEach((r, i) => { const ry = y + 58; if (draw) { if (i % 2 === 0) rr(PX, y + 6, CW, 96, 16, "#FBF6FB"); x.fillStyle = "#24021F"; x.font = `700 25px ${F}`; x.fillText(r[0], cols[0] + 14, ry); x.textAlign = "right"; x.font = `500 25px ${F}`; x.fillText(r[1], cols[2] - 20, ry); x.fillText(r[3], cols[3] - 20, ry - 10); x.fillStyle = "#7A6479"; x.font = `400 18px ${F}`; x.fillText(r[2], cols[3] - 20, ry + 20); x.fillStyle = "#410440"; x.font = `800 27px ${F}`; x.fillText(r[4] + "/dz", W - PX - 14, ry); x.textAlign = "left"; } y += 104; });
-    if (draw) { x.fillStyle = "#7A6479"; x.font = `400 20px ${F}`; x.fillText("Prices exclude logistics.", PX, y + 28); } y += 130;
-    // 6. how it works
+    head("PRICES", "Your partner price sheet");
+    const RH = u(70), cw3 = (CW - u(28) - u(12)) / 3.45;
+    rr(PX, y, CW, RH * D.products.length, u(20), "#fff", "#F0E3EF");
+    D.products.forEach((p, i) => { const ry = y + i * RH; if (draw) { if (i % 2 === 0) { x.save(); x.beginPath(); x.roundRect(PX + u(1), ry + u(1), CW - u(2), RH - u(1), i === 0 ? [u(19), u(19), 0, 0] : i === D.products.length - 1 ? [0, 0, u(19), u(19)] : 0); x.fillStyle = "#FBF6FB"; x.fill(); x.restore(); } if (i) { x.fillStyle = "#F3E9F3"; x.fillRect(PX, ry, CW, u(1)); } }
+      T(p.name, PX + u(14), ry + u(22), font(700, 14.5), "#24021F", CW, u(18));
+      const c1 = PX + u(14), c2 = c1 + cw3 * 1, c3 = c2 + cw3 * 1.15 + u(6);
+      if (draw) { x.font = font(400, 11); x.fillStyle = "#7A6479"; x.fillText("Normal price", c1, ry + u(42)); x.fillText("Partner price", c2, ry + u(42)); x.fillText(p.bulkLabel, c3, ry + u(42));
+        x.font = font(600, 14); x.fillStyle = "#A895A7"; const t1 = p.was + " /dz"; x.fillText(t1, c1, ry + u(59)); const w1 = x.measureText(t1).width; x.strokeStyle = "#A895A7"; x.lineWidth = u(1.2); x.beginPath(); x.moveTo(c1, ry + u(54)); x.lineTo(c1 + w1, ry + u(54)); x.stroke();
+        x.font = font(800, 15); x.fillStyle = "#410440"; x.fillText(p.partner + " /dz", c2, ry + u(59)); x.font = font(600, 14); x.fillStyle = "#24021F"; x.fillText(p.bulk, c3, ry + u(59)); } });
+    y += RH * D.products.length + u(20);
+    if (draw) { x.font = font(400, 11.5); x.fillStyle = "#7A6479"; x.fillText("Partner prices apply to any quantity. Prices exclude logistics.", PX, y); } y += u(40);
+    // 6. how it works: stacked step cards
     head("HOW IT WORKS", "Partnering is simple");
-    const stw = CW / 3; if (draw) { x.strokeStyle = "#E58BE3"; x.lineWidth = 4; x.setLineDash([12, 10]); x.beginPath(); x.moveTo(PX + stw / 2, y + 44); x.lineTo(PX + stw * 2.5, y + 44); x.stroke(); x.setLineDash([]); }
-    let sh = 0; D.steps.forEach((s, i) => { const sx = PX + i * stw + stw / 2; if (draw) { x.fillStyle = "#C73CC5"; x.beginPath(); x.arc(sx, y + 44, 44, 0, Math.PI * 2); x.fill(); x.fillStyle = "#fff"; x.font = `800 36px ${F}`; x.textAlign = "center"; x.fillText(String(i + 1), sx, y + 57); x.textAlign = "left"; }
-      T(s[0], sx, y + 136, `700 27px ${F}`, "#24021F", stw - 30, 34, "center"); const h2 = T(s[1], sx, y + 174, `400 22px ${F}`, "#7A6479", stw - 50, 30, "center"); sh = Math.max(sh, h2); });
-    y += 174 + sh + 80;
-    // 7. CTA
-    const CH = 280; if (draw) { const g = x.createRadialGradient(PX + CW * .9, y, 30, PX + CW * .5, y + CH / 2, CW); g.addColorStop(0, "#7A1577"); g.addColorStop(.6, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.beginPath(); x.roundRect(PX, y, CW, CH, 32); x.fill(); }
-    T("Let's start with a free sample pack", W / 2, y + 82, `800 42px ${F}`, "#fff", CW - 80, 50, "center");
-    T(`Reply and we'll send it to ${D.name} this week.`, W / 2, y + 132, `400 25px ${F}`, "#F2DDF1", CW - 80, 32, "center");
-    if (draw) { x.font = `700 28px ${F}`; const bt = `WhatsApp ${D.shop.phone}`, bw2 = x.measureText(bt).width + 80; x.fillStyle = "#1DAA61"; x.beginPath(); x.roundRect(W / 2 - bw2 / 2, y + 168, bw2, 72, 36); x.fill(); x.fillStyle = "#fff"; x.textAlign = "center"; x.fillText(bt, W / 2, y + 214); x.textAlign = "left"; }
-    y += CH + 60;
-    T(`AU Hair Accessories  ·  ${D.yourName}`, W / 2, y, `700 25px ${F}`, "#24021F", CW, 32, "center");
-    T(D.shop.address, W / 2, y + 40, `400 21px ${F}`, "#7A6479", CW, 30, "center");
-    T(`${D.shop.ig}  ·  ${D.shop.web}`, W / 2, y + 76, `400 21px ${F}`, "#7A6479", CW, 30, "center");
-    return y + 130;
+    D.steps.forEach((s, i) => { if (i) { if (draw) icon(x, "down", W / 2, y + u(15), u(22), "#E58BE3", 2.4); y += u(30); }
+      const tw = CW - u(32) - u(46) - u(54) - u(24); x.font = font(400, 12.5); const dl = wrap(x, s[2], tw).length; const sh = Math.max(u(72), u(26) + u(20) + dl * u(18) + u(14));
+      rr(PX, y, CW, sh, u(18), "#F7F1F7");
+      if (draw) { x.font = font(800, 30); x.fillStyle = "#E58BE3"; x.fillText("0" + (i + 1), PX + u(16), y + sh / 2 + u(11)); x.fillStyle = "#fff"; x.beginPath(); x.arc(PX + CW - u(16) - u(21), y + sh / 2, u(21), 0, Math.PI * 2); x.fill(); icon(x, s[0], PX + CW - u(37), y + sh / 2, u(20), "#A0229E", 2.2); }
+      const tx = PX + u(16) + u(54); T(s[1], tx, y + u(28), font(700, 15), "#24021F", tw, u(20)); T(s[2], tx, y + u(28) + u(20), font(400, 12.5), "#7A6479", tw, u(18));
+      y += sh; });
+    y += u(30);
+    // 7. free sample CTA
+    x.font = font(400, 14); const cl = wrap(x, D.sample.d, CW - u(40)).length; x.font = font(800, 21); const tl2 = wrap(x, D.sample.t, CW - u(30)).length; const CH = u(24) + u(54) + u(30) + tl2 * u(26) + u(2) + cl * u(21) + u(6) + u(46) + u(26);
+    if (draw) { const g = x.createRadialGradient(PX + CW * .9, y, 10, PX + CW * .5, y + CH / 2, CW); g.addColorStop(0, "#7A1577"); g.addColorStop(.6, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.beginPath(); x.roundRect(PX, y, CW, CH, u(24)); x.fill();
+      x.fillStyle = "rgba(255,255,255,.12)"; x.beginPath(); x.arc(W / 2, y + u(24) + u(27), u(27), 0, Math.PI * 2); x.fill(); icon(x, "gift", W / 2, y + u(51), u(26), "#fff", 2); }
+    let cy = y + u(24) + u(54) + u(30); cy += T(D.sample.t, W / 2, cy, font(800, 21), "#fff", CW - u(30), u(26), "center"); cy += u(2);
+    cy += T(D.sample.d, W / 2, cy, font(400, 14), "#F2DDF1", CW - u(40), u(21), "center"); cy += u(6);
+    if (draw) { x.font = font(700, 14.5); const bt = `WhatsApp ${D.shop.phone}`, bw2 = x.measureText(bt).width + u(44); x.fillStyle = "#1DAA61"; x.beginPath(); x.roundRect(W / 2 - bw2 / 2, cy, bw2, u(46), u(14)); x.fill(); x.fillStyle = "#fff"; x.textAlign = "center"; x.fillText(bt, W / 2, cy + u(29)); x.textAlign = "left"; }
+    y += CH + u(30);
+    T(`AU Hair Accessories · ${D.yourName}`, W / 2, y, font(700, 12.5), "#24021F", CW, u(20), "center"); y += u(20);
+    y += T(D.shop.address, W / 2, y, font(400, 12), "#7A6479", CW, u(19), "center");
+    T(`${D.shop.ig}  ·  ${D.shop.web}`, W / 2, y, font(400, 12), "#7A6479", CW, u(19), "center");
+    return y + u(30);
   };
   const H = lay(document.createElement("canvas").getContext("2d"), false);
-  const c = document.createElement("canvas"); c.width = W; c.height = H; const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H); lay(ctx, true);
+  const c = document.createElement("canvas"); c.width = W; c.height = Math.ceil(H); const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H); lay(ctx, true);
   // link preview 1200x630
   const p = document.createElement("canvas"); p.width = 1200; p.height = 630; const x = p.getContext("2d");
   const g = x.createRadialGradient(1000, 60, 40, 700, 300, 1100); g.addColorStop(0, "#7A1577"); g.addColorStop(.5, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.fillRect(0, 0, 1200, 630);
@@ -947,8 +968,9 @@ async function buildPdf(id) {
   x.fillStyle = "#fff"; x.font = `800 56px ${F}`; wrap(x, `${D.name} × AU Hair Accessories`, 660).slice(0, 3).forEach((t, i) => x.fillText(t, 70, 316 + i * 66));
   x.fillStyle = "#fff"; x.beginPath(); x.roundRect(72, 528, 380, 62, 31); x.fill(); x.fillStyle = "#410440"; x.font = `700 26px ${F}`; x.fillText("Tap to view proposal", 108, 569);
   const { jsPDF } = await loadJsPDF();
-  const doc = new jsPDF({ unit: "pt", format: [595.28, 595.28 * H / W], compress: true });
-  doc.addImage(c.toDataURL("image/jpeg", 0.88), "JPEG", 0, 0, 595.28, 595.28 * H / W);
+  const PW = 390, PH = PW * c.height / W;
+  const doc = new jsPDF({ unit: "pt", format: [PW, PH], compress: true });
+  doc.addImage(c.toDataURL("image/jpeg", 0.9), "JPEG", 0, 0, PW, PH);
   const d = await api(`leads/${id}/pdf`, { method: "POST", body: { pdf: doc.output("datauristring"), og: p.toDataURL("image/jpeg", 0.86) } });
   putLead(d.lead); return d.lead;
 }
@@ -1034,7 +1056,7 @@ async function settings() {
   <div class="card" style="margin-top:12px"><h3>Links</h3><ul class="lst"><li><span>Store</span><a href="/" target="_blank">auhairaccessories.com</a></li><li><span>Orders export</span><a href="/api/admin/export/orders.csv">Download CSV</a></li><li><span>Visitor export</span><a href="/api/admin/export/events.csv">Download CSV</a></li></ul></div>
   <div class="card" style="margin-top:12px"><h3>Partner proposals</h3><p class="muted" style="margin:-4px 0 8px">Used in every partnership proposal you send to wig businesses.</p>
     <label class="f" for="pyn">Your name (signs the messages)</label><input type="text" id="pyn">
-    <label class="f" for="pof">What partners get (one per line, as Title: short description)</label><textarea id="pof" style="min-height:170px"></textarea>
+    <label class="f" for="pof">What partners get (one per line, as Title: short description). {mesh} and {cap} fill in your partner prices.</label><textarea id="pof" style="min-height:170px"></textarea>
     <label class="f" for="pcl">Extra for businesses that also teach (Title: short description)</label><input type="text" id="pcl">
     <label class="f" for="psk">Web search key (Brave Search API)</label><input type="password" id="psk" placeholder="Paste key to turn on live search" autocomplete="off"><p class="hint" id="pskh"></p>
     <button class="btn" id="psave" style="margin-top:12px">Save</button></div>

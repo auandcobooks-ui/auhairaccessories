@@ -585,35 +585,37 @@ function cleanLead(b, partial) {
   return f;
 }
 const DEFAULT_OFFER = [
-  "Partner prices: Our bulk rates on smaller orders, so you don't need a full bag or carton",
-  "Free sample pack: Test our caps on your next units before you place an order",
-  "First pick of stock: You hear first when colours and new stock land",
-  "Delivered to you: Sent to your shop or doorstep in any state",
+  "Partner prices: {mesh} a dozen on mesh dome caps and {cap} on wig caps, even on small orders",
+  "Free sample dozen: One dozen of DIY or Stretch Mesh Dome Cap to test, you only cover logistics",
+  "First pick of stock: You hear first when new stock lands",
+  "Delivered to you: Sent to your shop or workshop in any state",
   "Easy reorders: Order in a few taps on WhatsApp or auhairaccessories.com",
 ];
 const DEFAULT_CLASS = "Class supply: Caps for your students' kits at partner prices, and we share your classes with our followers";
 async function partnerCfg(env) {
-  const d = { yourName: "Nonso", searchKey: "", offer: DEFAULT_OFFER, classOffer: DEFAULT_CLASS, v: 2 };
+  const d = { yourName: "Nonso", searchKey: "", offer: DEFAULT_OFFER, classOffer: DEFAULT_CLASS, v: 3 };
   const s = (await getSetting(env, "partner_cfg")) || {};
-  if (!s.v) { delete s.offer; } // old academy-only wording is replaced by the partnership offer
-  return { ...d, ...s, v: 2 };
+  if (!s.v || s.v < 3) delete s.offer; // earlier default wording is replaced by the current partnership offer
+  return { ...d, ...s, v: 3 };
 }
 const perkOf = (line) => { const i = line.indexOf(":"); return i > 0 && i < 40 ? { t: line.slice(0, i).trim(), d: line.slice(i + 1).trim() } : { t: line.trim(), d: "" }; };
+const NGN = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
+const fillOffer = (t, cat) => String(t).replace(/\{mesh\}/g, NGN(cat.diy.bulk)).replace(/\{cap\}/g, NGN(cat.regular.bulk));
 async function proposalDoc(env, l) {
-  const c = await partnerCfg(env), cat = (await getCatalog(env)).products, N = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
+  const c = await partnerCfg(env), cat = (await getCatalog(env)).products, N = NGN;
   const P = l.proposal || {};
   return {
     name: l.name, teaches: !!l.teaches, yourName: c.yourName, link: `/p/${l.token}`,
     intro: P.intro || `We'd love to be the wig cap supplier behind every unit ${l.name} makes, with quality caps, steady stock and partner prices.`,
-    stats: [[N(Math.min(cat.regular.bulk, cat.diy.bulk)), "per dozen at bulk price"], ["11", "wig cap colours"], ["Every state", "nationwide delivery"]],
+    boxes: [["mesh", "DIY Mesh Dome Cap", "Full-size dome to build full wigs on"], ["mesh", "Stretch Mesh Dome Cap", "Stretch fit for closure & U-part wigs"], ["wind", "Breathable mesh", "Cool, light and dries fast"], ["truck", "Every state", "Delivered to your workshop"]],
     products: [
-      { img: "/img/p/making-cap-diy-mesh.jpg", name: "DIY Mesh Dome Cap", tag: "Build full wigs on it", pts: ["Cool mesh spandex", "High & tight band", "Full size"], price: N(cat.diy.dz), unit: "per dozen" },
-      { img: "/img/p/making-cap-stretch-mesh.jpg", name: "Stretch Mesh Dome Cap", tag: "For closure & U-part wigs", pts: ["Stretch dome fit", "Breathable", "Dries fast"], price: N(cat.stretch.dz), unit: "per dozen" },
-      { img: "/img/p/wearing-cap-black.jpg", name: "Regular Wig Cap", tag: "Under every install", pts: ["Thin sheer nylon", "Flat, smooth base", "11 colours"], price: N(cat.regular.dz), unit: "per dozen" },
+      { img: "/img/p/making-cap-diy-mesh.jpg", name: "DIY Mesh Dome Cap", tag: "Build full wigs on it", pts: ["Cool mesh spandex", "High & tight band", "Full size"], was: N(cat.diy.dz), partner: N(cat.diy.bulk), bulkLabel: "Carton of 50 dozen", bulk: N(cat.diy.bulk * 50) },
+      { img: "/img/p/making-cap-stretch-mesh.jpg", name: "Stretch Mesh Dome Cap", tag: "For closure & U-part wigs", pts: ["Stretch dome fit", "Breathable", "Dries fast"], was: N(cat.stretch.dz), partner: N(cat.stretch.bulk), bulkLabel: "Carton of 50 dozen", bulk: N(cat.stretch.bulk * 50) },
+      { img: "/img/p/wearing-cap-black.jpg", name: "Regular Wig Cap", tag: "Under every install", pts: ["Thin sheer nylon", "Flat, smooth base", "11 colours"], was: N(cat.regular.dz), partner: N(cat.regular.bulk), bulkLabel: "Bag of 100 dozen", bulk: N(cat.regular.bulk * 100) },
     ],
-    perks: c.offer.map(perkOf), classPerk: l.teaches ? perkOf(c.classOffer) : null,
-    prices: [["Regular Wig Cap", N(cat.regular.dz), `Bag of 100 dozen`, N(cat.regular.bulk * 100), N(cat.regular.bulk)], ["DIY Mesh Dome Cap", N(cat.diy.dz), "Carton of 50 dozen", N(cat.diy.bulk * 50), N(cat.diy.bulk)], ["Stretch Mesh Dome Cap", N(cat.stretch.dz), "Carton of 50 dozen", N(cat.stretch.bulk * 50), N(cat.stretch.bulk)]],
-    steps: [["Send your order", "On WhatsApp or at auhairaccessories.com"], ["We pack & dispatch", "From our Trade Fair shop, to any state"], ["You build & sell", "Quality caps, steady supply, better margins"]],
+    perks: c.offer.map((x) => perkOf(fillOffer(x, cat))), classPerk: l.teaches ? perkOf(fillOffer(c.classOffer, cat)) : null,
+    steps: [["chat", "Send your order", "On WhatsApp or at auhairaccessories.com. Any quantity, partner prices."], ["box", "We pack & dispatch", "From our Trade Fair shop in Lagos, to any state."], ["star", "You build & sell", "Quality caps, steady supply, better margins."]],
+    sample: { t: "Start with a free sample dozen", d: `One dozen of DIY or Stretch Mesh Dome Cap, free for ${l.name}. You only cover logistics.` },
     shop: SHOP,
   };
 }
@@ -631,19 +633,19 @@ async function writeProposal(env, l) {
   const cat = await getCatalog(env), c = await partnerCfg(env), pr = cat.products;
   const facts = `AU Hair Accessories is a wig cap supplier at Shop A1, by Bayelsa Plaza, BBA Trade Fair Complex, Lagos, Nigeria. Online store: auhairaccessories.com (orders go to WhatsApp). WhatsApp 0912 643 3425. Instagram @auhairaccessories. Delivers to every state.
 Products: DIY Mesh Dome Cap and Stretch Mesh Dome Cap - mesh caps wig makers pin to the block and sew bundles, closures and frontals onto (₦${pr.diy.dz} per dozen, ₦${pr.diy.bulk * 50} per carton of 50 dozen). Regular Wig Cap - thin sheer nylon cap worn under every wig install, 11 colours (₦${pr.regular.dz} per dozen, ₦${pr.regular.bulk * 100} per bag of 100 dozen). Prices exclude logistics.
-Partner offer: ${c.offer.map((x) => "- " + x).join("\n")}${l.teaches ? "\n- " + c.classOffer : ""}
+Partner offer: ${c.offer.map((x) => "- " + fillOffer(x, pr)).join("\n")}${l.teaches ? "\n- " + fillOffer(c.classOffer, pr) : ""}
 Sender: ${c.yourName}, AU Hair Accessories.`;
   const biz = `Business: ${l.name}${l.kind ? " (" + l.kind + ")" : ""}. Location: ${[l.city, l.country].filter(Boolean).join(", ") || "unknown"}. What we know: ${l.about || "a wig business"}. ${l.teaches ? "They ALSO teach wig making (mention class supply as a bonus, not the main point)." : "They do not teach classes; do not mention classes or students."}`;
   const first = l.name;
   const fallback = () => ({
     intro: `${first} turns bundles into beautiful wigs. We'd love to be the cap supplier behind every unit you build: quality caps, steady stock and partner prices${l.teaches ? ", plus supply for your classes" : ""}.`,
-    whatsapp: `Hello ${first} 👋🏾\n\nI'm ${c.yourName} from AU Hair Accessories, wig cap suppliers at Trade Fair, Lagos. I love the wigs you make.\n\nWe'd like to be your cap supplier: mesh dome caps and wig caps at partner prices, delivered to you, with a free sample pack to start${l.teaches ? ", plus caps for your classes" : ""}.\n\nHere's a short proposal for ${first}:\n{link}\n\nCan we talk this week?`,
+    whatsapp: `Hello ${first} 👋🏾\n\nI'm ${c.yourName} from AU Hair Accessories, wig cap suppliers at Trade Fair, Lagos. I love the wigs you make.\n\nWe'd like to be your cap supplier: mesh dome caps from ${NGN(pr.diy.bulk)} a dozen, even on small orders, delivered to you. You can start with a free sample dozen (you only cover logistics)${l.teaches ? ", and we can supply your classes too" : ""}.\n\nHere's a short proposal for ${first}:\n{link}\n\nCan we talk this week?`,
     emailSubject: `Business partnership: wig caps for ${first}`,
-    emailBody: `Hello ${first},\n\nI'm ${c.yourName} from AU Hair Accessories, a wig cap supplier at BBA Trade Fair Complex, Lagos.\n\nWe'd love to partner with ${first} as your supplier of mesh dome caps and wig caps, the base of every unit you build.\n\nAs a partner you get:\n${c.offer.map((x) => "• " + perkOf(x).t).join("\n")}${l.teaches ? "\n• " + perkOf(c.classOffer).t : ""}\n\nThe full proposal, with prices:\n{link}\n\nCan we start with a free sample pack?\n\nWarm regards,\n${c.yourName}\nAU Hair Accessories\nWhatsApp: 0912 643 3425\nauhairaccessories.com`,
+    emailBody: `Hello ${first},\n\nI'm ${c.yourName} from AU Hair Accessories, a wig cap supplier at BBA Trade Fair Complex, Lagos.\n\nWe'd love to partner with ${first} as your supplier of mesh dome caps and wig caps, the base of every unit you build.\n\nAs a partner you get:\n${c.offer.map((x) => "• " + perkOf(fillOffer(x, pr)).t).join("\n")}${l.teaches ? "\n• " + perkOf(c.classOffer).t : ""}\n\nThe full proposal, with prices:\n{link}\n\nCan we start with a free sample dozen? You only cover logistics.\n\nWarm regards,\n${c.yourName}\nAU Hair Accessories\nWhatsApp: 0912 643 3425\nauhairaccessories.com`,
   });
   if (!env.AI) return fallback();
   try {
-    const sys = `You write short, warm, confident B2B supply-partnership outreach in Nigerian business English for AU Hair Accessories, written to wig businesses (wig makers, vendors, people who turn bundles into custom units). The goal is a business partnership: AU supplies their wig caps. Use ONLY the facts provided; never invent awards, numbers, names, dates or claims about the business you are writing to. Keep it short and easy to read. No hashtags. Return ONLY a JSON object with keys: intro (max 28 words, tailored to this business, speaks to them directly, for the top of the proposal), whatsapp (max 80 words, friendly, max 2 emojis, must contain the exact placeholder {link} on its own line, end with a simple question), emailSubject (max 60 chars), emailBody (90-140 words, plain text with line breaks, a short bullet list of the partner perks using only their titles, must contain {link} on its own line, sign off with the sender name, "AU Hair Accessories", "WhatsApp: 0912 643 3425" and "auhairaccessories.com").`;
+    const sys = `You write short, warm, confident B2B supply-partnership outreach in Nigerian business English for AU Hair Accessories, written to wig businesses (wig makers, vendors, people who turn bundles into custom units). The goal is a business partnership: AU supplies their wig caps. Use ONLY the facts provided; never invent awards, numbers, names, dates or claims about the business you are writing to. Keep it short and easy to read. No hashtags. Return ONLY a JSON object with keys: intro (max 28 words, tailored to this business, speaks to them directly, for the top of the proposal), whatsapp (max 80 words, friendly, max 2 emojis, must contain the exact placeholder {link} on its own line, end with a simple question), emailSubject (max 60 chars), emailBody (90-140 words, plain text with line breaks, a short bullet list of the partner perks using only their titles, must contain {link} on its own line, sign off with the sender name, "AU Hair Accessories", "WhatsApp: 0912 643 3425" and "auhairaccessories.com"). Mention the free sample dozen (one dozen of mesh dome caps, they only cover logistics).`;
     const out = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", { messages: [{ role: "system", content: sys }, { role: "user", content: facts + "\n\n" + biz }], max_tokens: 900, temperature: 0.6 });
     const txt = String(out?.response ?? out?.result?.response ?? (typeof out === "string" ? out : JSON.stringify(out)));
     const j = JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
@@ -657,7 +659,7 @@ Sender: ${c.yourName}, AU Hair Accessories.`;
   } catch (e) { return fallback(); }
 }
 const ICONS = {
-  naira: "M6 20V4l12 16V4M3 10h18M3 14h18", gift: "M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z",
+  naira: "M6 20V4l12 16V4M3 10h18M3 14h18", mesh: "M3 18a9 9 0 0 1 18 0zM7.5 10.5v7.5M12 9v9M16.5 10.5v7.5M4.5 14h15", wind: "M3 8h11a3 3 0 1 0-3-3M3 16h14a3 3 0 1 1-3 3M3 12h17", box: "M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10", down: "M12 4v16M6 14l6 6 6-6", gift: "M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z",
   star: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z", truck: "M1 4h14v12H1zM15 8h4l3 3v5h-7zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
   cart: "M6 6h15l-1.5 9h-12zM6 6L5 3H2M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z", chat: "M21 12a8 8 0 0 1-11.8 7L3 21l2-6A8 8 0 1 1 21 12z", grad: "M22 10L12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5",
 };
@@ -680,49 +682,51 @@ async function proposalPublic(env, url) {
   const v = encodeURIComponent(lead.proposal_at || "");
   const title = `${lead.name} × AU Hair Accessories · Partnership proposal`;
   const date = new Date(lead.proposal_at || Date.now()).toLocaleDateString("en-NG", { timeZone: "Africa/Lagos", day: "numeric", month: "long", year: "numeric" });
-  const wa = `https://wa.me/${SHOP.wa}?text=${encodeURIComponent(`Hello AU Hair Accessories, this is ${lead.name}. I saw your partnership proposal and I'd like to start with the free sample pack.`)}`;
+  const wa = `https://wa.me/${SHOP.wa}?text=${encodeURIComponent(`Hello AU Hair Accessories, this is ${lead.name}. I saw your partnership proposal and I'd like my free sample dozen.`)}`;
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${hx(title)}</title><meta name="robots" content="noindex, nofollow"><meta name="theme-color" content="#410440">
-<meta property="og:type" content="website"><meta property="og:site_name" content="AU Hair Accessories"><meta property="og:title" content="${hx(title)}"><meta property="og:description" content="Quality wig caps, steady stock and partner prices for ${hx(lead.name)}.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="AU Hair Accessories"><meta property="og:title" content="${hx(title)}"><meta property="og:description" content="Mesh dome caps and wig caps at partner prices for ${hx(lead.name)}.">
 ${lead.has_pdf ? `<meta property="og:image" content="${url.origin}/p/${lead.token}/preview.jpg?v=${v}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">` : ""}<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 <style>*{box-sizing:border-box}html,body{margin:0;background:#F7F1F7;color:#24021F;font-family:Poppins,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-.w{max-width:760px;margin:0 auto;padding:16px 16px 40px}.pp{background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 20px 50px rgba(65,4,64,.12)}
-.hd{background:radial-gradient(120% 140% at 85% 0%,#7A1577,#410440 55%,#24021F);color:#fff;padding:26px 24px 70px;position:relative;overflow:hidden}
-.hd .wm{position:absolute;right:-40px;bottom:-40px;width:240px;opacity:.07}.hd .l{height:40px;display:block}
-.eb{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;letter-spacing:.18em;font-weight:700;color:#E58BE3;margin:26px 0 8px}.eb span:last-child{letter-spacing:0;color:#E9CFE8;font-weight:500}
-.hd h1{margin:0;font-size:30px;line-height:1.15;letter-spacing:-.02em}.hd h1 i{font-style:normal;color:#E58BE3}.hd p{margin:12px 0 0;color:#F2DDF1;font-size:15.5px;line-height:1.55;max-width:560px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-44px 20px 0;position:relative}.stats div{background:#fff;border-radius:18px;padding:14px 12px;text-align:center;box-shadow:0 10px 30px rgba(65,4,64,.14)}
-.stats b{display:block;font-size:21px;color:#410440;letter-spacing:-.02em}.stats span{font-size:11.5px;color:#7A6479;line-height:1.3;display:block;margin-top:2px}
-.sec{padding:30px 24px 0}.lb{font-size:11.5px;font-weight:700;letter-spacing:.18em;color:#A0229E;margin:0 0 4px}.sec h2{margin:0 0 16px;font-size:21px;letter-spacing:-.01em}
-.prods{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.pc{border:1.5px solid #F0E3EF;border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
-.pc img{width:100%;aspect-ratio:4/4.4;object-fit:cover;display:block;background:#F7F1F7}.pc div{padding:12px;display:flex;flex-direction:column;flex:1}.pc b{font-size:14.5px;line-height:1.25}
-.pc em{font-style:normal;display:inline-block;background:#FFE7FF;color:#A0229E;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;margin:6px 0 8px;align-self:flex-start}
-.pc ul{margin:0 0 10px;padding:0;list-style:none;font-size:12px;color:#7A6479}.pc li::before{content:"✓ ";color:#1E9E5A;font-weight:800}.pc strong{margin-top:auto;font-size:18px;color:#410440}.pc small{color:#7A6479;font-size:11px}
-@media(max-width:600px){.stats{margin:-44px 12px 0;gap:8px}.stats div{padding:12px 6px}.stats b{font-size:16px;white-space:nowrap}.stats span{font-size:10.5px}.eb{flex-direction:column;gap:4px}.hd h1{font-size:26px}.prods{grid-template-columns:1fr}.pc{flex-direction:row}.pc img{width:120px;aspect-ratio:auto;height:auto;min-height:150px}}
-.perks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pk{background:#F7F1F7;border-radius:16px;padding:14px;display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
-.pk i{width:40px;height:40px;border-radius:12px;background:#410440;color:#fff;display:grid;place-items:center}.pk b{display:block;font-size:14px}.pk span{font-size:12.5px;color:#7A6479;line-height:1.45}
-@media(max-width:600px){.perks{grid-template-columns:1fr}}
-.cls{margin-top:12px;background:linear-gradient(120deg,#FFE7FF,#F3E4FF);border-radius:18px;padding:16px;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center}.cls i{width:44px;height:44px;border-radius:50%;background:#A0229E;color:#fff;display:grid;place-items:center}.cls b{display:block}.cls span{font-size:13px;color:#5A3D58}
-table{width:100%;border-collapse:collapse;font-size:13px}th{font-size:11px;color:#7A6479;font-weight:600;text-align:left;padding:8px 6px;border-bottom:2px solid #F0E3EF}td{padding:11px 6px;border-bottom:1px solid #F3E9F3;vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}td b{color:#410440}tr:last-child td{border:0}
+.w{max-width:620px;margin:0 auto;padding:14px 14px 40px}.pp{background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 20px 50px rgba(65,4,64,.12)}
+.hd{background:radial-gradient(120% 140% at 85% 0%,#7A1577,#410440 55%,#24021F);color:#fff;padding:24px 22px 78px;position:relative;overflow:hidden}
+.hd .wm{position:absolute;right:-40px;bottom:-40px;width:230px;opacity:.07}.hd .l{height:38px;display:block}
+.eb{font-size:11px;letter-spacing:.2em;font-weight:700;color:#E58BE3;margin:24px 0 2px}.dt{font-size:12.5px;color:#E9CFE8;margin:0 0 10px}
+.hd h1{margin:0;font-size:28px;line-height:1.15;letter-spacing:-.02em}.hd h1 i{font-style:normal;color:#E58BE3}.hd p{margin:12px 0 0;color:#F2DDF1;font-size:15px;line-height:1.55}
+.bx{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:-52px 16px 0;position:relative}.bx div{background:#fff;border-radius:18px;padding:14px;box-shadow:0 10px 30px rgba(65,4,64,.14)}
+.bx i{width:36px;height:36px;border-radius:11px;background:#FFE7FF;color:#A0229E;display:grid;place-items:center;margin-bottom:8px}.bx b{display:block;font-size:14px;line-height:1.25}.bx span{display:block;font-size:12px;color:#7A6479;line-height:1.4;margin-top:3px}
+.sec{padding:30px 20px 0}.lb{font-size:11px;font-weight:700;letter-spacing:.2em;color:#A0229E;margin:0 0 4px}.sec h2{margin:0 0 14px;font-size:22px;letter-spacing:-.01em;line-height:1.2}
+.pc{display:grid;grid-template-columns:118px 1fr;border:1.5px solid #F0E3EF;border-radius:20px;overflow:hidden;margin-bottom:12px}.pc img{width:118px;height:100%;min-height:200px;object-fit:cover;display:block;background:#F7F1F7}
+.pc>div{padding:13px 14px}.pc b{display:block;font-size:15.5px;line-height:1.25}.pc em{font-style:normal;display:inline-block;background:#FFE7FF;color:#A0229E;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;margin:6px 0 6px}
+.pc ul{margin:0 0 8px;padding:0;list-style:none;font-size:12px;color:#7A6479;line-height:1.55}.pc li::before{content:"✓ ";color:#1E9E5A;font-weight:800}
+.pr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.pr s{color:#A895A7;font-size:14px}.pr strong{font-size:22px;color:#410440;letter-spacing:-.02em}.pr small{font-size:11px;color:#1E9E5A;font-weight:700}
+.bk{margin-top:7px;background:#F7F1F7;border-radius:10px;padding:6px 9px;font-size:12px;display:flex;justify-content:space-between;gap:6px}.bk span{color:#7A6479}.bk b{display:inline;font-size:12.5px;color:#24021F}
+.pk{display:grid;grid-template-columns:46px 1fr;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid #F3E9F3}.pk:last-child{border:0}.pk i{width:46px;height:46px;border-radius:14px;background:#410440;color:#fff;display:grid;place-items:center}
+.pk b{display:block;font-size:15px}.pk span{font-size:13px;color:#7A6479;line-height:1.45}
+.cls{margin-top:10px;background:linear-gradient(120deg,#FFE7FF,#F3E4FF);border-radius:18px;padding:14px;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center}.cls i{width:44px;height:44px;border-radius:50%;background:#A0229E;color:#fff;display:grid;place-items:center}.cls b{display:block;font-size:14.5px}.cls span{font-size:13px;color:#5A3D58}
+.ps{border:1.5px solid #F0E3EF;border-radius:20px;overflow:hidden}.pr2{padding:13px 14px;border-bottom:1px solid #F3E9F3}.pr2:last-child{border:0}.pr2:nth-child(odd){background:#FBF6FB}.pr2 b{font-size:14.5px;display:block;margin-bottom:6px}
+.g3{display:grid;grid-template-columns:1fr 1.15fr 1.3fr;gap:6px}.g3 div{font-size:11px;color:#7A6479}.g3 div span{display:block;font-size:14px;color:#24021F;font-weight:600;margin-top:1px}.g3 div s{display:block;font-size:14px;color:#A895A7;margin-top:1px}.g3 .pp2 span{color:#410440;font-weight:800;font-size:15px}
 .note{font-size:11.5px;color:#7A6479;margin:8px 0 0}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;position:relative}.sp{text-align:center;padding:0 4px}.sp i{width:46px;height:46px;border-radius:50%;background:#C73CC5;color:#fff;font-style:normal;font-weight:800;font-size:18px;display:grid;place-items:center;margin:0 auto 8px;position:relative;z-index:1}
-.steps::before{content:"";position:absolute;left:16%;right:16%;top:23px;height:2px;background:repeating-linear-gradient(90deg,#E58BE3 0 8px,transparent 8px 14px)}.sp b{display:block;font-size:13.5px}.sp span{font-size:12px;color:#7A6479;line-height:1.4}
-.cta{margin:30px 24px 0;background:radial-gradient(120% 160% at 90% 0%,#7A1577,#410440 60%,#24021F);color:#fff;border-radius:22px;padding:22px;text-align:center}.cta h3{margin:0 0 6px;font-size:21px}.cta p{margin:0 0 14px;color:#F2DDF1;font-size:14px}
-.cta a{display:inline-block;background:#1DAA61;color:#fff;text-decoration:none;font-weight:700;border-radius:14px;padding:13px 22px}
-.ft{padding:20px 24px 24px;font-size:12.5px;color:#7A6479;line-height:1.7;text-align:center}.ft b{color:#24021F}
-.bt{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.bt a{flex:1;min-width:150px;text-align:center;text-decoration:none;font-weight:700;border-radius:14px;padding:13px 10px;font-size:14px;background:#fff;color:#410440;border:1.5px solid #EADCEA}
+.st{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:#F7F1F7;border-radius:18px;padding:14px 16px}.st em{font-style:normal;font-size:30px;font-weight:800;color:#E58BE3;letter-spacing:-.03em;line-height:1}
+.st b{display:block;font-size:15px}.st span{font-size:12.5px;color:#7A6479;line-height:1.4}.st i{width:42px;height:42px;border-radius:50%;background:#fff;color:#A0229E;display:grid;place-items:center}
+.ar{display:flex;justify-content:center;color:#E58BE3;margin:4px 0}
+.cta{margin:30px 20px 0;background:radial-gradient(120% 160% at 90% 0%,#7A1577,#410440 60%,#24021F);color:#fff;border-radius:24px;padding:24px 20px;text-align:center}.cta i{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;margin:0 auto 10px;color:#fff}
+.cta h3{margin:0 0 6px;font-size:21px}.cta p{margin:0 0 16px;color:#F2DDF1;font-size:14px;line-height:1.5}.cta a{display:inline-block;background:#1DAA61;color:#fff;text-decoration:none;font-weight:700;border-radius:14px;padding:13px 22px}
+.ft{padding:22px 20px 24px;font-size:12.5px;color:#7A6479;line-height:1.7;text-align:center}.ft b{color:#24021F}
+.bt{display:flex;gap:10px;margin-top:14px}.bt a{flex:1;text-align:center;text-decoration:none;font-weight:700;border-radius:14px;padding:13px 10px;font-size:14px;background:#fff;color:#410440;border:1.5px solid #EADCEA}
 @media print{.bt{display:none}body{background:#fff}.pp{box-shadow:none}}</style></head><body><div class="w"><div class="pp">
 <div class="hd"><img class="wm" src="/img/au-icon-white.png" alt=""><img class="l" src="/img/au-logo-reverse.png" alt="AU Hair Accessories">
-<div class="eb"><span>BUSINESS PARTNERSHIP PROPOSAL</span><span>${hx(date)}</span></div>
+<p class="eb">BUSINESS PARTNERSHIP PROPOSAL</p><p class="dt">${hx(date)}</p>
 <h1>${hx(lead.name)} <i>×</i> AU Hair Accessories</h1><p>${hx(D.intro)}</p></div>
-<div class="stats">${D.stats.map((s) => `<div><b>${hx(s[0])}</b><span>${hx(s[1])}</span></div>`).join("")}</div>
-<div class="sec"><p class="lb">WHAT WE SUPPLY</p><h2>The caps behind every wig you make</h2><div class="prods">${D.products.map((p) => `<div class="pc"><img src="${p.img}" alt="${hx(p.name)}"><div><b>${p.name}</b><em>${p.tag}</em><ul>${p.pts.map((x) => `<li>${x}</li>`).join("")}</ul><strong>${p.price}</strong><small>${p.unit}</small></div></div>`).join("")}</div></div>
-<div class="sec"><p class="lb">AS OUR PARTNER</p><h2>What you get</h2><div class="perks">${D.perks.map((k, i) => `<div class="pk"><i>${svgI(PERK_ICONS[i])}</i><div><b>${hx(k.t)}</b><span>${hx(k.d)}</span></div></div>`).join("")}</div>
+<div class="bx">${D.boxes.map((b) => `<div><i>${svgI(b[0], 20)}</i><b>${hx(b[1])}</b><span>${hx(b[2])}</span></div>`).join("")}</div>
+<div class="sec"><p class="lb">WHAT WE SUPPLY</p><h2>The caps behind every wig you make</h2>${D.products.map((p) => `<div class="pc"><img src="${p.img}" alt="${hx(p.name)}"><div><b>${p.name}</b><em>${p.tag}</em><ul>${p.pts.map((x) => `<li>${x}</li>`).join("")}</ul>
+<div class="pr"><s>${p.was}</s><strong>${p.partner}</strong><small>PARTNER PRICE / DOZEN</small></div><div class="bk"><span>${p.bulkLabel}</span><b>${p.bulk}</b></div></div></div>`).join("")}</div>
+<div class="sec"><p class="lb">AS OUR PARTNER</p><h2>What you get</h2>${D.perks.map((k, i) => `<div class="pk"><i>${svgI(PERK_ICONS[i])}</i><div><b>${hx(k.t)}</b><span>${hx(k.d)}</span></div></div>`).join("")}
 ${D.classPerk ? `<div class="cls"><i>${svgI("grad")}</i><div><b>You teach wig making too? ${hx(D.classPerk.t)}</b><span>${hx(D.classPerk.d)}</span></div></div>` : ""}</div>
-<div class="sec"><p class="lb">PRICES</p><h2>Your price sheet</h2><table><tr><th>Cap</th><th class="n">Per dozen</th><th class="n">Bulk pack</th><th class="n">Works out to</th></tr>${D.prices.map((r) => `<tr><td><b>${r[0]}</b></td><td class="n">${r[1]}</td><td class="n">${r[3]}<br><span class="note">${r[2]}</span></td><td class="n"><b>${r[4]}</b>/dz</td></tr>`).join("")}</table><p class="note">Prices exclude logistics.</p></div>
-<div class="sec"><p class="lb">HOW IT WORKS</p><h2>Partnering is simple</h2><div class="steps">${D.steps.map((s, i) => `<div class="sp"><i>${i + 1}</i><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}</div></div>
-<div class="cta"><h3>Let's start with a free sample pack</h3><p>Reply and we'll send it to ${hx(lead.name)} this week.</p><a href="${wa}">Reply on WhatsApp</a></div>
+<div class="sec"><p class="lb">PRICES</p><h2>Your partner price sheet</h2><div class="ps">${D.products.map((p) => `<div class="pr2"><b>${p.name}</b><div class="g3"><div>Normal price<s>${p.was} /dz</s></div><div class="pp2">Partner price<span>${p.partner} /dz</span></div><div>${p.bulkLabel}<span>${p.bulk}</span></div></div></div>`).join("")}</div><p class="note">Partner prices apply to any quantity. Prices exclude logistics.</p></div>
+<div class="sec"><p class="lb">HOW IT WORKS</p><h2>Partnering is simple</h2>${D.steps.map((s, i) => `${i ? `<div class="ar">${svgI("down", 22)}</div>` : ""}<div class="st"><em>0${i + 1}</em><div><b>${s[1]}</b><span>${s[2]}</span></div><i>${svgI(s[0], 20)}</i></div>`).join("")}</div>
+<div class="cta"><i>${svgI("gift", 26)}</i><h3>${hx(D.sample.t)}</h3><p>${hx(D.sample.d)}</p><a href="${wa}">Claim it on WhatsApp</a></div>
 <div class="ft"><b>AU Hair Accessories</b> · ${hx(D.yourName)}<br>${hx(SHOP.address)}<br>WhatsApp ${hx(SHOP.phone)} · ${hx(SHOP.ig)} · ${hx(SHOP.web)}</div></div>
 ${lead.has_pdf ? `<div class="bt"><a href="/p/${lead.token}/proposal.pdf?dl=1&v=${v}">Download PDF</a></div>` : ""}</div></body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
