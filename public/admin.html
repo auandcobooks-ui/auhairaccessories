@@ -165,9 +165,11 @@ label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:1
 .sheet.on{display:flex}
 .sheet .bx{background:var(--bg);width:min(520px,100%);border-radius:22px 22px 0 0;padding:18px 16px;padding-bottom:max(18px,env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;overflow-x:hidden;touch-action:pan-y}
 @media(min-width:760px){.sheet{align-items:center}.sheet .bx{border-radius:22px}}
+.rframe{width:100%;height:72vh;border:0;border-radius:14px;background:#fff;display:block}
 .mitem{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;margin-bottom:8px;cursor:pointer;text-align:left}
 .mitem svg{width:20px;height:20px;color:var(--orchid)}
-.rprev{width:100%;max-height:52vh;object-fit:contain;object-position:top;border-radius:14px;border:1px solid var(--line);background:#fff;display:block}
+.sendrow{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px}.sendrow .btn{padding:11px 6px;font-size:13px}
+.rprev{-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;width:100%;max-height:52vh;object-fit:contain;object-position:top;border-radius:14px;border:1px solid var(--line);background:#fff;display:block}
 </style>
 </head>
 <body>
@@ -209,6 +211,9 @@ const I = {
   clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   wa: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>',
   share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8h16v-8M16 6l-4-4-4 4M12 2v13"/></svg>',
+  sms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.8 7L3 21l2-6A8 8 0 1 1 21 12z"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
+  img: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>',
   dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v3h16v-3M12 3v13M7 11l5 5 5-5"/></svg>',
 };
 
@@ -463,14 +468,14 @@ async function openOrder(ref, fresh) {
    <div class="card" style="margin-top:12px">
      ${o.status === "cancelled" ? `<div class="cxl">This order was cancelled ${when(o.cancelled_at)}.</div>` : `<div class="trk"><span class="fill" style="width:${Math.max(0, idx) * 25}%"></span>${STEPS.map((s, i) => `<div class="st ${i <= idx ? "on" : ""} ${i === idx ? "cur" : ""}"><i>${i <= idx ? "✓" : ""}</i><b>${STEPTXT[s][0]}</b><small>${i <= idx && at[s] ? when(at[s]) : STEPTXT[s][1]}</small></div>`).join("")}</div>`}
      ${next ? `<button class="btn w ${o.status === "new" ? "g" : ""}" id="nxt">${next[1]}</button>` : o.status === "delivered" ? `<p style="text-align:center;font-weight:700;color:var(--ok);margin:4px 0">Order complete ✓</p>` : `<button class="btn w o" id="reo">Reopen this order</button>`}
-     ${o.status === "dispatched" || o.status === "delivered" ? `<a class="btn o w" style="margin-top:8px" id="upd-wa" href="${esc(waLink(o.phone, MSG[o.status](o)))}" target="_blank" rel="noopener">${I.wa}Send "${o.status === "dispatched" ? "on its way" : "delivered"}" message</a>` : ""}
+     ${o.status === "dispatched" || o.status === "delivered" ? `<p style="margin:14px 0 6px;font-weight:700;font-size:13px">Send the "${o.status === "dispatched" ? "on its way" : "delivered"}" message</p>${sendRow(o, o.status)}` : ""}
      <div class="row" style="justify-content:center;gap:4px;margin-top:6px;flex-wrap:wrap">${idx > 0 ? `<button class="lnk" id="back">Move back to ${STEPTXT[STEPS[idx - 1]][0]}</button>` : ""}${o.status !== "cancelled" && o.status !== "delivered" ? `<button class="lnk" id="cxl" style="color:var(--bad)">Cancel order</button>` : ""}</div>
    </div>
    ${idx >= 1 ? `<div class="card" style="margin-top:12px"><h3>Receipt</h3>${o.receipt_token ? `<div class="rcp"><img src="/r/${o.receipt_token}/receipt.jpg?v=${rv}" alt="Receipt" id="rimg"><div>
        <p style="margin:0 0 8px;font-size:13px">${o.receipt_sent ? `<span class="sent">✓ Sent ${when(o.receipt_sent)}</span>` : `<b>Ready to send</b>`}<br><span class="muted">Branded receipt with ${esc(first(o.name))}'s details and a live order tracker.</span></p>
-       <a class="btn g w" id="sendr" href="${esc(waLink(o.phone, MSG.receipt(o)))}" target="_blank" rel="noopener">${I.wa}${o.receipt_sent ? "Send again" : "Send to " + esc(first(o.name))}</a>
-       <div class="row" style="margin-top:8px;gap:8px"><button class="btn o sm" id="shr" style="flex:1">${I.share}Image</button><a class="btn o sm" style="flex:1" href="/r/${o.receipt_token}" target="_blank" rel="noopener">${I.eye}View</a></div>
-       <button class="lnk" id="remk">Remake receipt</button></div></div>` : `<p class="muted" style="margin:0 0 10px">No receipt yet for this order.</p><button class="btn g w" id="mkr">Make receipt</button>`}</div>` : ""}
+       <div class="row" style="gap:8px"><button class="btn o sm" id="shr" style="flex:1">${I.img}Save image</button><button class="btn o sm" id="vwr" style="flex:1">${I.eye}View</button></div>
+       <button class="lnk" id="remk">Remake receipt</button></div></div>
+       <p style="margin:12px 0 6px;font-weight:700;font-size:13px">Send receipt to ${esc(first(o.name))}</p>${sendRow(o, "receipt")}` : `<p class="muted" style="margin:0 0 10px">No receipt yet for this order.</p><button class="btn g w" id="mkr">Make receipt</button>`}</div>` : ""}
    <div class="card" style="margin-top:12px"><table class="items"><colgroup><col><col style="width:22%"><col style="width:22%"><col style="width:24%"></colgroup><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Total</th></tr>
      ${o.items.map((i) => `<tr><td>${esc(i.name)}${i.colourName && i.id === "regular" ? `<br><span class="muted">${esc(i.colourName)}</span>` : ""}</td><td class="n">${i.qty} ${i.unit === "big" ? esc(i.unitName || "bag") : "dz"}${i.dozens && i.unit === "big" ? `<br><span class="muted">${i.dozens} dz</span>` : ""}</td><td class="n">${naira(i.price)}</td><td class="n">${naira(i.line)}</td></tr>`).join("")}
      <tr><td colspan="3"><b>Total</b> <span class="muted">(excluding logistics)</span></td><td class="n"><b>${naira(o.total)}</b></td></tr></table></div>
@@ -490,9 +495,9 @@ async function openOrder(ref, fresh) {
   $("#cxl", P) && ($("#cxl", P).onclick = () => { if (confirm(`Cancel order ${o.ref}? You can reopen it later.`)) patchOrder(o.ref, { status: "cancelled" }, "Order cancelled"); });
   $("#mkr", P) && ($("#mkr", P).onclick = () => makeReceipt(o.ref, true));
   $("#remk", P) && ($("#remk", P).onclick = () => makeReceipt(o.ref, true));
-  $("#rimg", P) && ($("#rimg", P).onclick = () => window.open(`/r/${o.receipt_token}`, "_blank"));
-  $("#sendr", P) && ($("#sendr", P).onclick = () => markSent(o.ref));
-  $("#shr", P) && ($("#shr", P).onclick = () => shareImage(o));
+  $("#rimg", P) && ($("#rimg", P).onclick = () => imageSheet(o));
+  $("#shr", P) && ($("#shr", P).onclick = () => imageSheet(o));
+  $("#vwr", P) && ($("#vwr", P).onclick = () => pageSheet(o));
   $("#tocust", P) && ($("#tocust", P).onclick = () => openCustomer(o.customer));
   $("#svn", P).onclick = () => patchOrder(o.ref, { notes: $("#nt").value }, "Notes saved");
   $("#del", P) && ($("#del", P).onclick = () => { if (confirm(`Delete order ${o.ref}? You can restore it or undo this later.`)) patchOrder(o.ref, { deleted: true }, "Order deleted", true); });
@@ -508,10 +513,45 @@ function afterChange() { if (S.tab === "orders") loadOrders(); else if (S.tab ==
 async function markSent(ref) { try { const d = await api(`orders/${ref}/receipt/sent`, { method: "POST" }); putOrder(d.order); setTimeout(() => S.openRef === ref && openOrder(ref), 800); } catch {} }
 const imgCache = {};
 async function prefetchImage(o) { const k = o.receipt_token + o.receipt_at; if (imgCache[k]) return imgCache[k]; try { const b = await (await fetch(`/r/${o.receipt_token}/receipt.jpg?v=${encodeURIComponent(o.receipt_at || "")}`)).blob(); imgCache[k] = new File([b], `AU-receipt-${o.ref}.jpg`, { type: "image/jpeg" }); } catch {} return imgCache[k]; }
-async function shareImage(o) {
-  const f = imgCache[o.receipt_token + o.receipt_at] || await prefetchImage(o);
-  if (f && navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text: MSG.receipt(o) }); markSent(o.ref); } catch {} return; }
-  const a = document.createElement("a"); a.href = `/r/${o.receipt_token}/receipt.jpg?dl=1`; a.download = ""; a.click(); toast("Receipt image downloaded");
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function smsLink(phone, text) { return `sms:${String(phone || "").replace(/[^\d+]/g, "")}${isIOS ? "&" : "?"}body=${encodeURIComponent(text)}`; }
+function sendRow(o, kind) {
+  const t = MSG[kind](o), d = `data-send="${kind}" data-ref="${esc(o.ref)}"`;
+  return `<div class="sendrow"><a class="btn g" ${d} data-ch="wa" href="${esc(waLink(o.phone, t))}" target="_blank" rel="noopener">${I.wa}WhatsApp</a><a class="btn o" ${d} data-ch="sms" href="${esc(smsLink(o.phone, t))}">${I.sms}Text</a><button class="btn o" ${d} data-ch="copy" type="button">${I.copy}Copy</button></div>`;
+}
+async function copyText(t) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(t); ok = true; } catch {}
+  if (!ok) { const ta = document.createElement("textarea"); ta.value = t; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;font-size:16px"; document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, t.length); try { ok = document.execCommand("copy"); } catch {} ta.remove(); }
+  toast(ok ? "Copied · paste it in your message" : "Couldn't copy, please try again");
+  return ok;
+}
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-send]"); if (!b) return;
+  const o = S.orders.find((x) => x.ref === b.dataset.ref); if (!o) return;
+  if (b.dataset.ch === "copy") { e.preventDefault(); const ok = await copyText(MSG[b.dataset.send](o)); if (ok && b.dataset.send === "receipt") markSent(o.ref); return; }
+  if (b.dataset.send === "receipt") markSent(o.ref);
+  if (b.closest("#sheet")) setTimeout(closeSheet, 400);
+});
+const imgUrl = (o) => `/r/${o.receipt_token}/receipt.jpg?v=${encodeURIComponent(o.receipt_at || "")}`;
+function imageSheet(o) {
+  // Everything stays inside the dashboard: on iPhone, press and hold the picture to save it to Photos
+  const canShareFiles = !!(navigator.canShare && navigator.share);
+  openSheet(`<div class="row" style="margin-bottom:6px"><h3 style="margin:0;flex:1">Save receipt image</h3><button class="btn o sm" data-sclose>Done</button></div>
+    <p class="muted" style="margin:0 0 10px">${isIOS ? "Press and hold the picture, then tap <b>Save to Photos</b>." : "Press and hold the picture, then tap <b>Download image</b>."}</p>
+    <img class="rprev" style="max-height:64vh" src="${imgUrl(o)}" alt="Receipt ${esc(o.ref)}">
+    ${canShareFiles ? `<button class="btn o w" id="is-share" style="margin-top:10px">${I.share}Share or save with other apps</button>` : ""}
+    <button class="btn w" data-sclose style="margin-top:8px">Done</button>`);
+  $("#is-share") && ($("#is-share").onclick = async () => {
+    const f = await prefetchImage(o);
+    if (!f || !navigator.canShare({ files: [f] })) return toast("Press and hold the picture to save it");
+    try { await navigator.share({ files: [f] }); } catch {}
+  });
+  prefetchImage(o);
+}
+function pageSheet(o) {
+  openSheet(`<div class="row" style="margin-bottom:10px"><h3 style="margin:0;flex:1">What ${esc(first(o.name))} sees</h3><button class="btn o sm" data-sclose>Close</button></div>
+    <iframe class="rframe" src="/r/${o.receipt_token}" title="Receipt page"></iframe>`);
 }
 
 // ---------- branded receipt (drawn in the browser, saved to the store) ----------
@@ -598,12 +638,11 @@ async function makeReceipt(ref, showReady) {
 }
 function readySheet(o, img) {
   $("#toast").classList.remove("on");
-  openSheet(`<h3 style="margin:0 0 4px">Receipt ready for ${esc(first(o.name))}</h3><p class="muted" style="margin:0 0 12px">It goes straight to ${esc(o.phone || "their number")} on WhatsApp. Just tap send in the chat.</p>
+  openSheet(`<h3 style="margin:0 0 4px">Receipt ready for ${esc(first(o.name))}</h3><p class="muted" style="margin:0 0 12px">WhatsApp and Text open ${esc(o.phone || "their number")} with the message ready. Copy lets you paste it anywhere.</p>
     <img class="rprev" src="${img}" alt="Receipt preview">
-    <a class="btn g w" style="margin-top:12px;padding:14px" id="rs-send" href="${esc(waLink(o.phone, MSG.receipt(o)))}" target="_blank" rel="noopener">${I.wa}Send receipt to ${esc(first(o.name))}</a>
-    <div class="row" style="margin-top:8px"><button class="btn o" style="flex:1" id="rs-img">${I.share}Send as image</button><button class="btn o" style="flex:1" data-sclose>Later</button></div>`);
-  $("#rs-send").onclick = () => { markSent(o.ref); setTimeout(closeSheet, 300); };
-  $("#rs-img").onclick = () => { shareImage(o); };
+    <p style="margin:12px 0 6px;font-weight:700;font-size:13px">Send it to ${esc(first(o.name))} by</p>${sendRow(o, "receipt")}
+    <div class="row" style="margin-top:8px"><button class="btn o" style="flex:1" id="rs-img">${I.img}Save image</button><button class="btn o" style="flex:1" data-sclose>Later</button></div>`);
+  $("#rs-img").onclick = () => imageSheet(o);
   prefetchImage(o);
 }
 
