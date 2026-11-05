@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#410440">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>AU Admin · Dashboard</title>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -14,100 +16,163 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 <style>
-:root{--plum:#410440;--orchid:#C73CC5;--ink:#A0229E;--soft:#E58BE3;--blush:#FFE7FF;--night:#24021F;--bg:#F7F1F7;--card:#fff;--line:#EADCEA;--muted:#7A6479;--text:#24021F;--ok:#1E9E5A;--warn:#C9851A;--bad:#C22F3B}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:Poppins,system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+:root{--plum:#410440;--orchid:#C73CC5;--ink:#A0229E;--soft:#E58BE3;--blush:#FFE7FF;--night:#24021F;--bg:#F7F1F7;--card:#fff;--line:#EADCEA;--muted:#7A6479;--text:#24021F;--ok:#1E9E5A;--warn:#C9851A;--bad:#C22F3B;--navh:0px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Poppins,system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100%;overscroll-behavior:none}
+body{touch-action:pan-y;position:relative}
+img,svg{max-width:100%}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:var(--ink)}
-.top{position:sticky;top:0;z-index:20;background:var(--plum);color:#fff;display:flex;align-items:center;gap:12px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top))}
-.top img{height:30px}
+.top{position:sticky;top:0;z-index:20;background:var(--plum);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top))}
+.top img{height:28px}
 .top .sp{flex:1}
-.top select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:7px 10px}
-.top select{width:auto;max-width:170px}
+.top select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:7px 8px;width:auto;max-width:150px;font-size:13px}
 .top select option{color:#111}
-.rbtn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--plum);border:0;border-radius:10px;padding:7px 12px;font-weight:700;cursor:pointer}
+.rbtn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--plum);border:0;border-radius:10px;padding:7px 11px;font-weight:700;cursor:pointer}
 .rbtn svg{width:16px;height:16px}
-.rbtn.spin svg{animation:sp .8s linear infinite}
+.spin svg,.ptr.go svg{animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .upd{font-size:11.5px;color:#E9CFE8;white-space:nowrap}
-@media(max-width:520px){.upd{display:none}.rbtn span{display:none}}
-.tabs{display:flex;gap:4px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:50px;z-index:19;overflow-x:auto}
-.tabs button{border:0;background:none;padding:9px 14px;border-radius:999px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
-.tabs button[aria-selected=true]{background:var(--blush);color:var(--plum)}
-main{max-width:1180px;margin:0 auto;padding:16px 16px 120px}
+@media(max-width:560px){.upd{display:none}.rbtn span{display:none}}
+/* nav: tabs on wide screens, bottom bar on phones */
+.nav{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:48px;z-index:19}
+.nav button{border:0;background:none;padding:9px 14px;border-radius:999px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;position:relative}
+.nav button svg{width:18px;height:18px;display:none}
+.nav button[aria-selected=true]{background:var(--blush);color:var(--plum)}
+.nav .more{display:none}
+.nav .bdg{background:var(--bad);color:#fff;font-size:10.5px;font-weight:800;border-radius:999px;min-width:18px;height:18px;padding:0 5px;display:inline-grid;place-items:center}
+@media(max-width:759px){
+  :root{--navh:64px}
+  .nav{position:fixed;top:auto;bottom:0;left:0;right:0;border:0;border-top:1px solid var(--line);padding:6px 4px;padding-bottom:max(6px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:0;box-shadow:0 -8px 24px rgba(65,4,64,.08);z-index:40}
+  .nav button{flex-direction:column;gap:2px;font-size:10.5px;padding:5px 2px;border-radius:12px;justify-content:center}
+  .nav button svg{display:block}
+  .nav button[aria-selected=true]{background:none;color:var(--plum)}
+  .nav button[aria-selected=true] svg{color:var(--orchid)}
+  .nav .x{display:none}.nav .more{display:flex}
+  .nav .bdg{position:absolute;top:0;left:calc(50% + 4px)}
+}
+main{max-width:1180px;margin:0 auto;padding:16px 16px calc(110px + var(--navh))}
 h2{font-size:20px;margin:6px 0 12px}
 h3{font-size:15px;margin:0 0 10px}
 .grid{display:grid;gap:12px}
+.grid>*{min-width:0}
 .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(min-width:760px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:1fr 1fr 1fr}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
 .kpi small{display:block;color:var(--muted);font-size:12px;font-weight:600}
-.kpi b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.kpi b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:2px;overflow-wrap:anywhere}
 .kpi span{font-size:12px;color:var(--muted)}
-.kpi.hi{background:var(--plum);color:#fff;border-color:var(--plum)}.kpi.hi small,.kpi.hi span{color:#E9CFE8}
+.kpi .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--blush);color:var(--plum);margin-bottom:10px}
+.kpi .ic svg{width:18px;height:18px}
+.kpi.warn{background:#FFF6E6;border-color:#F4DDAF}.kpi.warn .ic{background:#FFE7B8;color:#8A5A00}
+.hero{background:radial-gradient(120% 160% at 90% 0%,#7A1577 0%,#410440 50%,#24021F 100%);color:#fff;border:0;border-radius:22px;padding:20px;position:relative;overflow:hidden}
+.hero small{color:#E9CFE8;font-weight:600;font-size:12.5px}
+.hero .big{font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:4px 0 6px;overflow-wrap:anywhere}
+.hero .sub{color:#F2DDF1;font-size:13px}
+.hero .wm{position:absolute;right:-30px;bottom:-30px;width:180px;opacity:.08;pointer-events:none}
+.hero .hrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.hero .hrow div{background:rgba(255,255,255,.09);border-radius:14px;padding:10px}
+.hero .hrow b{display:block;font-size:17px}
+.hero .hrow span{font-size:11.5px;color:#E9CFE8}
 .row{display:flex;align-items:center;gap:10px}
-.bar{display:grid;grid-template-columns:minmax(110px,1.3fr) 1fr 56px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
+.bar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 56px;gap:10px;align-items:center;margin:7px 0;font-size:13px}
 .bar i{display:block;height:10px;border-radius:6px;background:var(--orchid);min-width:2px}
 .bar .t{height:10px;background:#F3E6F3;border-radius:6px;overflow:hidden}
 .bar em{font-style:normal;text-align:right;font-weight:600}
 .lst{margin:0;padding:0;list-style:none}
 .lst li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F3E9F3;font-size:13px}
+.lst li>span:last-child{text-align:right;overflow-wrap:anywhere;min-width:0}
 .lst li:last-child{border:0}
 .muted{color:var(--muted)}
-.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;text-transform:capitalize}
-.s-new{background:#FFF2D9;color:#8A5A00}.s-confirmed{background:#E5EEFF;color:#1B3CC6}.s-paid{background:#DDF6E8;color:#147A43}.s-dispatched{background:#EFE4FF;color:#5B2BB5}.s-delivered{background:#D9F2EE;color:#0F6E61}.s-cancelled{background:#F5E1E3;color:#9B1E2A}
-.btn{border:0;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer;background:var(--plum);color:#fff}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.s-new{background:#FFF2D9;color:#8A5A00}.s-confirmed{background:#DDF6E8;color:#147A43}.s-dispatched{background:#EFE4FF;color:#5B2BB5}.s-delivered{background:#D9F2EE;color:#0F6E61}.s-cancelled{background:#F5E1E3;color:#9B1E2A}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;background:var(--plum);color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn svg{width:18px;height:18px;flex:none}
 .btn.o{background:#fff;color:var(--plum);border:1.5px solid var(--line)}
-.btn.g{background:#1DAA61}.btn.r{background:#fff;color:var(--bad);border:1.5px solid #F0C9CD}
+.btn.g{background:#1DAA61;color:#fff}.btn.r{background:#fff;color:var(--bad);border:1.5px solid #F0C9CD}
+.btn.w{width:100%}.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:10px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.lnk{background:none;border:0;color:var(--muted);font-weight:600;text-decoration:underline;cursor:pointer;padding:6px 4px;font-size:12.5px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .chips button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-weight:600;cursor:pointer;font-size:12.5px}
 .chips button[aria-pressed=true]{background:var(--plum);color:#fff;border-color:var(--plum)}
-input[type=text],input[type=number],input[type=password],input[type=tel],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+input[type=text],input[type=number],input[type=password],input[type=tel],input[type=search],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;font-size:16px}
 textarea{min-height:80px;resize:vertical}
 label.f{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 4px}
-.order{display:grid;grid-template-columns:1fr auto;gap:4px 10px;cursor:pointer}
+.order{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;cursor:pointer}
 .order:hover{border-color:var(--soft)}
 .order b{font-size:15px}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;margin-right:6px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#E2D2E1}.dots i.on{background:var(--ok)}
 .chart{width:100%;height:auto;display:block}
 .drawer{position:fixed;inset:0;z-index:50;display:none}
 .drawer.on{display:block}
 .drawer .sc{position:absolute;inset:0;background:rgba(36,2,31,.45)}
-.drawer .pn{position:absolute;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--bg);overflow:auto;padding:16px 16px 100px;box-shadow:-20px 0 40px rgba(0,0,0,.2)}
-.items{width:100%;border-collapse:collapse;font-size:13px}
-.items td,.items th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+.drawer .pn{position:absolute;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--bg);overflow-y:auto;overflow-x:hidden;padding:16px 16px 100px;padding-top:max(16px,env(safe-area-inset-top));box-shadow:-20px 0 40px rgba(0,0,0,.2);overscroll-behavior:contain;touch-action:pan-y}
+.items{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.items td,.items th{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;overflow-wrap:anywhere}
 .items th{color:var(--muted);font-size:11.5px;font-weight:600}
-.items td.n{text-align:right;font-variant-numeric:tabular-nums}
+.items td.n,.items th.n{text-align:right;font-variant-numeric:tabular-nums}
+/* progress tracker */
+.trk{display:grid;grid-template-columns:repeat(4,1fr);position:relative;margin:4px 0 14px}
+.trk .st{display:grid;justify-items:center;text-align:center;gap:4px;position:relative;z-index:1}
+.trk .st i{width:30px;height:30px;border-radius:50%;background:#fff;border:2.5px solid #E2D2E1;display:grid;place-items:center;font-style:normal;font-weight:800;color:#fff;font-size:14px}
+.trk .st.on i{background:var(--ok);border-color:var(--ok)}
+.trk .st.cur i{box-shadow:0 0 0 5px #D5F2E1}
+.trk .st b{font-size:12px}.trk .st small{font-size:10.5px;color:var(--muted);line-height:1.25}
+.trk::before{content:"";position:absolute;left:12.5%;right:12.5%;top:14px;height:3px;background:#E2D2E1;border-radius:3px}
+.trk .fill{position:absolute;left:12.5%;top:14px;height:3px;background:var(--ok);border-radius:3px;transition:width .3s}
+.cxl{background:#FBEDEE;border:1px solid #F0C9CD;color:#9B1E2A;border-radius:14px;padding:12px;font-weight:600;margin-bottom:12px}
+.rcp{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:start}
+.rcp img{width:92px;border-radius:10px;border:1px solid var(--line);display:block;background:#fff;cursor:pointer}
+.sent{color:var(--ok);font-weight:700;font-size:12.5px}
+.av{width:42px;height:42px;border-radius:50%;background:var(--blush);color:var(--plum);display:grid;place-items:center;font-weight:800;flex:none}
+.cust{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer}
+.cust:hover{border-color:var(--soft)}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;background:#EFE4FF;color:#5B2BB5;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:middle}
 .tog{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:600;user-select:none}
-.tog input{appearance:none;width:40px;height:23px;border-radius:999px;background:#E2D2E1;position:relative;margin:0;cursor:pointer;transition:.15s}
+.tog input{appearance:none;width:40px;height:23px;border-radius:999px;background:#E2D2E1;position:relative;margin:0;cursor:pointer;transition:.15s;flex:none}
 .tog input::after{content:"";position:absolute;left:3px;top:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .tog input:checked{background:var(--ok)}.tog input:checked::after{left:20px}
-.cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
 .col{border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:8px}
 .col .nm{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
-.col .nm i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
-.savebar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--line);padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));display:none;gap:10px;align-items:center;box-shadow:0 -10px 30px rgba(65,4,64,.1)}
+.col .nm i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);flex:none}
+.savebar{position:fixed;left:0;right:0;bottom:var(--navh);z-index:30;background:#fff;border-top:1px solid var(--line);padding:12px 16px;padding-bottom:max(12px,env(safe-area-inset-bottom));display:none;gap:10px;align-items:center;box-shadow:0 -10px 30px rgba(65,4,64,.1)}
+@media(max-width:759px){.savebar{padding-bottom:12px}}
 .savebar.on{display:flex}
-.savebar .sp{flex:1;font-size:13px;color:var(--muted)}
-.audit{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.savebar .sp{flex:1;font-size:13px;color:var(--muted);min-width:0}
+.audit{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
 .audit.dn{opacity:.55}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--night);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;z-index:60;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:max-content;max-width:calc(100% - 32px);top:calc(64px + env(safe-area-inset-top));background:var(--night);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;z-index:60;opacity:0;transition:.2s;pointer-events:none;text-align:center}
 .toast.on{opacity:1}
 .login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(120% 90% at 70% 10%,#62105F,#410440 50%,#24021F);padding:20px}
 .login .card{width:min(380px,100%);text-align:center;padding:28px}
 .login img{height:44px;margin-bottom:10px}
-.ev{font-size:12.5px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:7px 0;border-bottom:1px solid #F3E9F3;align-items:center}
+.ev{font-size:12.5px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 0;border-bottom:1px solid #F3E9F3}
+.ev:last-child{border:0}
 .ev .ty{font-weight:700;color:var(--plum)}
-.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
-.tbl th,.tbl td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
-.tbl th{color:var(--muted);font-weight:600;font-size:11.5px}
-.scroll{overflow-x:auto}
 .empty{padding:30px;text-align:center;color:var(--muted)}
 .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.att{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:10px 0;border-bottom:1px solid #F3E9F3;cursor:pointer;align-items:center}
+.att:last-child{border:0}
+/* pull to refresh */
+.ptr{position:fixed;left:50%;top:0;z-index:45;width:40px;height:40px;margin-left:-20px;border-radius:50%;background:#fff;color:var(--plum);display:grid;place-items:center;box-shadow:0 6px 20px rgba(65,4,64,.25);transform:translateY(-60px);opacity:0;pointer-events:none}
+.ptr svg{width:20px;height:20px}
+.ptr.ease{transition:transform .25s,opacity .25s}
+/* sheets / modal */
+.sheet{position:fixed;inset:0;z-index:55;display:none;align-items:flex-end;justify-content:center;background:rgba(36,2,31,.45)}
+.sheet.on{display:flex}
+.sheet .bx{background:var(--bg);width:min(520px,100%);border-radius:22px 22px 0 0;padding:18px 16px;padding-bottom:max(18px,env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;overflow-x:hidden;touch-action:pan-y}
+@media(min-width:760px){.sheet{align-items:center}.sheet .bx{border-radius:22px}}
+.mitem{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;margin-bottom:8px;cursor:pointer;text-align:left}
+.mitem svg{width:20px;height:20px;color:var(--orchid)}
+.rprev{width:100%;max-height:52vh;object-fit:contain;object-position:top;border-radius:14px;border:1px solid var(--line);background:#fff;display:block}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<div class="ptr" id="ptr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg></div>
 <div class="toast" id="toast"></div>
 <script>
 (() => {
@@ -116,12 +181,36 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const naira = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
 const num = (n) => Number(n || 0).toLocaleString("en-NG");
 const when = (iso) => iso ? new Date(iso).toLocaleString("en-NG", { timeZone: "Africa/Lagos", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "";
+const dateOnly = (iso) => iso ? new Date(iso).toLocaleDateString("en-NG", { timeZone: "Africa/Lagos", day: "numeric", month: "short", year: "numeric" }) : "";
 const ago = (iso) => { const s = (Date.now() - new Date(iso)) / 1000; if (s < 60) return "just now"; if (s < 3600) return Math.floor(s / 60) + "m ago"; if (s < 86400) return Math.floor(s / 3600) + "h ago"; return Math.floor(s / 86400) + "d ago"; };
-const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 2200); };
-const STATUSES = ["new", "confirmed", "paid", "dispatched", "delivered", "cancelled"];
+const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 2600); };
+const first = (n) => String(n || "").trim().split(/\s+/)[0] || "there";
+const initials = (n) => String(n || "?").trim().split(/\s+/).slice(0, 2).map((x) => x[0] || "").join("").toUpperCase() || "?";
+
+const STEPS = ["new", "confirmed", "dispatched", "delivered"];
+const SLABEL = { new: "New", confirmed: "Confirmed", dispatched: "Dispatched", delivered: "Delivered", cancelled: "Cancelled" };
+const STEPTXT = { new: ["Received", "Order sent"], confirmed: ["Confirmed", "Paid"], dispatched: ["Dispatched", "On the way"], delivered: ["Delivered", "Done"] };
 const COLOURS = [["black","Black","#161616"],["brown","Brown","#4A4033"],["dark-brown","Dark Brown","#3A2A1F"],["nude","Nude","#A98B6B"],["wine","Wine","#4E1C2E"],["red","Red","#B3202E"],["pink","Pink","#C3307F"],["purple","Purple","#3B1BA0"],["royal-blue","Royal Blue","#1B3CC6"],["sky-blue","Sky Blue","#4FA6E6"],["white","White","#ECEAE6"]];
 const PRODUCTS = { regular: { name: "Regular Wig Cap", big: "bag", bigDz: 100 }, mixed: { name: "Mixed Colour Bag", big: "bag", bigDz: 100 }, diy: { name: "DIY Mesh Dome Cap", big: "carton", bigDz: 50 }, stretch: { name: "Stretch Mesh Dome Cap", big: "carton", bigDz: 50 } };
 const EVLABEL = { page_view: "Visited", select_colour: "Picked colour", select_unit: "Switched unit", add_to_cart: "Added to cart", remove_from_cart: "Removed item", open_cart: "Opened cart", order_sent: "Sent order", click_whatsapp: "Tapped WhatsApp", click_social: "Tapped social link" };
+const SHOP = { address: "Shop A1, by Bayelsa Plaza, BBA Trade Fair Complex, Lagos", phone: "0912 643 3425", ig: "@auhairaccessories", web: "auhairaccessories.com" };
+const I = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>',
+  people: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg>',
+  box: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>',
+  more: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>',
+  naira: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V4l12 16V4M3 10h18M3 14h18"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  wa: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>',
+  share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8h16v-8M16 6l-4-4-4 4M12 2v13"/></svg>',
+  dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v3h16v-3M12 3v13M7 11l5 5 5-5"/></svg>',
+};
 
 async function api(path, opt = {}) {
   const r = await fetch("/api/admin/" + path, { credentials: "same-origin", headers: { "content-type": "application/json" }, ...opt, body: opt.body ? JSON.stringify(opt.body) : undefined });
@@ -134,107 +223,200 @@ async function api(path, opt = {}) {
 // ---------- login ----------
 function showLogin(msg = "") {
   $("#app").innerHTML = `<div class="login"><form class="card" id="lf"><img src="img/au-logo-primary.png" alt="AU Hair Accessories"><h2 style="margin:4px 0 4px">Admin dashboard</h2><p class="muted" style="margin:0 0 16px">Enter your admin password.</p>
-    <input type="password" id="pw" autocomplete="current-password" placeholder="Password" autofocus><p id="le" style="color:var(--bad);min-height:18px;margin:8px 0">${esc(msg)}</p><button class="btn" style="width:100%">Sign in</button></form></div>`;
+    <input type="password" id="pw" autocomplete="current-password" placeholder="Password" autofocus><p id="le" style="color:var(--bad);min-height:18px;margin:8px 0">${esc(msg)}</p><button class="btn w">Sign in</button></form></div>`;
   $("#lf").onsubmit = async (e) => { e.preventDefault(); try { await api("login", { method: "POST", body: { password: $("#pw").value } }); boot(); } catch (er) { $("#le").textContent = er.message; } };
 }
 
 // ---------- shell ----------
-const S = { tab: "overview", days: 30, status: "", q: "", catalog: null, draft: null, orders: [] };
+const S = { tab: "overview", days: 30, status: "", q: "", cq: "", csort: "recent", catalog: null, draft: null, orders: [], customers: [], cache: {} };
+const TABS = [["overview", "Overview", "Home", I.home], ["orders", "Orders", "Orders", I.bag], ["customers", "Customers", "Customers", I.people], ["products", "Products & stock", "Stock", I.box], ["visitors", "Insights", "Insights", I.chart, "x"], ["activity", "Activity & undo", "Activity", I.undo, "x"], ["settings", "Settings", "Settings", I.gear, "x"]];
 function shell() {
   $("#app").innerHTML = `<div class="top"><img src="img/au-logo-reverse.png" alt="AU"><b style="font-size:13px;opacity:.85">Admin</b><span class="sp"></span><span class="upd" id="upd"></span><button class="rbtn" id="rfr" type="button" aria-label="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg><span>Refresh</span></button>
     <select id="days" aria-label="Date range"><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option></select></div>
-  <nav class="tabs" role="tablist">${[["overview","Overview"],["orders","Orders"],["products","Products & stock"],["visitors","Visitors"],["activity","Activity & undo"],["settings","Settings"]].map(([k,l]) => `<button role="tab" data-tab="${k}" aria-selected="${S.tab === k}">${l}</button>`).join("")}</nav>
+  <nav class="nav" role="tablist">${TABS.map(([k, l, s, ic, x]) => `<button role="tab" class="${x || ""}" data-tab="${k}" aria-selected="${S.tab === k}">${ic}<span class="lg">${l}</span>${k === "orders" ? `<span class="bdg" id="nbdg" hidden></span>` : ""}</button>`).join("")}<button class="more" id="morebtn" aria-selected="false">${I.more}<span>More</span></button></nav>
   <main id="main"></main><div class="savebar" id="savebar"></div>
-  <div class="drawer" id="drawer"><div class="sc" data-close></div><div class="pn" id="dpn"></div></div>`;
+  <div class="drawer" id="drawer"><div class="sc" data-close></div><div class="pn" id="dpn"></div></div>
+  <div class="sheet" id="sheet"><div class="bx" id="sbx"></div></div>`;
+  // short labels on the phone bar
+  const fit = () => $$(".nav button[data-tab]").forEach((b) => { const t = TABS.find((x) => x[0] === b.dataset.tab); $(".lg", b).textContent = innerWidth < 760 ? t[2] : t[1]; });
+  fit(); addEventListener("resize", fit);
   $("#days").value = String(S.days);
   $("#days").onchange = () => { S.days = Number($("#days").value); render(); };
   $("#rfr").onclick = refresh;
-  $$(".tabs button").forEach((b) => (b.onclick = () => { if (S.draft && S.tab === "products" && diffSummary(S.catalog, S.draft).length && !confirm("Discard unsaved product changes?")) return; S.draft = null; S.tab = b.dataset.tab; $$(".tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b))); render(); }));
+  $$(".nav button[data-tab]").forEach((b) => (b.onclick = () => go(b.dataset.tab)));
+  $("#morebtn").onclick = () => openSheet(`<h3 style="margin:0 0 12px">More</h3>${TABS.filter((t) => t[4]).map(([k, l, , ic]) => `<button class="mitem" data-go="${k}">${ic}${l}</button>`).join("")}<button class="btn o w" data-sclose>Close</button>`);
   $("#drawer").addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeDrawer(); });
+  $("#sheet").addEventListener("click", (e) => { if (e.target.id === "sheet" || e.target.closest("[data-sclose]")) closeSheet(); const g = e.target.closest("[data-go]"); if (g) { closeSheet(); go(g.dataset.go); } });
+  setupPTR();
 }
-async function render() { $("#savebar").classList.remove("on"); $("#savebar").innerHTML = ""; await ({ overview, orders, products, visitors, activity, settings })[S.tab](); stamp(); }
+function go(tab) {
+  if (S.draft && S.tab === "products" && diffSummary(S.catalog, S.draft).length && !confirm("Discard unsaved product changes?")) return;
+  S.draft = null; S.tab = tab; closeDrawer(); $("#main").innerHTML = "";
+  $$(".nav button[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.tab === tab)));
+  $("#morebtn").setAttribute("aria-selected", String(!!TABS.find((t) => t[0] === tab)[4]));
+  scrollTo(0, 0); render();
+}
+async function render() { $("#savebar").classList.remove("on"); $("#savebar").innerHTML = ""; await ({ overview, orders, customers, products, visitors, activity, settings })[S.tab](); stamp(); badge(); }
 function stamp() { const u = $("#upd"); if (u) u.textContent = "Updated " + new Date().toLocaleTimeString("en-NG", { timeZone: "Africa/Lagos", hour: "numeric", minute: "2-digit" }); }
+async function badge() { try { const d = S.cache.waiting ?? (await api("orders?status=new")).orders.length; S.cache.waiting = undefined; const b = $("#nbdg"); if (b) { b.hidden = !d; b.textContent = d; } } catch {} }
+let busy = false;
 async function refresh() {
   if (S.tab === "products" && S.draft && S.catalog && diffSummary(S.catalog, S.draft).length && !confirm("Refreshing will discard your unsaved product changes. Continue?")) return;
-  const b = $("#rfr"); if (b.classList.contains("spin")) return; b.classList.add("spin"); closeDrawer();
-  try { await render(); toast("Up to date"); } catch (e) { toast(e.message); } finally { b.classList.remove("spin"); }
+  if (busy) return; busy = true; const b = $("#rfr"); b.classList.add("spin");
+  const drawerRef = $("#drawer").classList.contains("on") ? S.openRef : null;
+  try { await render(); if (drawerRef) await openOrder(drawerRef, true); toast("Up to date"); } catch (e) { toast(e.message); } finally { b.classList.remove("spin"); busy = false; }
 }
 async function boot() { try { await api("me"); shell(); render(); } catch (e) { if (e.message !== "Not signed in") showLogin(e.message); } }
+
+// ---------- pull down to refresh ----------
+function setupPTR() {
+  const P = $("#ptr"); let y0 = null, d = 0;
+  const top = () => (document.scrollingElement || document.documentElement).scrollTop <= 0;
+  const blocked = () => $("#drawer").classList.contains("on") || $("#sheet").classList.contains("on");
+  addEventListener("touchstart", (e) => { if (busy || blocked() || e.touches.length !== 1 || !top()) { y0 = null; return; } y0 = e.touches[0].clientY; d = 0; P.classList.remove("ease"); }, { passive: true });
+  addEventListener("touchmove", (e) => {
+    if (y0 == null) return; d = e.touches[0].clientY - y0;
+    if (d <= 0 || !top()) { P.style.opacity = 0; P.style.transform = "translateY(-60px)"; return; }
+    if (e.cancelable) e.preventDefault();
+    const pull = Math.min(110, d * 0.5);
+    P.style.opacity = Math.min(1, pull / 50); P.style.transform = `translateY(${pull}px) rotate(${pull * 4}deg)`;
+  }, { passive: false });
+  addEventListener("touchend", async () => {
+    if (y0 == null) return; const pull = Math.min(110, d * 0.5); y0 = null; P.classList.add("ease");
+    if (pull >= 60) { P.style.transform = "translateY(70px)"; P.classList.add("go"); await refresh(); P.classList.remove("go"); }
+    P.style.opacity = 0; P.style.transform = "translateY(-60px)";
+  });
+}
 
 // ---------- charts ----------
 function bars(rows, { label, value, fmt = num, max }) {
   const m = max || Math.max(1, ...rows.map(value));
   return rows.length ? rows.map((r) => `<div class="bar"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(label(r))}</span><span class="t"><i style="width:${(value(r) / m) * 100}%"></i></span><em>${fmt(value(r))}</em></div>`).join("") : `<p class="muted">No data yet.</p>`;
 }
-function dailyChart(daily, dailyOrders, days) {
-  const map = {}; const d0 = new Date(Date.now() + 3600e3); const keys = [];
-  for (let i = days - 1; i >= 0; i--) { const d = new Date(d0); d.setUTCDate(d.getUTCDate() - i); const k = d.toISOString().slice(0, 10); keys.push(k); map[k] = { v: 0, n: 0 }; }
+function dayKeys(days) { const d0 = new Date(Date.now() + 3600e3), keys = []; for (let i = days - 1; i >= 0; i--) { const d = new Date(d0); d.setUTCDate(d.getUTCDate() - i); keys.push(d.toISOString().slice(0, 10)); } return keys; }
+function salesChart(dailyOrders, days) {
+  const keys = dayKeys(days), map = Object.fromEntries(keys.map((k) => [k, { v: 0, s: 0, n: 0 }]));
+  dailyOrders.forEach((r) => { if (map[r.d]) Object.assign(map[r.d], { v: r.v, s: r.sold, n: r.n }); });
+  const W = 700, H = 200, P = 8, mv = Math.max(1, ...keys.map((k) => map[k].v)), bw = (W - P * 2) / keys.length;
+  const svg = keys.map((k, i) => { const x = P + i * bw + bw * .14, w = Math.max(1, bw * .72), hv = (map[k].v / mv) * (H - 46), hs = (map[k].s / mv) * (H - 46);
+    return `<rect x="${x}" y="${H - 24 - hv}" width="${w}" height="${hv}" rx="3" fill="#F1D3F0"><title>${k}: ${map[k].n} orders, ${naira(map[k].v)} sent, ${naira(map[k].s)} confirmed</title></rect><rect x="${x}" y="${H - 24 - hs}" width="${w}" height="${hs}" rx="3" fill="#410440"/>`; }).join("");
+  const step = Math.ceil(keys.length / 7);
+  const lbl = keys.map((k, i) => i % step === 0 ? `<text x="${P + i * bw + bw / 2}" y="${H - 6}" font-size="11" text-anchor="middle" fill="#7A6479">${new Date(k + "T12:00:00Z").toLocaleDateString("en-NG", { day: "numeric", month: "short" })}</text>` : "").join("");
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Sales per day">${svg}${lbl}</svg>
+  <div class="row muted" style="font-size:12px;gap:16px;flex-wrap:wrap"><span><i style="display:inline-block;width:10px;height:10px;background:#410440;border-radius:3px"></i> Confirmed</span><span><i style="display:inline-block;width:10px;height:10px;background:#F1D3F0;border-radius:3px"></i> Sent, not yet confirmed</span></div>`;
+}
+function visitChart(daily, dailyOrders, days) {
+  const keys = dayKeys(days), map = Object.fromEntries(keys.map((k) => [k, { v: 0, n: 0 }]));
   daily.forEach((r) => { if (map[r.d]) map[r.d].v = r.v; }); dailyOrders.forEach((r) => { if (map[r.d]) map[r.d].n = r.n; });
-  const W = 700, H = 190, P = 26, mv = Math.max(1, ...keys.map((k) => map[k].v)), mo = Math.max(1, ...keys.map((k) => map[k].n));
-  const bw = (W - P * 2) / keys.length;
+  const W = 700, H = 190, P = 26, mv = Math.max(1, ...keys.map((k) => map[k].v)), mo = Math.max(1, ...keys.map((k) => map[k].n)), bw = (W - P * 2) / keys.length;
   const barsSvg = keys.map((k, i) => { const h = (map[k].v / mv) * (H - 50); return `<rect x="${P + i * bw + bw * .15}" y="${H - 24 - h}" width="${Math.max(1, bw * .7)}" height="${h}" rx="2" fill="#E58BE3"><title>${k}: ${map[k].v} visitors, ${map[k].n} orders</title></rect>`; }).join("");
   const pts = keys.map((k, i) => `${P + i * bw + bw / 2},${H - 24 - (map[k].n / mo) * (H - 50)}`).join(" ");
   const step = Math.ceil(keys.length / 7);
   const lbl = keys.map((k, i) => i % step === 0 ? `<text x="${P + i * bw + bw / 2}" y="${H - 6}" font-size="10" text-anchor="middle" fill="#7A6479">${k.slice(5)}</text>` : "").join("");
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily visitors and orders">${barsSvg}<polyline points="${pts}" fill="none" stroke="#410440" stroke-width="2.5"/>${keys.map((k, i) => map[k].n ? `<circle cx="${P + i * bw + bw / 2}" cy="${H - 24 - (map[k].n / mo) * (H - 50)}" r="3.5" fill="#410440"/>` : "").join("")}${lbl}</svg>
-  <div class="row muted" style="font-size:12px;gap:16px"><span><i style="display:inline-block;width:10px;height:10px;background:#E58BE3;border-radius:3px"></i> Visitors (max ${mv})</span><span><i style="display:inline-block;width:14px;height:3px;background:#410440;vertical-align:middle"></i> Orders (max ${mo})</span></div>`;
+  <div class="row muted" style="font-size:12px;gap:16px;flex-wrap:wrap"><span><i style="display:inline-block;width:10px;height:10px;background:#E58BE3;border-radius:3px"></i> Visitors (max ${mv})</span><span><i style="display:inline-block;width:14px;height:3px;background:#410440;vertical-align:middle"></i> Orders (max ${mo})</span></div>`;
 }
+const SRCNAME = (s) => ({ direct: "Direct / typed link", facebook: "Facebook", instagram: "Instagram", whatsapp: "WhatsApp", tiktok: "TikTok", google: "Google", website: "Website", manual: "Added by you", "walk-in": "Walk-in", phone: "Phone call", x: "X (Twitter)" }[s] || s);
 
 // ---------- overview ----------
 async function overview() {
-  const m = $("#main"); m.innerHTML = `<p class="muted">Loading…</p>`;
+  const m = $("#main"); if (!m.innerHTML) m.innerHTML = `<p class="muted">Loading…</p>`;
   const d = await api("summary?days=" + S.days);
-  const f = Object.fromEntries(d.funnel.map((r) => [r.type, r]));
+  S.cache.waiting = d.waiting?.n || 0;
   const v = d.visitors?.v || 0, ord = d.orders?.n || 0;
-  const paid = d.byStatus.filter((s) => ["paid", "dispatched", "delivered"].includes(s.status)).reduce((a, s) => a + s.v, 0);
-  const open = d.byStatus.filter((s) => ["new", "confirmed"].includes(s.status)).reduce((a, s) => a + s.v, 0);
-  const funnel = [["Visited the store", f.page_view?.v || 0], ["Picked a colour", f.select_colour?.v || 0], ["Added to cart", f.add_to_cart?.v || 0], ["Opened cart", f.open_cart?.v || 0], ["Sent order on WhatsApp", f.order_sent?.v || 0]];
-  const hours = Array.from({ length: 24 }, (_, h) => ({ h, v: (d.hours.find((x) => x.h === h) || {}).v || 0 }));
   const label = S.days === 1 ? "today" : `last ${S.days} days`;
+  const conv = v ? (ord / v * 100) : 0;
+  const ads = d.sources.filter((s) => /facebook|instagram|fb|ig|meta|tiktok/.test(s.source)).reduce((a, s) => a + s.v, 0);
+  const adOrders = d.orderSources.filter((s) => /facebook|instagram|fb|ig|meta|tiktok/.test(s.source)).reduce((a, s) => a + s.n, 0);
+  const sold = d.sold || { n: 0, v: 0 }, wait = d.waiting || { n: 0, v: 0 };
   m.innerHTML = `
-  <div class="grid kpis">
-    <div class="card kpi"><small>Visitors · ${label}</small><b>${num(v)}</b><span>${num(d.today?.v)} today · ${num(d.visitors?.pv)} page views</span></div>
-    <div class="card kpi"><small>Added to cart</small><b>${num(f.add_to_cart?.v)}</b><span>${v ? Math.round(((f.add_to_cart?.v || 0) / v) * 100) : 0}% of visitors</span></div>
-    <div class="card kpi"><small>Orders sent</small><b>${num(ord)}</b><span>${v ? (ord / v * 100).toFixed(1) : 0}% of visitors ordered</span></div>
-    <div class="card kpi hi"><small>Order value</small><b>${naira(d.orders?.v)}</b><span>${naira(paid)} paid · ${naira(open)} open</span></div>
+  <div class="hero"><img class="wm" src="img/au-icon-white.png" alt="">
+    <small>Confirmed sales · ${label}</small>
+    <div class="big">${naira(sold.v)}</div>
+    <div class="sub">${num(sold.n)} paid order${sold.n === 1 ? "" : "s"} · ${naira(d.allSold?.v)} confirmed since you started</div>
+    <div class="hrow"><div><b>${num(d.customers?.active)}</b><span>Customers</span></div><div><b>${num(d.customers?.new)}</b><span>New</span></div><div><b>${num(d.customers?.returning)}</b><span>Came back</span></div></div>
+  </div>
+  <div class="grid kpis" style="margin-top:12px">
+    <div class="card kpi"><span class="ic">${I.eye}</span><small>Store visitors</small><b>${num(v)}</b><span>${num(d.today?.v)} today</span></div>
+    <div class="card kpi"><span class="ic">${I.send}</span><small>Orders sent to WhatsApp</small><b>${num(ord)}</b><span>${conv ? conv.toFixed(conv < 10 ? 1 : 0) : 0}% of visitors ordered</span></div>
+    <div class="card kpi"><span class="ic">${I.naira}</span><small>Value of orders sent</small><b>${naira(d.orders?.v)}</b><span>Everything sent, paid or not</span></div>
+    <div class="card kpi ${wait.n ? "warn" : ""}" id="kwait" style="cursor:pointer"><span class="ic">${I.clock}</span><small>Waiting for you</small><b>${num(wait.n)}</b><span>${wait.n ? naira(wait.v) + " not confirmed yet" : "All orders handled"}</span></div>
   </div>
   <div class="grid two" style="margin-top:12px">
-    <div class="card"><h3>Visitors and orders per day</h3>${dailyChart(d.daily, d.dailyOrders, Math.min(S.days === 1 ? 7 : S.days, 90))}</div>
-    <div class="card"><h3>From visit to order</h3>${bars(funnel, { label: (r) => r[0], value: (r) => r[1], max: Math.max(1, funnel[0][1]) })}<p class="hint">Unique visitors who reached each step.</p></div>
+    <div class="card"><div class="row"><h3 style="margin:0;flex:1">Needs your attention</h3>${d.attention.length ? `<span class="pill s-new">${d.attention.length}</span>` : ""}</div>
+      ${d.attention.length ? d.attention.slice(0, 5).map((o) => `<div class="att" data-ref="${esc(o.ref)}"><span><b>${esc(o.name || "No name")}</b> <span class="muted">· ${esc(o.ref)}</span><br><span class="muted" style="font-size:12px">${o.status === "new" ? "Confirm payment" : "Paid · ready to dispatch"} · ${ago(o.created_at)}</span></span><span style="text-align:right"><b>${naira(o.total)}</b><br><span class="pill s-${o.status}">${SLABEL[o.status]}</span></span></div>`).join("") : `<p class="muted" style="margin:8px 0 0">Nothing waiting. New orders from the store will show here.</p>`}
+      ${d.attention.length > 5 ? `<button class="btn o w sm" id="allatt" style="margin-top:10px">See all ${d.attention.length} in Orders</button>` : ""}
+    </div>
+    <div class="card"><h3>Sales per day</h3>${salesChart(d.dailyOrders, Math.min(S.days === 1 ? 7 : S.days, 60))}</div>
   </div>
-  <div class="grid three" style="margin-top:12px">
-    <div class="card"><h3>Orders by status</h3>${bars(STATUSES.map((s) => d.byStatus.find((x) => x.status === s) || { status: s, n: 0, v: 0 }), { label: (r) => r.status, value: (r) => r.n })}</div>
-    <div class="card"><h3>Where visitors come from</h3>${bars(d.sources, { label: (r) => r.source, value: (r) => r.v })}</div>
-    <div class="card"><h3>Devices</h3>${bars(d.devices, { label: (r) => r.device || "unknown", value: (r) => r.v })}</div>
+  <div class="grid two" style="margin-top:12px">
+    <div class="card"><h3>Where orders come from</h3>${d.orderSources.length ? `<ul class="lst">${d.orderSources.map((s) => `<li><span>${esc(SRCNAME(s.source))}<br><span class="muted">${s.n} order${s.n === 1 ? "" : "s"} · ${naira(s.v)} sent</span></span><b>${naira(s.sold)}<br><span class="muted" style="font-weight:500;font-size:11.5px">confirmed</span></b></li>`).join("")}</ul>` : `<p class="muted">No orders yet.</p>`}
+      <p class="hint">Ads: ${num(ads)} visitor${ads === 1 ? "" : "s"} and ${num(adOrders)} order${adOrders === 1 ? "" : "s"} came from Facebook, Instagram or TikTok.</p></div>
+    <div class="card"><h3>Top items ordered</h3>${d.topOrdered.length ? `<ul class="lst">${d.topOrdered.slice(0, 6).map((r) => `<li><span>${esc(r.item)}<br><span class="muted">${num(r.dozens)} dozen · ${r.orders} order${r.orders === 1 ? "" : "s"}</span></span><b>${naira(r.value)}</b></li>`).join("")}</ul>` : `<p class="muted">No orders yet.</p>`}</div>
+  </div>
+  <div class="grid two" style="margin-top:12px">
+    <div class="card"><h3>Where visitors come from</h3>${bars(d.sources, { label: (r) => SRCNAME(r.source), value: (r) => r.v })}</div>
     <div class="card"><h3>Orders by state</h3>${bars(d.states, { label: (r) => r.state, value: (r) => r.n })}</div>
-    <div class="card"><h3>Visitor cities</h3>${bars(d.cities, { label: (r) => `${r.city}${r.country && r.country !== "NG" ? " (" + r.country + ")" : ""}`, value: (r) => r.v })}</div>
-    <div class="card"><h3>Most added to cart</h3>${bars(d.topAdds, { label: (r) => `${PRODUCTS[r.pid]?.name || r.pid}${r.pid === "regular" ? " – " + (COLOURS.find((c) => c[0] === r.pcolour)?.[1] || r.pcolour) : ""} · ${r.punit === "big" ? PRODUCTS[r.pid]?.big || "bag" : "dozen"}`, value: (r) => r.n })}</div>
   </div>
-  <div class="grid two" style="margin-top:12px">
-    <div class="card"><h3>Top ordered items</h3>${d.topOrdered.length ? `<ul class="lst">${d.topOrdered.map((r) => `<li><span>${esc(r.item)}<br><span class="muted">${num(r.dozens)} dozen · ${r.orders} order${r.orders === 1 ? "" : "s"}</span></span><b>${naira(r.value)}</b></li>`).join("")}</ul>` : `<p class="muted">No orders yet.</p>`}</div>
-    <div class="card"><h3>Busiest hours (Lagos time)</h3>${(() => { const mx = Math.max(1, ...hours.map((h) => h.v)); return `<svg class="chart" viewBox="0 0 480 130">${hours.map((h) => `<rect x="${h.h * 20 + 2}" y="${105 - (h.v / mx) * 95}" width="16" height="${(h.v / mx) * 95}" rx="2" fill="${h.v === mx && h.v ? "#410440" : "#E58BE3"}"><title>${h.h}:00 — ${h.v} visitors</title></rect>${h.h % 3 === 0 ? `<text x="${h.h * 20 + 10}" y="122" font-size="10" text-anchor="middle" fill="#7A6479">${h.h}</text>` : ""}`).join("")}</svg>`; })()}</div>
-  </div>
-  <div class="card" style="margin-top:12px"><h3>Live activity</h3>
-    ${d.live.length ? d.live.map((e) => `<div class="ev"><span class="ty">${esc(EVLABEL[e.type] || e.type)}</span><span>${esc(evDetail(e))}<br><span class="muted">${esc([e.city, e.device, e.source].filter(Boolean).join(" · "))}</span></span><span class="muted">${ago(e.ts)}</span></div>`).join("") : `<p class="muted">No visits recorded yet. They'll appear here as people browse the store.</p>`}
-  </div>
-  <p class="hint">All time: ${num(d.allTime?.n)} orders worth ${naira(d.allTime?.v)}.</p>`;
+  <p class="hint" style="text-align:center;margin-top:16px">Confirmed sales are orders you've marked as paid. "Waiting for you" are orders sent to WhatsApp that you haven't confirmed yet. More detail is in Insights.</p>`;
+  $$(".att", m).forEach((a) => (a.onclick = () => openOrder(a.dataset.ref)));
+  $("#kwait").onclick = () => { S.status = "new"; go("orders"); };
+  $("#allatt") && ($("#allatt").onclick = () => { S.status = ""; go("orders"); });
 }
+
+// ---------- insights (visitors) ----------
 function evDetail(e) {
   let x = {}; try { x = JSON.parse(e.data || "{}") || {}; } catch {}
   const p = PRODUCTS[x.id]?.name || "", c = COLOURS.find((k) => k[0] === x.colour)?.[1] || "";
   if (e.type === "add_to_cart" || e.type === "remove_from_cart") return `${x.qty || ""} ${x.unit === "big" ? PRODUCTS[x.id]?.big || "bag" : "dozen"} · ${p}${c && x.id === "regular" ? " – " + c : ""}`;
   if (e.type === "select_colour") return `${p} – ${c}`;
   if (e.type === "order_sent") return `${x.ref || ""} · ${naira(x.value)}`;
-  if (e.type === "page_view") return e.source === "direct" ? "Opened the store" : `From ${e.source}`;
+  if (e.type === "page_view") return e.source === "direct" ? "Opened the store" : `From ${SRCNAME(e.source)}`;
   return x.href || "";
+}
+async function visitors() {
+  const m = $("#main"); m.innerHTML = `<p class="muted">Loading…</p>`;
+  const [d, ev] = await Promise.all([api("summary?days=" + S.days), api("events?limit=200" + (S.evt ? "&type=" + S.evt : ""))]);
+  const f = Object.fromEntries(d.funnel.map((r) => [r.type, r]));
+  const funnel = [["Visited the store", f.page_view?.v || 0], ["Picked a colour", f.select_colour?.v || 0], ["Added to cart", f.add_to_cart?.v || 0], ["Opened cart", f.open_cart?.v || 0], ["Sent order on WhatsApp", f.order_sent?.v || 0]];
+  const hours = Array.from({ length: 24 }, (_, h) => ({ h, v: (d.hours.find((x) => x.h === h) || {}).v || 0 }));
+  const atc = f.add_to_cart?.v || 0, sent = f.order_sent?.v || 0;
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Insights</h2><button class="btn o sm" id="exe">${I.dl}Export visits</button></div>
+  <div class="grid kpis" style="margin-top:12px">
+    <div class="card kpi"><small>Visitors</small><b>${num(d.visitors?.v)}</b><span>${num(d.visitors?.pv)} page views</span></div>
+    <div class="card kpi"><small>Added to cart</small><b>${num(atc)}</b><span>Put caps in their cart</span></div>
+    <div class="card kpi"><small>Left without ordering</small><b>${num(Math.max(0, atc - sent))}</b><span>Added to cart, didn't send</span></div>
+    <div class="card kpi"><small>Sent the order</small><b>${num(sent)}</b><span>${atc ? Math.round(sent / atc * 100) : 0}% of carts</span></div>
+  </div>
+  <div class="grid two" style="margin-top:12px">
+    <div class="card"><h3>From visit to order</h3>${bars(funnel, { label: (r) => r[0], value: (r) => r[1], max: Math.max(1, funnel[0][1]) })}<p class="hint">Unique visitors who reached each step.</p></div>
+    <div class="card"><h3>Visitors and orders per day</h3>${visitChart(d.daily, d.dailyOrders, Math.min(S.days === 1 ? 7 : S.days, 90))}</div>
+  </div>
+  <div class="grid three" style="margin-top:12px">
+    <div class="card"><h3>Most added to cart</h3>${bars(d.topAdds, { label: (r) => `${PRODUCTS[r.pid]?.name || r.pid}${r.pid === "regular" ? " – " + (COLOURS.find((c) => c[0] === r.pcolour)?.[1] || r.pcolour) : ""} · ${r.punit === "big" ? PRODUCTS[r.pid]?.big || "bag" : "dozen"}`, value: (r) => r.n })}</div>
+    <div class="card"><h3>Visitor cities</h3>${bars(d.cities, { label: (r) => `${r.city}${r.country && r.country !== "NG" ? " (" + r.country + ")" : ""}`, value: (r) => r.v })}</div>
+    <div class="card"><h3>Devices</h3>${bars(d.devices, { label: (r) => r.device || "unknown", value: (r) => r.v })}</div>
+  </div>
+  <div class="card" style="margin-top:12px"><h3>Busiest hours (Lagos time)</h3>${(() => { const mx = Math.max(1, ...hours.map((h) => h.v)); return `<svg class="chart" viewBox="0 0 480 130">${hours.map((h) => `<rect x="${h.h * 20 + 2}" y="${105 - (h.v / mx) * 95}" width="16" height="${(h.v / mx) * 95}" rx="2" fill="${h.v === mx && h.v ? "#410440" : "#E58BE3"}"><title>${h.h}:00 — ${h.v} visitors</title></rect>${h.h % 3 === 0 ? `<text x="${h.h * 20 + 10}" y="122" font-size="10" text-anchor="middle" fill="#7A6479">${h.h}</text>` : ""}`).join("")}</svg>`; })()}</div>
+  <div class="card" style="margin-top:12px"><h3>Every visit, live</h3>
+    <div class="chips">${[["", "Everything"], ...Object.entries(EVLABEL)].map(([k, l]) => `<button data-t="${k}" aria-pressed="${(S.evt || "") === k}">${l}</button>`).join("")}</div>
+    ${ev.events.length ? ev.events.map((e) => `<div class="ev"><span><span class="ty">${esc(EVLABEL[e.type] || e.type)}</span> · ${esc(evDetail(e))}<br><span class="muted">${esc([e.city, e.region, e.country].filter(Boolean).join(", "))} · ${esc(e.device || "")} · ${esc(SRCNAME(e.source || ""))}</span></span><span class="muted" style="text-align:right">${ago(e.ts)}<br>#${esc((e.visitor || "").slice(0, 5))}</span></div>`).join("") : `<p class="empty">No visitor activity yet.</p>`}</div>`;
+  $$("[data-t]", m).forEach((b) => (b.onclick = () => { S.evt = b.dataset.t; visitors(); }));
+  $("#exe").onclick = () => (location.href = "/api/admin/export/events.csv");
 }
 
 // ---------- orders ----------
+function dots(o) { const i = o.status === "cancelled" ? -1 : STEPS.indexOf(o.status); return `<span class="dots">${STEPS.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span>`; }
+function itemsLine(o) { return o.items.map((i) => `${i.qty} ${i.unit === "big" ? i.unitName || "bag" : "dz"} ${i.name}${i.colourName && i.id === "regular" ? " (" + i.colourName + ")" : ""}`).join(" · "); }
+function orderCard(o) {
+  return `<div class="card order" data-ref="${esc(o.ref)}"><div><b>${esc(o.name || "No name")}</b> <span class="muted">· ${esc(o.ref)}</span><br><span class="muted">${esc([o.state, o.lga].filter(Boolean).join(", "))} · ${when(o.created_at)}</span><br><span style="font-size:12.5px">${esc(itemsLine(o))}</span></div>
+    <div style="text-align:right"><b>${naira(o.total)}</b><br><span class="pill s-${o.status}">${SLABEL[o.status] || o.status}</span><br><span style="display:inline-block;margin-top:6px">${dots(o)}</span>${o.receipt_sent ? `<br><span class="sent" style="font-size:11px">Receipt sent</span>` : ""}</div></div>`;
+}
 async function orders() {
   const m = $("#main");
-  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0">Orders</h2><span style="flex:1"></span><button class="btn o" id="exp">Export CSV</button><button class="btn" id="add">+ Add order</button></div>
-  <div class="chips" style="margin-top:12px">${[["", "All"], ...STATUSES.map((s) => [s, s[0].toUpperCase() + s.slice(1)]), ["deleted", "Deleted"]].map(([k, l]) => `<button data-st="${k}" aria-pressed="${S.status === k}">${l}</button>`).join("")}</div>
-  <input type="text" id="q" placeholder="Search order no., name, phone, state…" value="${esc(S.q)}" style="margin-bottom:12px">
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Orders</h2><button class="btn o sm" id="exp">${I.dl}CSV</button><button class="btn sm" id="add">+ Add order</button></div>
+  <div class="chips" style="margin-top:12px">${[["", "All"], ...["new", "confirmed", "dispatched", "delivered", "cancelled"].map((s) => [s, SLABEL[s]]), ["deleted", "Deleted"]].map(([k, l]) => `<button data-st="${k}" aria-pressed="${S.status === k}">${l}</button>`).join("")}</div>
+  <input type="search" id="q" placeholder="Search order no., name, phone, state…" value="${esc(S.q)}" style="margin-bottom:12px">
   <div id="olist"><p class="muted">Loading…</p></div>`;
   $$(".chips button", m).forEach((b) => (b.onclick = () => { S.status = b.dataset.st; orders(); }));
   let t; $("#q").oninput = () => { clearTimeout(t); t = setTimeout(() => { S.q = $("#q").value; loadOrders(); }, 250); };
@@ -246,46 +428,195 @@ async function loadOrders() {
   const qs = new URLSearchParams(); if (S.status === "deleted") qs.set("deleted", "1"); else if (S.status) qs.set("status", S.status); if (S.q) qs.set("q", S.q);
   const d = await api("orders?" + qs); S.orders = d.orders;
   const total = d.orders.reduce((a, o) => a + (o.total || 0), 0);
-  $("#olist").innerHTML = d.orders.length ? `<p class="muted" style="margin:0 0 8px">${d.orders.length} order${d.orders.length === 1 ? "" : "s"} · ${naira(total)}</p><div class="grid">${d.orders.map((o) => `<div class="card order" data-ref="${o.ref}">
-      <div><b>${esc(o.name || "No name")}</b> <span class="muted">· ${esc(o.ref)}</span><br><span class="muted">${esc([o.state, o.lga].filter(Boolean).join(", "))} · ${when(o.created_at)}</span><br><span style="font-size:12.5px">${esc(o.items.map((i) => `${i.qty} ${i.unit === "big" ? i.unitName || "bag" : "dz"} ${i.name}${i.colourName && i.id === "regular" ? " (" + i.colourName + ")" : ""}`).join(" · "))}</span></div>
-      <div style="text-align:right"><b>${naira(o.total)}</b><br><span class="pill s-${o.status}">${o.status}</span></div></div>`).join("")}</div>` : `<div class="card empty">No orders here yet.</div>`;
+  const el = $("#olist"); if (!el) return;
+  el.innerHTML = d.orders.length ? `<p class="muted" style="margin:0 0 8px">${d.orders.length} order${d.orders.length === 1 ? "" : "s"} · ${naira(total)}</p><div class="grid">${d.orders.map(orderCard).join("")}</div>` : `<div class="card empty">No orders here yet.</div>`;
   $$("#olist .order").forEach((c) => (c.onclick = () => openOrder(c.dataset.ref)));
 }
-function waLink(phone) { let p = String(phone || "").replace(/\D/g, ""); if (p.startsWith("0")) p = "234" + p.slice(1); return `https://wa.me/${p}`; }
+function intl(phone) { let p = String(phone || "").replace(/\D/g, ""); if (p.startsWith("234")) return p; if (p.startsWith("0")) return "234" + p.slice(1); if (p.length === 10) return "234" + p; return p; }
+function waLink(phone, text) { return `https://wa.me/${intl(phone)}${text ? "?text=" + encodeURIComponent(text) : ""}`; }
+function rUrl(o) { return o.receipt_token ? `${location.origin}/r/${o.receipt_token}` : ""; }
+const MSG = {
+  receipt: (o) => `Hi ${first(o.name)}, thank you for shopping with AU Hair Accessories! 💜\n\nYour payment for order ${o.ref} is confirmed.\nTotal: ${naira(o.total)} (excluding logistics)\n\nHere is your receipt:\n${rUrl(o)}\n\nYou can follow your order on the same link.`,
+  dispatched: (o) => `Hi ${first(o.name)}, good news! 🚚 Your order ${o.ref} has been dispatched and is on its way to you.${rUrl(o) ? `\n\nFollow your order here:\n${rUrl(o)}` : ""}`,
+  delivered: (o) => `Hi ${first(o.name)}, your order ${o.ref} has been delivered. Thank you for buying from AU Hair Accessories! 💜\n\nWe'd love to see your installs, tag us ${SHOP.ig}.\nReorder anytime: ${SHOP.web}`,
+};
 function openDrawer(html) { $("#dpn").innerHTML = html; $("#drawer").classList.add("on"); document.body.style.overflow = "hidden"; }
-function closeDrawer() { $("#drawer").classList.remove("on"); document.body.style.overflow = ""; }
-function openOrder(ref) {
-  const o = S.orders.find((x) => x.ref === ref); if (!o) return;
-  openDrawer(`<div class="row"><button class="btn o" data-close style="padding:6px 12px">← Back</button><span style="flex:1"></span><span class="pill s-${o.status}">${o.status}</span></div>
-   <h2 style="margin:14px 0 2px">${esc(o.name || "No name")}</h2><p class="muted" style="margin:0">${esc(o.ref)} · ${when(o.created_at)} · from ${esc(o.source || "website")}</p>
-   <div class="card" style="margin-top:12px"><table class="items"><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Total</th></tr>
+function closeDrawer() { const d = $("#drawer"); if (!d) return; d.classList.remove("on"); document.body.style.overflow = ""; S.openRef = null; }
+function openSheet(html) { $("#sbx").innerHTML = html; $("#sheet").classList.add("on"); }
+function closeSheet() { $("#sheet").classList.remove("on"); }
+async function getOrder(ref, fresh) {
+  let o = !fresh && S.orders.find((x) => x.ref === ref);
+  if (!o) { o = (await api("orders/" + ref)).order; const i = S.orders.findIndex((x) => x.ref === ref); if (i >= 0) S.orders[i] = o; else S.orders.push(o); }
+  return o;
+}
+async function openOrder(ref, fresh) {
+  let o; try { o = await getOrder(ref, fresh); } catch (e) { return toast(e.message); }
+  S.openRef = ref;
+  const idx = o.status === "cancelled" ? -1 : STEPS.indexOf(o.status);
+  const at = { new: o.created_at, confirmed: o.confirmed_at, dispatched: o.dispatched_at, delivered: o.delivered_at };
+  const next = { new: ["confirmed", "Confirm payment & make receipt"], confirmed: ["dispatched", "Mark as dispatched"], dispatched: ["delivered", "Mark as delivered"] }[o.status];
+  const custN = S.customers.length ? S.customers.find((c) => c.key === o.customer) : null;
+  const rv = encodeURIComponent(o.receipt_at || "");
+  const scroll = $("#drawer").classList.contains("on") && S.lastRef === ref ? $("#dpn").scrollTop : 0; S.lastRef = ref;
+  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button><span style="flex:1"></span><span class="pill s-${o.status}">${SLABEL[o.status]}</span></div>
+   <h2 style="margin:14px 0 2px">${esc(o.name || "No name")}</h2><p class="muted" style="margin:0">${esc(o.ref)} · ${when(o.created_at)} · from ${esc(SRCNAME(o.source || "website"))}</p>
+   <div class="card" style="margin-top:12px">
+     ${o.status === "cancelled" ? `<div class="cxl">This order was cancelled ${when(o.cancelled_at)}.</div>` : `<div class="trk"><span class="fill" style="width:${Math.max(0, idx) * 25}%"></span>${STEPS.map((s, i) => `<div class="st ${i <= idx ? "on" : ""} ${i === idx ? "cur" : ""}"><i>${i <= idx ? "✓" : ""}</i><b>${STEPTXT[s][0]}</b><small>${i <= idx && at[s] ? when(at[s]) : STEPTXT[s][1]}</small></div>`).join("")}</div>`}
+     ${next ? `<button class="btn w ${o.status === "new" ? "g" : ""}" id="nxt">${next[1]}</button>` : o.status === "delivered" ? `<p style="text-align:center;font-weight:700;color:var(--ok);margin:4px 0">Order complete ✓</p>` : `<button class="btn w o" id="reo">Reopen this order</button>`}
+     ${o.status === "dispatched" || o.status === "delivered" ? `<a class="btn o w" style="margin-top:8px" id="upd-wa" href="${esc(waLink(o.phone, MSG[o.status](o)))}" target="_blank" rel="noopener">${I.wa}Send "${o.status === "dispatched" ? "on its way" : "delivered"}" message</a>` : ""}
+     <div class="row" style="justify-content:center;gap:4px;margin-top:6px;flex-wrap:wrap">${idx > 0 ? `<button class="lnk" id="back">Move back to ${STEPTXT[STEPS[idx - 1]][0]}</button>` : ""}${o.status !== "cancelled" && o.status !== "delivered" ? `<button class="lnk" id="cxl" style="color:var(--bad)">Cancel order</button>` : ""}</div>
+   </div>
+   ${idx >= 1 ? `<div class="card" style="margin-top:12px"><h3>Receipt</h3>${o.receipt_token ? `<div class="rcp"><img src="/r/${o.receipt_token}/receipt.jpg?v=${rv}" alt="Receipt" id="rimg"><div>
+       <p style="margin:0 0 8px;font-size:13px">${o.receipt_sent ? `<span class="sent">✓ Sent ${when(o.receipt_sent)}</span>` : `<b>Ready to send</b>`}<br><span class="muted">Branded receipt with ${esc(first(o.name))}'s details and a live order tracker.</span></p>
+       <a class="btn g w" id="sendr" href="${esc(waLink(o.phone, MSG.receipt(o)))}" target="_blank" rel="noopener">${I.wa}${o.receipt_sent ? "Send again" : "Send to " + esc(first(o.name))}</a>
+       <div class="row" style="margin-top:8px;gap:8px"><button class="btn o sm" id="shr" style="flex:1">${I.share}Image</button><a class="btn o sm" style="flex:1" href="/r/${o.receipt_token}" target="_blank" rel="noopener">${I.eye}View</a></div>
+       <button class="lnk" id="remk">Remake receipt</button></div></div>` : `<p class="muted" style="margin:0 0 10px">No receipt yet for this order.</p><button class="btn g w" id="mkr">Make receipt</button>`}</div>` : ""}
+   <div class="card" style="margin-top:12px"><table class="items"><colgroup><col><col style="width:22%"><col style="width:22%"><col style="width:24%"></colgroup><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Total</th></tr>
      ${o.items.map((i) => `<tr><td>${esc(i.name)}${i.colourName && i.id === "regular" ? `<br><span class="muted">${esc(i.colourName)}</span>` : ""}</td><td class="n">${i.qty} ${i.unit === "big" ? esc(i.unitName || "bag") : "dz"}${i.dozens && i.unit === "big" ? `<br><span class="muted">${i.dozens} dz</span>` : ""}</td><td class="n">${naira(i.price)}</td><td class="n">${naira(i.line)}</td></tr>`).join("")}
      <tr><td colspan="3"><b>Total</b> <span class="muted">(excluding logistics)</span></td><td class="n"><b>${naira(o.total)}</b></td></tr></table></div>
-   <div class="card" style="margin-top:12px"><h3>Customer</h3><ul class="lst">
+   <div class="card" style="margin-top:12px"><div class="row"><h3 style="margin:0;flex:1">Customer</h3>${o.customer ? `<button class="lnk" id="tocust" style="color:var(--ink)">Open in customer book →</button>` : ""}</div><ul class="lst" style="margin-top:6px">
      <li><span class="muted">Phone</span><span>${esc(o.phone || "—")}</span></li><li><span class="muted">State</span><span>${esc(o.state || "—")}</span></li><li><span class="muted">LGA</span><span>${esc(o.lga || "—")}</span></li>
-     ${o.park ? `<li><span class="muted">Waybill park</span><span>${esc(o.park)}</span></li>` : ""}<li><span class="muted">Address</span><span style="text-align:right">${esc(o.address || "—")}</span></li></ul>
-     ${o.phone ? `<div class="row" style="margin-top:10px"><a class="btn g" style="text-decoration:none;flex:1;text-align:center" href="${waLink(o.phone)}" target="_blank" rel="noopener">Chat on WhatsApp</a><a class="btn o" style="text-decoration:none;flex:1;text-align:center" href="tel:${esc(o.phone)}">Call</a></div>` : ""}</div>
-   <div class="card" style="margin-top:12px"><h3>Status</h3><div class="chips">${STATUSES.map((s) => `<button data-set="${s}" aria-pressed="${o.status === s}">${s[0].toUpperCase() + s.slice(1)}</button>`).join("")}</div>
-     <label class="f" for="nt">Notes (only you see these)</label><textarea id="nt" placeholder="e.g. Paid ₦145,000 by transfer, logistics ₦5,000">${esc(o.notes || "")}</textarea>
+     ${o.park ? `<li><span class="muted">Waybill park</span><span>${esc(o.park)}</span></li>` : ""}<li><span class="muted">Address</span><span>${esc(o.address || "—")}</span></li></ul>
+     ${o.phone ? `<div class="row" style="margin-top:10px"><a class="btn g" style="flex:1" href="${esc(waLink(o.phone))}" target="_blank" rel="noopener">${I.wa}Chat</a><a class="btn o" style="flex:1" href="tel:${esc(o.phone)}">Call</a></div>` : ""}</div>
+   <div class="card" style="margin-top:12px"><label class="f" for="nt" style="margin-top:0">Notes (only you see these)</label><textarea id="nt" placeholder="e.g. Paid ₦145,000 by transfer, logistics ₦5,000">${esc(o.notes || "")}</textarea>
      <div class="row" style="margin-top:10px"><button class="btn" id="svn">Save notes</button><span style="flex:1"></span>${o.deleted ? `<button class="btn o" id="rst">Restore order</button>` : `<button class="btn r" id="del">Delete order</button>`}</div></div>`);
-  $$("[data-set]", $("#dpn")).forEach((b) => (b.onclick = () => patchOrder(o.ref, { status: b.dataset.set }, `Marked ${o.ref} as ${b.dataset.set}`)));
-  $("#svn").onclick = () => patchOrder(o.ref, { notes: $("#nt").value }, "Notes saved");
-  $("#del") && ($("#del").onclick = () => { if (confirm(`Delete order ${o.ref}? You can restore it or undo this later.`)) patchOrder(o.ref, { deleted: true }, "Order deleted", true); });
-  $("#rst") && ($("#rst").onclick = () => patchOrder(o.ref, { deleted: false }, "Order restored", true));
+  $("#dpn").scrollTop = scroll;
+  const P = $("#dpn");
+  $("#nxt", P) && ($("#nxt", P).onclick = async () => { const b = $("#nxt", P); b.disabled = true; b.textContent = "Saving…";
+    const ok = await patchOrder(o.ref, { status: next[0] }, next[0] === "confirmed" ? "Payment confirmed" : `Marked as ${SLABEL[next[0]].toLowerCase()}`);
+    if (ok && next[0] === "confirmed") await makeReceipt(o.ref, true); });
+  $("#reo", P) && ($("#reo", P).onclick = () => patchOrder(o.ref, { status: o.confirmed_at ? "confirmed" : "new" }, "Order reopened"));
+  $("#back", P) && ($("#back", P).onclick = () => patchOrder(o.ref, { status: STEPS[idx - 1] }, `Moved back to ${STEPTXT[STEPS[idx - 1]][0]}`));
+  $("#cxl", P) && ($("#cxl", P).onclick = () => { if (confirm(`Cancel order ${o.ref}? You can reopen it later.`)) patchOrder(o.ref, { status: "cancelled" }, "Order cancelled"); });
+  $("#mkr", P) && ($("#mkr", P).onclick = () => makeReceipt(o.ref, true));
+  $("#remk", P) && ($("#remk", P).onclick = () => makeReceipt(o.ref, true));
+  $("#rimg", P) && ($("#rimg", P).onclick = () => window.open(`/r/${o.receipt_token}`, "_blank"));
+  $("#sendr", P) && ($("#sendr", P).onclick = () => markSent(o.ref));
+  $("#shr", P) && ($("#shr", P).onclick = () => shareImage(o));
+  $("#tocust", P) && ($("#tocust", P).onclick = () => openCustomer(o.customer));
+  $("#svn", P).onclick = () => patchOrder(o.ref, { notes: $("#nt").value }, "Notes saved");
+  $("#del", P) && ($("#del", P).onclick = () => { if (confirm(`Delete order ${o.ref}? You can restore it or undo this later.`)) patchOrder(o.ref, { deleted: true }, "Order deleted", true); });
+  $("#rst", P) && ($("#rst", P).onclick = () => patchOrder(o.ref, { deleted: false }, "Order restored", true));
+  if (o.receipt_token) prefetchImage(o);
 }
 async function patchOrder(ref, body, msg, close) {
-  try { const d = await api("orders/" + ref, { method: "PATCH", body }); const i = S.orders.findIndex((x) => x.ref === ref); if (i >= 0) S.orders[i] = d.order; toast(msg + " · undo in Activity"); if (close) { closeDrawer(); loadOrders(); } else { openOrder(ref); loadOrders(); } } catch (e) { toast(e.message); }
+  try { const d = await api("orders/" + ref, { method: "PATCH", body }); putOrder(d.order); toast(msg + " · undo in Activity");
+    if (close) closeDrawer(); else await openOrder(ref); afterChange(); return true; } catch (e) { toast(e.message); return false; }
 }
+function putOrder(o) { const i = S.orders.findIndex((x) => x.ref === o.ref); if (i >= 0) S.orders[i] = o; else S.orders.push(o); }
+function afterChange() { if (S.tab === "orders") loadOrders(); else if (S.tab === "overview") overview().catch(() => {}); else if (S.tab === "customers") loadCustomers(); badge(); }
+async function markSent(ref) { try { const d = await api(`orders/${ref}/receipt/sent`, { method: "POST" }); putOrder(d.order); setTimeout(() => S.openRef === ref && openOrder(ref), 800); } catch {} }
+const imgCache = {};
+async function prefetchImage(o) { const k = o.receipt_token + o.receipt_at; if (imgCache[k]) return imgCache[k]; try { const b = await (await fetch(`/r/${o.receipt_token}/receipt.jpg?v=${encodeURIComponent(o.receipt_at || "")}`)).blob(); imgCache[k] = new File([b], `AU-receipt-${o.ref}.jpg`, { type: "image/jpeg" }); } catch {} return imgCache[k]; }
+async function shareImage(o) {
+  const f = imgCache[o.receipt_token + o.receipt_at] || await prefetchImage(o);
+  if (f && navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text: MSG.receipt(o) }); markSent(o.ref); } catch {} return; }
+  const a = document.createElement("a"); a.href = `/r/${o.receipt_token}/receipt.jpg?dl=1`; a.download = ""; a.click(); toast("Receipt image downloaded");
+}
+
+// ---------- branded receipt (drawn in the browser, saved to the store) ----------
+const IMG = {};
+const loadImg = (src) => IMG[src] || (IMG[src] = new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }));
+function wrap(ctx, text, maxW) { const words = String(text || "").split(/\s+/), lines = []; let l = ""; for (const w of words) { const t = l ? l + " " + w : w; if (ctx.measureText(t).width > maxW && l) { lines.push(l); l = w; } else l = t; } if (l) lines.push(l); return lines.length ? lines : [""]; }
+async function drawReceipt(o) {
+  await Promise.all([document.fonts.load("800 40px Poppins"), document.fonts.load("600 30px Poppins"), document.fonts.load("400 30px Poppins")]).catch(() => {});
+  const logo = await loadImg("/img/au-logo-reverse.png"), icon = await loadImg("/img/au-icon-white.png");
+  const W = 1080, PX = 72, F = "Poppins, Arial, sans-serif";
+  const lay = (ctx, draw) => {
+    let y = 0;
+    // header
+    const HH = 360;
+    if (draw) {
+      const g = ctx.createRadialGradient(W * .85, 0, 40, W * .6, HH * .4, W * .9); g.addColorStop(0, "#7A1577"); g.addColorStop(.5, "#410440"); g.addColorStop(1, "#24021F");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, HH);
+      ctx.globalAlpha = .07; ctx.drawImage(icon, W - 330, 120, 380, 380 * icon.height / icon.width); ctx.globalAlpha = 1;
+      const lh = 92; ctx.drawImage(logo, PX, 64, lh * logo.width / logo.height, lh);
+      ctx.save(); ctx.translate(W - PX - 120, 112); ctx.rotate(-0.1); ctx.strokeStyle = "#7CE0A6"; ctx.lineWidth = 5; ctx.beginPath(); ctx.roundRect(-110, -44, 220, 88, 18); ctx.stroke();
+      ctx.fillStyle = "#7CE0A6"; ctx.font = `800 46px ${F}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("PAID", 0, 3); ctx.restore();
+      ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = "#fff"; ctx.font = `800 62px ${F}`; ctx.fillText("Payment receipt", PX, 248);
+      ctx.fillStyle = "#E9CFE8"; ctx.font = `500 30px ${F}`; ctx.fillText(`${o.ref}  ·  ${new Date(o.confirmed_at || Date.now()).toLocaleString("en-NG", { timeZone: "Africa/Lagos", day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" })}`, PX, 300);
+    }
+    y = HH + 70;
+    const label = (t) => { if (draw) { ctx.fillStyle = "#A0229E"; ctx.font = `700 25px ${F}`; ctx.letterSpacing = "4px"; ctx.fillText(t, PX, y); ctx.letterSpacing = "0px"; } y += 50; };
+    const kv = (k, v) => { ctx.font = `600 31px ${F}`; const lines = wrap(ctx, v || "—", W - PX * 2 - 300); if (draw) { ctx.fillStyle = "#7A6479"; ctx.font = `400 31px ${F}`; ctx.fillText(k, PX, y); ctx.fillStyle = "#24021F"; ctx.font = `600 31px ${F}`; ctx.textAlign = "right"; lines.forEach((l, i) => ctx.fillText(l, W - PX, y + i * 42)); ctx.textAlign = "left"; } y += lines.length * 42 + 14; };
+    const dash = () => { y += 10; if (draw) { ctx.strokeStyle = "#E3CFE2"; ctx.lineWidth = 3; ctx.setLineDash([14, 12]); ctx.beginPath(); ctx.moveTo(PX, y); ctx.lineTo(W - PX, y); ctx.stroke(); ctx.setLineDash([]); } y += 60; };
+    label("BILLED TO");
+    kv("Name", o.name); kv("Phone", o.phone);
+    if (o.state) kv("State", [o.state, o.lga].filter(Boolean).join(", "));
+    if (o.park) kv("Waybill park", o.park);
+    if (o.address) kv("Address", o.address);
+    dash(); label("ITEMS");
+    for (const i of o.items) {
+      ctx.font = `600 32px ${F}`; const nm = wrap(ctx, `${i.name}${i.colourName && i.id === "regular" ? " – " + i.colourName : ""}`, W - PX * 2 - 260);
+      const sub = `${i.qty} ${i.unit === "big" ? (i.unitName || "bag") + (i.qty > 1 ? "s" : "") + (i.dozens ? ` (${i.dozens} dozen)` : "") : "dozen"} × ${naira(i.price)}`;
+      if (draw) { ctx.fillStyle = "#24021F"; nm.forEach((l, k) => ctx.fillText(l, PX, y + k * 42)); ctx.textAlign = "right"; ctx.font = `700 32px ${F}`; ctx.fillText(naira(i.line), W - PX, y); ctx.textAlign = "left"; ctx.fillStyle = "#7A6479"; ctx.font = `400 27px ${F}`; ctx.fillText(sub, PX, y + nm.length * 42); }
+      y += nm.length * 42 + 58;
+    }
+    // total box
+    y += 6; const TB = 150;
+    if (draw) { ctx.fillStyle = "#FFE7FF"; ctx.beginPath(); ctx.roundRect(PX - 6, y - 50, W - PX * 2 + 12, TB, 26); ctx.fill();
+      ctx.fillStyle = "#24021F"; ctx.font = `700 33px ${F}`; ctx.fillText("Total paid", PX + 26, y + 6); ctx.fillStyle = "#7A6479"; ctx.font = `400 26px ${F}`; ctx.fillText("Excluding logistics", PX + 26, y + 48);
+      ctx.fillStyle = "#410440"; ctx.font = `800 58px ${F}`; ctx.textAlign = "right"; ctx.fillText(naira(o.total), W - PX - 26, y + 40); ctx.textAlign = "left"; }
+    y += TB + 30;
+    if (draw) { ctx.fillStyle = "#1E9E5A"; ctx.beginPath(); ctx.arc(PX + 18, y - 10, 18, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 4.5; ctx.beginPath(); ctx.moveTo(PX + 9, y - 10); ctx.lineTo(PX + 16, y - 2); ctx.lineTo(PX + 28, y - 18); ctx.stroke();
+      ctx.fillStyle = "#24021F"; ctx.font = `600 29px ${F}`; ctx.fillText("Payment confirmed by AU Hair Accessories", PX + 52, y); }
+    y += 70;
+    // footer
+    const FH = 270;
+    if (draw) { ctx.fillStyle = "#24021F"; ctx.fillRect(0, y, W, FH);
+      ctx.fillStyle = "#fff"; ctx.font = `700 31px ${F}`; ctx.fillText("AU Hair Accessories", PX, y + 66);
+      ctx.fillStyle = "#E9CFE8"; ctx.font = `400 26px ${F}`; ctx.fillText(SHOP.address, PX, y + 110);
+      ctx.fillText(`WhatsApp ${SHOP.phone}  ·  ${SHOP.ig}  ·  ${SHOP.web}`, PX, y + 150);
+      ctx.fillStyle = "#E58BE3"; ctx.font = `600 27px ${F}`; ctx.fillText("Thank you for shopping with us.", PX, y + 206); }
+    return y + FH;
+  };
+  const m = document.createElement("canvas").getContext("2d"); const H = lay(m, false);
+  const c = document.createElement("canvas"); c.width = W; c.height = H; const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H); lay(ctx, true);
+  // link-preview card (1200 x 630) for WhatsApp
+  const p = document.createElement("canvas"); p.width = 1200; p.height = 630; const x = p.getContext("2d");
+  const g = x.createRadialGradient(1000, 60, 40, 700, 300, 1100); g.addColorStop(0, "#7A1577"); g.addColorStop(.5, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.fillRect(0, 0, 1200, 630);
+  x.globalAlpha = .07; x.drawImage(icon, 760, 230, 520, 520 * icon.height / icon.width); x.globalAlpha = 1;
+  x.drawImage(logo, 70, 60, 84 * logo.width / logo.height, 84);
+  x.save(); x.translate(1010, 104); x.rotate(-0.1); x.strokeStyle = "#7CE0A6"; x.lineWidth = 5; x.beginPath(); x.roundRect(-104, -42, 208, 84, 18); x.stroke(); x.fillStyle = "#7CE0A6"; x.font = `800 44px ${F}`; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("PAID", 0, 3); x.restore();
+  x.fillStyle = "#E58BE3"; x.font = `700 28px ${F}`; x.letterSpacing = "5px"; x.fillText("PAYMENT RECEIPT", 72, 262); x.letterSpacing = "0px";
+  x.fillStyle = "#fff"; x.font = `800 112px ${F}`; x.fillText(naira(o.total), 66, 384);
+  x.fillStyle = "#F2DDF1"; x.font = `500 34px ${F}`; x.fillText(`Order ${o.ref}${o.name ? "  ·  " + o.name : ""}`.slice(0, 60), 72, 446);
+  x.fillStyle = "#E9CFE8"; x.font = `400 26px ${F}`; x.fillText(`${o.items.length} item${o.items.length === 1 ? "" : "s"} · excluding logistics`, 72, 492);
+  x.fillStyle = "#fff"; x.beginPath(); x.roundRect(72, 528, 360, 62, 31); x.fill(); x.fillStyle = "#410440"; x.font = `700 26px ${F}`; x.fillText("Tap to view receipt", 106, 569);
+  return { img: c.toDataURL("image/jpeg", 0.9), og: p.toDataURL("image/jpeg", 0.86) };
+}
+async function makeReceipt(ref, showReady) {
+  toast("Making receipt…");
+  try {
+    const o = await getOrder(ref, true);
+    const { img, og } = await drawReceipt(o);
+    const d = await api(`orders/${ref}/receipt`, { method: "POST", body: { img, og } });
+    putOrder(d.order); await openOrder(ref); afterChange();
+    if (showReady) readySheet(d.order, img);
+  } catch (e) { toast("Receipt: " + e.message); }
+}
+function readySheet(o, img) {
+  $("#toast").classList.remove("on");
+  openSheet(`<h3 style="margin:0 0 4px">Receipt ready for ${esc(first(o.name))}</h3><p class="muted" style="margin:0 0 12px">It goes straight to ${esc(o.phone || "their number")} on WhatsApp. Just tap send in the chat.</p>
+    <img class="rprev" src="${img}" alt="Receipt preview">
+    <a class="btn g w" style="margin-top:12px;padding:14px" id="rs-send" href="${esc(waLink(o.phone, MSG.receipt(o)))}" target="_blank" rel="noopener">${I.wa}Send receipt to ${esc(first(o.name))}</a>
+    <div class="row" style="margin-top:8px"><button class="btn o" style="flex:1" id="rs-img">${I.share}Send as image</button><button class="btn o" style="flex:1" data-sclose>Later</button></div>`);
+  $("#rs-send").onclick = () => { markSent(o.ref); setTimeout(closeSheet, 300); };
+  $("#rs-img").onclick = () => { shareImage(o); };
+  prefetchImage(o);
+}
+
 function orderForm() {
   const opts = Object.entries(PRODUCTS).map(([k, p]) => `<option value="${k}">${p.name}</option>`).join("");
-  openDrawer(`<div class="row"><button class="btn o" data-close style="padding:6px 12px">← Back</button></div><h2 style="margin:14px 0 4px">Add an order</h2><p class="muted" style="margin:0 0 10px">For orders that came in by WhatsApp, phone or walk-in, so all your sales are in one place.</p>
+  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button></div><h2 style="margin:14px 0 4px">Add an order</h2><p class="muted" style="margin:0 0 10px">For orders that came in by WhatsApp, phone or walk-in, so all your sales are in one place.</p>
   <div class="card"><label class="f">Customer name</label><input type="text" id="o-name"><label class="f">Phone</label><input type="tel" id="o-phone">
   <div class="grid two"><div><label class="f">State</label><input type="text" id="o-state"></div><div><label class="f">LGA</label><input type="text" id="o-lga"></div></div>
   <label class="f">Address / waybill park</label><input type="text" id="o-address">
-  <label class="f">Source</label><select id="o-source"><option>whatsapp</option><option>walk-in</option><option>phone</option><option>instagram</option><option>facebook</option><option>other</option></select></div>
+  <label class="f">Where did this order come from?</label><select id="o-source"><option value="whatsapp">WhatsApp</option><option value="walk-in">Walk-in</option><option value="phone">Phone call</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="tiktok">TikTok</option><option value="other">Other</option></select></div>
   <div class="card" style="margin-top:12px"><h3>Items</h3><div id="o-items"></div><button class="btn o" id="o-addi" style="margin-top:8px">+ Add item</button><p id="o-tot" style="font-weight:800;margin:12px 0 0"></p></div>
-  <div class="card" style="margin-top:12px"><label class="f">Status</label><select id="o-status">${STATUSES.map((s) => `<option>${s}</option>`).join("")}</select><label class="f">Notes</label><textarea id="o-notes"></textarea></div>
-  <button class="btn" id="o-save" style="width:100%;margin-top:12px">Save order</button>`);
+  <div class="card" style="margin-top:12px"><label class="f">Stage</label><select id="o-status">${["new", "confirmed", "dispatched", "delivered"].map((s) => `<option value="${s}">${s === "new" ? "New (not paid yet)" : s === "confirmed" ? "Confirmed (paid)" : SLABEL[s]}</option>`).join("")}</select><label class="f">Notes</label><textarea id="o-notes"></textarea></div>
+  <button class="btn w" id="o-save" style="margin-top:12px">Save order</button>`);
   const row = () => { const d = document.createElement("div"); d.className = "card"; d.style.cssText = "padding:10px;margin-bottom:8px;display:grid;gap:6px;grid-template-columns:1fr 1fr";
     d.innerHTML = `<select class="i-p" style="grid-column:1/-1">${opts}</select><select class="i-c">${COLOURS.map((c) => `<option value="${c[0]}">${c[1]}</option>`).join("")}<option value="mixed">Mixed (10 colours)</option></select><select class="i-u"><option value="dozen">Dozen</option><option value="big">Bag / carton</option></select><input type="number" class="i-q" min="1" value="1" placeholder="Qty"><input type="number" class="i-pr" min="0" placeholder="Price each (₦)">`;
     $("#o-items").appendChild(d); d.oninput = tot; d.onchange = tot; };
@@ -294,7 +625,61 @@ function orderForm() {
   const tot = () => ($("#o-tot").textContent = "Total: " + naira(items().reduce((a, i) => a + i.line, 0)));
   row(); tot(); $("#o-addi").onclick = row;
   $("#o-save").onclick = async () => { try { const b = { name: $("#o-name").value, phone: $("#o-phone").value, state: $("#o-state").value, lga: $("#o-lga").value, address: $("#o-address").value, source: $("#o-source").value, status: $("#o-status").value, notes: $("#o-notes").value, items: items() };
-    if (!b.items.length) return toast("Add at least one item"); await api("orders", { method: "POST", body: b }); toast("Order added"); closeDrawer(); loadOrders(); } catch (e) { toast(e.message); } };
+    if (!b.items.length) return toast("Add at least one item"); const d = await api("orders", { method: "POST", body: b }); putOrder(d.order); toast("Order added"); await openOrder(d.order.ref); afterChange(); } catch (e) { toast(e.message); } };
+}
+
+// ---------- customer book ----------
+async function customers() {
+  const m = $("#main");
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Customer book</h2><button class="btn o sm" id="cexp">${I.dl}CSV</button></div>
+  <div class="grid kpis" style="margin-top:12px" id="cstats"></div>
+  <div class="chips" style="margin-top:12px">${[["recent", "Most recent"], ["spent", "Top spenders"], ["orders", "Most orders"], ["back", "Returning"]].map(([k, l]) => `<button data-cs="${k}" aria-pressed="${S.csort === k}">${l}</button>`).join("")}</div>
+  <input type="search" id="cq" placeholder="Search name, phone, state…" value="${esc(S.cq)}" style="margin-bottom:12px">
+  <div id="clist"><p class="muted">Loading…</p></div>`;
+  $$("[data-cs]", m).forEach((b) => (b.onclick = () => { S.csort = b.dataset.cs; $$("[data-cs]", m).forEach((x) => x.setAttribute("aria-pressed", String(x === b))); drawCustomers(); }));
+  $("#cq").oninput = () => { S.cq = $("#cq").value; drawCustomers(); };
+  $("#cexp").onclick = exportCustomers;
+  await loadCustomers();
+}
+async function loadCustomers() { S.customers = (await api("customers")).customers; drawCustomers(); }
+function drawCustomers() {
+  const el = $("#clist"); if (!el) return;
+  const all = S.customers, buyers = all.filter((c) => c.soldOrders > 0), back = all.filter((c) => c.orders > 1);
+  $("#cstats").innerHTML = `<div class="card kpi"><small>Customers</small><b>${num(all.length)}</b><span>Everyone who has ordered</span></div>
+    <div class="card kpi"><small>Paid customers</small><b>${num(buyers.length)}</b><span>At least one confirmed order</span></div>
+    <div class="card kpi"><small>Returning</small><b>${num(back.length)}</b><span>Ordered more than once</span></div>
+    <div class="card kpi"><small>Average spend</small><b>${naira(buyers.length ? buyers.reduce((a, c) => a + c.sold, 0) / buyers.length : 0)}</b><span>Per paid customer</span></div>`;
+  const q = S.cq.trim().toLowerCase();
+  let list = all.filter((c) => !q || [c.name, c.phone, c.state, c.lga, c.address, c.notes, ...c.refs.map((r) => r.ref)].join(" ").toLowerCase().includes(q));
+  if (S.csort === "spent") list = [...list].sort((a, b) => b.sold - a.sold);
+  if (S.csort === "orders") list = [...list].sort((a, b) => b.orders - a.orders);
+  if (S.csort === "back") list = list.filter((c) => c.orders > 1);
+  el.innerHTML = list.length ? `<div class="grid">${list.map((c) => `<div class="card cust" data-ck="${esc(c.key)}"><span class="av">${esc(initials(c.name))}</span>
+     <div style="min-width:0"><b>${esc(c.name || "No name")}</b>${c.orders > 1 ? `<span class="tag">Returning</span>` : ""}<br><span class="muted" style="font-size:12.5px">${esc(c.phone || "")}${c.state ? " · " + esc(c.state) : ""}</span><br><span class="muted" style="font-size:12px">Last order ${ago(c.last)}</span></div>
+     <div style="text-align:right"><b>${naira(c.sold)}</b><br><span class="muted" style="font-size:12px">${c.orders} order${c.orders === 1 ? "" : "s"}</span></div></div>`).join("")}</div>` : `<div class="card empty">${all.length ? "No customer matches that search." : "Customers appear here automatically as orders come in."}</div>`;
+  $$(".cust", el).forEach((x) => (x.onclick = () => openCustomer(x.dataset.ck)));
+}
+async function openCustomer(key) {
+  if (!S.customers.length) { try { S.customers = (await api("customers")).customers; } catch (e) { return toast(e.message); } }
+  const c = S.customers.find((x) => x.key === key); if (!c) return toast("Customer not found");
+  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button></div>
+   <div class="row" style="margin:14px 0 4px"><span class="av" style="width:54px;height:54px;font-size:18px">${esc(initials(c.name))}</span><div style="min-width:0"><h2 style="margin:0">${esc(c.name || "No name")}</h2><span class="muted">Customer since ${dateOnly(c.first)}</span></div></div>
+   <div class="grid kpis" style="margin-top:12px"><div class="card kpi"><small>Total spent</small><b>${naira(c.sold)}</b><span>Confirmed orders</span></div><div class="card kpi"><small>Orders</small><b>${c.orders}</b><span>${c.soldOrders} paid</span></div>
+     <div class="card kpi"><small>Dozens bought</small><b>${num(c.dozens)}</b><span>From paid orders</span></div><div class="card kpi"><small>Last order</small><b style="font-size:18px">${dateOnly(c.last)}</b><span>${ago(c.last)}</span></div></div>
+   <div class="card" style="margin-top:12px"><h3>Details</h3><ul class="lst">
+     <li><span class="muted">Phone</span><span>${esc(c.phone || "—")}</span></li><li><span class="muted">State</span><span>${esc(c.state || "—")}</span></li><li><span class="muted">LGA</span><span>${esc(c.lga || "—")}</span></li>
+     ${c.park ? `<li><span class="muted">Waybill park</span><span>${esc(c.park)}</span></li>` : ""}<li><span class="muted">Address</span><span>${esc(c.address || "—")}</span></li><li><span class="muted">Found us via</span><span>${esc(c.sources.map(SRCNAME).join(", "))}</span></li></ul>
+     ${c.phone ? `<div class="row" style="margin-top:10px"><a class="btn g" style="flex:1" href="${esc(waLink(c.phone))}" target="_blank" rel="noopener">${I.wa}Chat</a><a class="btn o" style="flex:1" href="tel:${esc(c.phone)}">Call</a></div>` : ""}</div>
+   <div class="card" style="margin-top:12px"><h3>Purchase history</h3>${c.refs.map((r) => `<div class="att" data-ref="${esc(r.ref)}"><span><b>${esc(r.ref)}</b><br><span class="muted" style="font-size:12px">${when(r.at)}</span></span><span style="text-align:right"><b>${naira(r.total)}</b><br><span class="pill s-${r.status}">${SLABEL[r.status] || r.status}</span></span></div>`).join("")}</div>
+   <div class="card" style="margin-top:12px"><label class="f" for="cn" style="margin-top:0">Notes about this customer (only you see these)</label><textarea id="cn" placeholder="e.g. Wig maker in Ibadan, prefers GIG waybill, buys black every month">${esc(c.notes || "")}</textarea><button class="btn" id="csv" style="margin-top:10px">Save notes</button></div>`);
+  $$(".att", $("#dpn")).forEach((a) => (a.onclick = () => openOrder(a.dataset.ref)));
+  $("#csv").onclick = async () => { try { await api("customers/" + c.key, { method: "PUT", body: { notes: $("#cn").value, name: c.name } }); c.notes = $("#cn").value; toast("Notes saved · undo in Activity"); } catch (e) { toast(e.message); } };
+}
+function exportCustomers() {
+  const cols = ["name", "phone", "state", "lga", "park", "address", "orders", "soldOrders", "sold", "dozens", "first", "last", "notes"];
+  const cell = (v) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const csv = [cols.join(","), ...S.customers.map((c) => cols.map((k) => cell(c[k])).join(","))].join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `au-customers-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
 }
 
 // ---------- products & stock ----------
@@ -316,7 +701,7 @@ function drawProducts() {
     </div>
     <div class="cols">${cols.map(([k, n, h]) => { const a = p.colours[k] || { dozen: false, big: false }; return `<div class="col" data-c="${k}"><span class="nm"><i style="background:${h}"></i>${n}</span>
       ${id === "mixed" ? "" : `<label class="tog"><input type="checkbox" data-a="dozen" ${a.dozen ? "checked" : ""}>Dozen</label>`}<label class="tog"><input type="checkbox" data-a="big" ${a.big ? "checked" : ""}>${P.big[0].toUpperCase() + P.big.slice(1)}</label></div>`; }).join("")}</div>
-    ${id === "regular" ? `<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:6px"><button class="btn o" data-all="dozen:1" style="padding:6px 10px;font-size:12px">All dozens on</button><button class="btn o" data-all="dozen:0" style="padding:6px 10px;font-size:12px">All dozens off</button><button class="btn o" data-all="big:1" style="padding:6px 10px;font-size:12px">All bags on</button><button class="btn o" data-all="big:0" style="padding:6px 10px;font-size:12px">All bags off</button></div>` : ""}
+    ${id === "regular" ? `<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:6px"><button class="btn o sm" data-all="dozen:1">All dozens on</button><button class="btn o sm" data-all="dozen:0">All dozens off</button><button class="btn o sm" data-all="big:1">All bags on</button><button class="btn o sm" data-all="big:0">All bags off</button></div>` : ""}
     </div>`; }).join("")}`;
   m.oninput = m.onchange = (e) => {
     const card = e.target.closest("[data-p]"); if (!card) return; const p = S.draft.products[card.dataset.p];
@@ -347,29 +732,17 @@ function dirty() {
       try { const r = await api("catalog", { method: "PUT", body: { catalog: S.draft, summary: dd.join("; ").slice(0, 300) } }); S.catalog = r.catalog; S.draft = JSON.parse(JSON.stringify(r.catalog)); drawProducts(); toast("Saved · live on the store now"); }
       catch (e) { toast(e.message); } finally { const sb = $("#sav"); if (sb) sb.disabled = false; } };
   }
-  $("#sdesc").textContent = `${d.length} change${d.length === 1 ? "" : "s"}: ${d.slice(0, 3).join("; ")}${d.length > 3 ? "…" : ""}`;
+  $("#sdesc").textContent = `${d.length} change${d.length === 1 ? "" : "s"}: ${d.slice(0, 2).join("; ")}${d.length > 2 ? "…" : ""}`;
   bar.classList.add("on");
-}
-
-// ---------- visitors ----------
-async function visitors() {
-  const m = $("#main");
-  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0">Visitor activity</h2><span style="flex:1"></span><button class="btn o" id="exe">Export CSV</button></div>
-  <div class="chips" style="margin-top:12px">${[["", "Everything"], ...Object.entries(EVLABEL)].map(([k, l]) => `<button data-t="${k}" aria-pressed="${(S.evt || "") === k}">${l}</button>`).join("")}</div>
-  <div class="card scroll" id="evs"><p class="muted">Loading…</p></div>`;
-  $$(".chips button", m).forEach((b) => (b.onclick = () => { S.evt = b.dataset.t; visitors(); }));
-  $("#exe").onclick = () => (location.href = "/api/admin/export/events.csv");
-  const d = await api("events?limit=300" + (S.evt ? "&type=" + S.evt : ""));
-  $("#evs").innerHTML = d.events.length ? `<table class="tbl"><tr><th>When</th><th>What</th><th>Detail</th><th>Source</th><th>Location</th><th>Device</th><th>Visitor</th></tr>${d.events.map((e) => `<tr><td>${when(e.ts)}</td><td><b>${esc(EVLABEL[e.type] || e.type)}</b></td><td>${esc(evDetail(e))}</td><td>${esc(e.source || "")}</td><td>${esc([e.city, e.region, e.country].filter(Boolean).join(", "))}</td><td>${esc(e.device || "")}</td><td class="muted">${esc((e.visitor || "").slice(0, 6))}</td></tr>`).join("")}</table>` : `<p class="empty">No visitor activity yet.</p>`;
 }
 
 // ---------- activity & undo ----------
 async function activity() {
   const m = $("#main"); m.innerHTML = `<h2>Activity &amp; undo</h2><p class="muted" style="margin:-6px 0 12px">Every change made in this dashboard. Undo puts things back exactly as they were before that change. You can also undo an undo.</p><div id="al"><p class="muted">Loading…</p></div>`;
   const d = await api("audit");
-  $("#al").innerHTML = d.audit.length ? `<div class="grid">${d.audit.map((a) => `<div class="card audit ${a.undone ? "dn" : ""}"><div><b>${esc(a.summary || a.action)}</b><br><span class="muted">${when(a.ts)} · ${esc(a.entity)}${a.undone ? " · undone" : ""}${a.action === "undo" ? " · undo" : ""}</span></div>
-    <button class="btn o" data-u="${a.id}" ${a.undone ? "disabled" : ""}>Undo</button></div>`).join("")}</div>` : `<div class="card empty">No changes yet.</div>`;
-  $$("[data-u]", m).forEach((b) => (b.onclick = async () => { if (!confirm("Undo this change?")) return; try { await api(`audit/${b.dataset.u}/undo`, { method: "POST" }); toast("Undone"); activity(); } catch (e) { toast(e.message); } }));
+  $("#al").innerHTML = d.audit.length ? `<div class="grid">${d.audit.map((a) => `<div class="card audit ${a.undone ? "dn" : ""}"><div style="min-width:0"><b style="overflow-wrap:anywhere">${esc(a.summary || a.action)}</b><br><span class="muted">${when(a.ts)} · ${esc(a.entity)}${a.undone ? " · undone" : ""}${a.action === "undo" ? " · undo" : ""}</span></div>
+    ${a.entity === "receipt" ? "" : `<button class="btn o sm" data-u="${a.id}" ${a.undone ? "disabled" : ""}>Undo</button>`}</div>`).join("")}</div>` : `<div class="card empty">No changes yet.</div>`;
+  $$("[data-u]", m).forEach((b) => (b.onclick = async () => { if (!confirm("Undo this change?")) return; try { await api(`audit/${b.dataset.u}/undo`, { method: "POST" }); toast("Undone"); activity(); badge(); } catch (e) { toast(e.message); } }));
 }
 
 // ---------- settings ----------
@@ -394,11 +767,11 @@ async function settings() {
     const ch = []; if (next.store.announcement !== (c.store.announcement || "")) ch.push(next.store.announcement ? `Announcement: "${next.store.announcement}"` : "Announcement removed"); if (next.store.whatsapp !== c.store.whatsapp) ch.push(`WhatsApp number → ${next.store.whatsapp}`);
     if (!ch.length) return toast("Nothing changed");
     try { await api("catalog", { method: "PUT", body: { catalog: next, summary: ch.join("; ") } }); toast("Saved · live on the store now"); settings(); } catch (e) { toast(e.message); } };
-  $("#spx").onclick = async () => { const next = JSON.parse(JSON.stringify(c)); const m = $("#mpx").value.replace(/\s/g, ""), t = $("#tpx").value.trim().toUpperCase();
-    if (m && !/^\d{8,20}$/.test(m)) return toast("Meta Pixel ID should be numbers only");
+  $("#spx").onclick = async () => { const next = JSON.parse(JSON.stringify(c)); const mm = $("#mpx").value.replace(/\s/g, ""), t = $("#tpx").value.trim().toUpperCase();
+    if (mm && !/^\d{8,20}$/.test(mm)) return toast("Meta Pixel ID should be numbers only");
     if (t && !/^[A-Z0-9]{10,30}$/.test(t)) return toast("Check the TikTok Pixel ID");
-    next.store.metaPixel = m; next.store.tiktokPixel = t;
-    const ch = []; if (m !== (c.store.metaPixel || "")) ch.push(m ? `Meta Pixel set to ${m}` : "Meta Pixel removed"); if (t !== (c.store.tiktokPixel || "")) ch.push(t ? `TikTok Pixel set to ${t}` : "TikTok Pixel removed");
+    next.store.metaPixel = mm; next.store.tiktokPixel = t;
+    const ch = []; if (mm !== (c.store.metaPixel || "")) ch.push(mm ? `Meta Pixel set to ${mm}` : "Meta Pixel removed"); if (t !== (c.store.tiktokPixel || "")) ch.push(t ? `TikTok Pixel set to ${t}` : "TikTok Pixel removed");
     if (!ch.length) return toast("Nothing changed");
     try { await api("catalog", { method: "PUT", body: { catalog: next, summary: ch.join("; ") } }); toast("Saved · pixel live on the store"); settings(); } catch (e) { toast(e.message); } };
   $("#out").onclick = async () => { await api("logout", { method: "POST" }).catch(() => {}); showLogin(); };
