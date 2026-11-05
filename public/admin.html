@@ -723,27 +723,34 @@ function exportCustomers() {
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `au-customers-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
 }
 
-// ---------- partners: wig-making classes we want to supply ----------
+// ---------- partners: wig businesses we want to supply ----------
 const LST = { new: "To contact", contacted: "Contacted", replied: "Replied", partner: "Partner", no: "Not interested" };
 const LCLS = { new: "s-new", contacted: "s-dispatched", replied: "s-confirmed", partner: "s-delivered", no: "s-cancelled" };
-const PLACES = ["Lagos", "Abuja", "Port Harcourt", "Ibadan", "Enugu", "Benin City", "Nigeria", "Accra Ghana"];
-S.leads = []; S.lst = ""; S.pq = S.pq || "wig making class Lagos";
+const PLACES = ["Lagos", "Abuja", "Port Harcourt", "Ibadan", "Enugu", "Benin City", "Warri", "Kano", "Nigeria", "Accra Ghana"];
+const PTYPES = [["wig maker", "Wig makers"], ["wig vendor", "Wig vendors"], ["custom wig units bundles", "Custom units"], ["wig revamp", "Wig revamp"], ["frontal wig install", "Wig stylists"], ["wig making class", "Wig classes"]];
+const KINDS = ["Wig maker", "Wig vendor", "Wig maker & vendor", "Wig revamp / stylist", "Wig academy / trainer", "Hair salon", "Other"];
+const PICO = { naira: "M6 20V4l12 16V4M3 10h18M3 14h18", gift: "M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z", star: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z", truck: "M1 4h14v12H1zM15 8h4l3 3v5h-7zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", cart: "M6 6h15l-1.5 9h-12zM6 6L5 3H2M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z", chat: "M21 12a8 8 0 0 1-11.8 7L3 21l2-6A8 8 0 1 1 21 12z", grad: "M22 10L12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5" };
+const PERK_I = ["naira", "gift", "star", "truck", "cart", "chat", "star", "gift"];
+S.leads = []; S.lst = ""; S.ptype = S.ptype || "wig maker"; S.pplace = S.pplace || "Lagos";
 async function partners() {
   const m = $("#main"); m.innerHTML = `<p class="muted">Loading…</p>`;
   const [d, cfg] = await Promise.all([api("leads"), api("partner-config")]); S.leads = d.leads; S.pcfg = cfg;
-  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Partners</h2><button class="btn sm" id="ladd">+ Add a class</button></div>
-  <p class="muted" style="margin:4px 0 12px">Wig-making classes and academies to supply. Each one gets its own tailored proposal and PDF.</p>
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Partners</h2><button class="btn sm" id="ladd">+ Add a business</button></div>
+  <p class="muted" style="margin:4px 0 12px">Wig makers, vendors and wig businesses you want to supply. Each one gets its own tailored partnership proposal and PDF.</p>
   <div class="grid kpis" id="lstats"></div>
-  <div class="card" style="margin-top:12px"><h3>Find wig-making classes</h3>
-    <div class="row" style="gap:8px"><input type="search" id="pq" value="${esc(S.pq)}" placeholder="e.g. wig making class Abuja"><button class="btn" id="pgo" style="flex:none">Search</button></div>
-    <div class="chips" style="margin:10px 0 0">${PLACES.map((p) => `<button data-pl="${esc(p)}">${esc(p)}</button>`).join("")}</div>
+  <div class="card" style="margin-top:12px"><h3>Find wig businesses</h3>
+    <p class="muted" style="font-size:12px;margin:-4px 0 6px">Who</p><div class="chips" style="margin-bottom:8px">${PTYPES.map(([q, t]) => `<button data-pt="${esc(q)}" aria-pressed="${S.ptype === q}">${t}</button>`).join("")}</div>
+    <p class="muted" style="font-size:12px;margin:0 0 6px">Where</p><div class="chips" style="margin-bottom:10px">${PLACES.map((p) => `<button data-pl="${esc(p)}" aria-pressed="${S.pplace === p}">${esc(p.replace(" Ghana", ""))}</button>`).join("")}</div>
+    <div class="row" style="gap:8px"><input type="search" id="pq" value="${esc(S.ptype + " " + S.pplace)}" placeholder="e.g. wig maker Ikeja"><button class="btn" id="pgo" style="flex:none">Search</button></div>
     <div id="pres"></div></div>
   <div class="chips" style="margin-top:14px">${[["", "All"], ...Object.entries(LST)].map(([k, l]) => `<button data-ls="${k}" aria-pressed="${S.lst === k}">${l}</button>`).join("")}</div>
   <div id="llist"></div>`;
+  const setQ = () => ($("#pq").value = `${S.ptype} ${S.pplace}`);
   $("#ladd").onclick = () => leadForm();
   $("#pgo").onclick = () => pSearch();
   $("#pq").onkeydown = (e) => { if (e.key === "Enter") { e.preventDefault(); pSearch(); } };
-  $$("[data-pl]", m).forEach((b) => (b.onclick = () => { $("#pq").value = `wig making class ${b.dataset.pl}`; pSearch(); }));
+  $$("[data-pt]", m).forEach((b) => (b.onclick = () => { S.ptype = b.dataset.pt; $$("[data-pt]", m).forEach((x) => x.setAttribute("aria-pressed", String(x === b))); setQ(); }));
+  $$("[data-pl]", m).forEach((b) => (b.onclick = () => { S.pplace = b.dataset.pl; $$("[data-pl]", m).forEach((x) => x.setAttribute("aria-pressed", String(x === b))); setQ(); }));
   $$("[data-ls]", m).forEach((b) => (b.onclick = () => { S.lst = b.dataset.ls; $$("[data-ls]", m).forEach((x) => x.setAttribute("aria-pressed", String(x === b))); drawLeads(); }));
   drawLeads();
 }
@@ -754,38 +761,43 @@ function drawLeads() {
   $("#lstats").innerHTML = `<div class="card kpi"><small>To contact</small><b>${n("new")}</b><span>${L.length} on your list</span></div><div class="card kpi"><small>Contacted</small><b>${n("contacted")}</b><span>Proposal sent</span></div><div class="card kpi"><small>Replied</small><b>${n("replied")}</b><span>Talking</span></div><div class="card kpi"><small>Partners</small><b>${n("partner")}</b><span>Buying from you</span></div>`;
   const list = L.filter((l) => !S.lst || l.status === S.lst);
   el.innerHTML = list.length ? `<div class="grid">${list.map((l) => `<div class="card cust" data-lid="${l.id}"><span class="av">${esc(initials(l.name))}</span>
-    <div style="min-width:0"><b>${esc(l.name)}</b>${l.proposal ? `<span class="tag" style="background:#DDF6E8;color:#147A43">Proposal ready</span>` : ""}<br><span class="muted" style="font-size:12.5px">${esc([l.city, l.country].filter(Boolean).join(", ") || "Location unknown")}</span><br><span class="muted" style="font-size:12px">${esc(contactIcons(l))}</span></div>
-    <div style="text-align:right"><span class="pill ${LCLS[l.status]}">${LST[l.status]}</span>${l.contacted_at ? `<br><span class="muted" style="font-size:11.5px">${ago(l.contacted_at)}</span>` : ""}</div></div>`).join("")}</div>` : `<div class="card empty">${L.length ? "Nothing in this group yet." : "Search above or add a class to start your list."}</div>`;
+    <div style="min-width:0"><b>${esc(l.name)}</b>${l.teaches ? `<span class="tag">Teaches</span>` : ""}${l.proposal ? `<span class="tag" style="background:#DDF6E8;color:#147A43">Proposal ready</span>` : ""}<br><span class="muted" style="font-size:12.5px">${esc([l.kind, l.city || l.country].filter(Boolean).join(" · ") || "Wig business")}</span><br><span class="muted" style="font-size:12px">${esc(contactIcons(l))}</span></div>
+    <div style="text-align:right"><span class="pill ${LCLS[l.status]}">${LST[l.status]}</span>${l.contacted_at ? `<br><span class="muted" style="font-size:11.5px">${ago(l.contacted_at)}</span>` : ""}</div></div>`).join("")}</div>` : `<div class="card empty">${L.length ? "Nothing in this group yet." : "Search above or add a business to start your list."}</div>`;
   $$("[data-lid]", el).forEach((x) => (x.onclick = () => openLead(Number(x.dataset.lid))));
 }
+function guessKind(t) { t = t.toLowerCase(); if (/academy|class|school|training|course|lesson/.test(t)) return "Wig academy / trainer"; if (/revamp|stylist|install/.test(t)) return "Wig revamp / stylist"; if (/vendor|seller|store|shop|boutique/.test(t) && /maker|make|custom|unit/.test(t)) return "Wig maker & vendor"; if (/vendor|seller|store|shop|boutique/.test(t)) return "Wig vendor"; if (/salon/.test(t)) return "Hair salon"; return "Wig maker"; }
 async function pSearch() {
-  const q = $("#pq").value.trim(); if (!q) return; S.pq = q; const box = $("#pres");
+  const q = $("#pq").value.trim(); if (!q) return; const box = $("#pres");
   box.innerHTML = `<p class="muted" style="margin:12px 0 0">Searching the web and checking each page for contacts…</p>`;
   try {
-    const d = await api("leads/search", { method: "POST", body: { q } }); S.pres = d.results;
+    const d = await api("leads/search", { method: "POST", body: { q } }); S.pres = d.results; S.presq = q;
     box.innerHTML = d.results.length ? `<p class="muted" style="margin:12px 0 6px">${d.results.length} results for "${esc(q)}"</p>${d.results.map((r, i) => { const c = r.contacts || {}; const host = (() => { try { return new URL(r.url).hostname.replace(/^www\./, ""); } catch { return ""; } })();
       const chips = [...(c.wa || []).map((x) => "WhatsApp " + x), ...(c.phones || []), ...(c.emails || []), ...(c.ig || []).map((x) => "@" + x)];
       return `<div class="att" style="cursor:default;align-items:start"><span style="min-width:0"><b style="overflow-wrap:anywhere">${esc(r.title)}</b><br><span class="muted" style="font-size:11.5px">${esc(host)}</span><br><span style="font-size:12.5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(r.snippet)}</span>${chips.length ? `<span style="display:block;margin-top:4px;font-size:12px;color:var(--ok);font-weight:600;overflow-wrap:anywhere">${esc(chips.join(" · "))}</span>` : `<span class="muted" style="display:block;margin-top:4px;font-size:12px">No contacts found on the page</span>`}</span>
-      <span>${r.known ? `<span class="pill s-confirmed">On list</span>` : `<button class="btn o sm" data-addr="${i}">+ Add</button>`}</span></div>`; }).join("")}` : `<p class="muted" style="margin:12px 0 0">No results. Try another city or wording.</p>`;
+      <span>${r.known ? `<span class="pill s-confirmed">On list</span>` : `<button class="btn o sm" data-addr="${i}">+ Add</button>`}</span></div>`; }).join("")}` : `<p class="muted" style="margin:12px 0 0">No results. Try another city or type.</p>`;
     $$("[data-addr]", box).forEach((b) => (b.onclick = async () => { const r = S.pres[Number(b.dataset.addr)], c = r.contacts || {};
-      const host = (() => { try { return new URL(r.url).hostname; } catch { return ""; } })(); const social = /facebook|instagram|tiktok|threads|x\.com|twitter|youtube|nairaland|allevents|eventbrite/.test(host);
+      const host = (() => { try { return new URL(r.url).hostname; } catch { return ""; } })(); const social = /facebook|instagram|tiktok|threads|x\.com|twitter|youtube|nairaland|allevents|eventbrite|jiji/.test(host);
       const ig = c.ig?.[0] || (/instagram\.com\/([A-Za-z0-9_.]+)/.exec(r.url) || [])[1] || "";
-      const nm = r.title.split(/\s[|–—-]\s|\s•\s|\(@/)[0].replace(/\s*\(@.*$/, "").trim().slice(0, 80);
-      const place = PLACES.find((p) => S.pq.toLowerCase().includes(p.toLowerCase())) || "";
-      const lead = { name: nm, about: r.snippet, source_url: r.url, website: social ? "" : r.url, instagram: ig, email: c.emails?.[0] || "", whatsapp: c.wa?.[0] || "", phone: c.phones?.[0] || "", facebook: /facebook\.com/.test(r.url) ? r.url : (c.fb?.[0] ? "https://" + c.fb[0] : ""), city: place.replace(" Ghana", ""), country: /ghana/i.test(place) ? "Ghana" : "Nigeria", kind: "Wig-making class" };
+      const nm = r.title.replace(/\s*\(@[^)]*\)/, "").split(/\s[|–—-]\s|\s•\s/)[0].replace(/\s*•\s*Instagram.*$/i, "").trim().slice(0, 80);
+      const place = PLACES.find((p) => S.presq.toLowerCase().includes(p.toLowerCase())) || "";
+      const txt = r.title + " " + r.snippet;
+      const lead = { name: nm, kind: guessKind(txt), teaches: /academy|class|school|training|course|lesson|teach/i.test(txt), about: r.snippet, source_url: r.url, website: social ? "" : r.url, instagram: ig, email: c.emails?.[0] || "", whatsapp: c.wa?.[0] || "", phone: c.phones?.[0] || "", facebook: /facebook\.com/.test(r.url) ? r.url : (c.fb?.[0] ? "https://" + c.fb[0] : ""), city: place.replace(" Ghana", "").replace("Nigeria", ""), country: /ghana/i.test(place) ? "Ghana" : "Nigeria" };
       try { const x = await api("leads", { method: "POST", body: lead }); if (!x.added) return toast("Already on your list"); b.outerHTML = `<span class="pill s-confirmed">Added</span>`; S.leads = (await api("leads")).leads; drawLeads(); toast(`${nm} added · tap it to write the proposal`); } catch (e) { toast(e.message); } }));
   } catch (e) {
-    box.innerHTML = e.message === "no_key" ? `<div class="cxl" style="margin:12px 0 0;background:#FFF6E6;border-color:#F4DDAF;color:#8A5A00">Live web search needs a search key, which is added once in Settings. Until then, add classes with "+ Add a class".<br><button class="btn o sm" style="margin-top:8px" id="tokey">Open Settings</button></div>` : `<p style="color:var(--bad);margin:12px 0 0">${esc(e.message)}</p>`;
+    box.innerHTML = e.message === "no_key" ? `<div class="cxl" style="margin:12px 0 0;background:#FFF6E6;border-color:#F4DDAF;color:#8A5A00">Live web search needs a search key, which is added once in Settings. Until then, add businesses with "+ Add a business".<br><button class="btn o sm" style="margin-top:8px" id="tokey">Open Settings</button></div>` : `<p style="color:var(--bad);margin:12px 0 0">${esc(e.message)}</p>`;
     $("#tokey") && ($("#tokey").onclick = () => go("settings"));
   }
 }
 function leadForm(l = {}) {
-  const F = [["name", "Business or academy name"], ["kind", "Type (e.g. Wig academy, Hair school, Trainer)"], ["city", "City"], ["country", "Country"], ["whatsapp", "WhatsApp number"], ["phone", "Phone number"], ["email", "Email"], ["instagram", "Instagram handle (without @)"], ["facebook", "Facebook page link"], ["website", "Website"], ["price_info", "Their class price (if known)"], ["next_date", "Next class date (if known)"]];
-  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button></div><h2 style="margin:14px 0 4px">${l.id ? "Edit details" : "Add a class"}</h2><p class="muted" style="margin:0 0 10px">The more you know about them, the more tailored their proposal will be.</p>
-    <div class="card">${F.map(([k, t]) => `<label class="f">${t}</label><input type="text" id="lf-${k}" value="${esc(l[k] || (k === "country" && !l.id ? "Nigeria" : ""))}">`).join("")}
-    <label class="f">What they do (anything you know: classes, style, students)</label><textarea id="lf-about">${esc(l.about || "")}</textarea></div>
+  const F = [["name", "Business name"], ["city", "City"], ["country", "Country"], ["whatsapp", "WhatsApp number"], ["phone", "Phone number"], ["email", "Email"], ["instagram", "Instagram handle (without @)"], ["facebook", "Facebook page link"], ["website", "Website"], ["price_info", "Their prices (if known)"], ["next_date", "Anything time-related (if known)"]];
+  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button></div><h2 style="margin:14px 0 4px">${l.id ? "Edit details" : "Add a business"}</h2><p class="muted" style="margin:0 0 10px">Wig makers, vendors, anyone who turns bundles into wigs. The more you know, the more tailored their proposal.</p>
+    <div class="card"><label class="f">Business name</label><input type="text" id="lf-name" value="${esc(l.name || "")}">
+    <label class="f">What they do</label><select id="lf-kind">${KINDS.map((k) => `<option ${l.kind === k ? "selected" : ""}>${k}</option>`).join("")}${l.kind && !KINDS.includes(l.kind) ? `<option selected>${esc(l.kind)}</option>` : ""}</select>
+    <label class="tog" style="margin-top:12px"><input type="checkbox" id="lf-teaches" ${l.teaches ? "checked" : ""}>They also teach wig making</label>
+    ${F.slice(1).map(([k, t]) => `<label class="f">${t}</label><input type="text" id="lf-${k}" value="${esc(l[k] || (k === "country" && !l.id ? "Nigeria" : ""))}">`).join("")}
+    <label class="f">About them (anything you know: what they make, their style, their customers)</label><textarea id="lf-about">${esc(l.about || "")}</textarea></div>
     <button class="btn w" id="lf-save" style="margin-top:12px">${l.id ? "Save details" : "Add to Partners"}</button>`);
-  $("#lf-save").onclick = async () => { const b = {}; [...F.map((f) => f[0]), "about"].forEach((k) => (b[k] = $("#lf-" + k).value.trim())); b.instagram = b.instagram.replace(/^@/, "");
+  $("#lf-save").onclick = async () => { const b = { kind: $("#lf-kind").value, teaches: $("#lf-teaches").checked }; [...F.map((f) => f[0]), "about"].forEach((k) => (b[k] = $("#lf-" + k).value.trim())); b.instagram = b.instagram.replace(/^@/, "").replace(/.*instagram\.com\//, "").replace(/\/.*/, "");
     if (!b.name) return toast("Add their name");
     try { if (l.id) { const d = await api("leads/" + l.id, { method: "PATCH", body: b }); putLead(d.lead); toast("Saved"); openLead(l.id); }
       else { const d = await api("leads", { method: "POST", body: b }); if (!d.added) return toast("Already on your list"); S.leads = (await api("leads")).leads; drawLeads(); openLead(d.ids[0]); toast("Added"); } } catch (e) { toast(e.message); } };
@@ -800,29 +812,28 @@ function openLead(id) {
   const links = [num && `<a class="btn g sm" href="${esc(waLink(num))}" target="_blank" rel="noopener">${I.wa}Chat</a>`, (l.phone || l.whatsapp) && `<a class="btn o sm" href="tel:${esc(l.phone || l.whatsapp)}">Call</a>`, ig && `<a class="btn o sm" href="https://instagram.com/${esc(ig)}" target="_blank" rel="noopener">Instagram</a>`, l.website && `<a class="btn o sm" href="${esc(l.website)}" target="_blank" rel="noopener">Website</a>`, l.source_url && l.source_url !== l.website && `<a class="btn o sm" href="${esc(l.source_url)}" target="_blank" rel="noopener">Where found</a>`].filter(Boolean).join("");
   const send = (ch, label, href, cls = "o") => `<a class="btn ${cls}" data-lsend="${ch}" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : `href="#"`}>${label}</a>`;
   openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button><span style="flex:1"></span><span class="pill ${LCLS[l.status]}">${LST[l.status]}</span></div>
-   <h2 style="margin:14px 0 2px">${esc(l.name)}</h2><p class="muted" style="margin:0">${esc([l.kind, [l.city, l.country].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</p>
+   <h2 style="margin:14px 0 2px">${esc(l.name)}</h2><p class="muted" style="margin:0">${esc([l.kind, [l.city, l.country].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}${l.teaches ? " · also teaches" : ""}</p>
    <div class="chips" style="margin-top:12px">${Object.entries(LST).map(([k, t]) => `<button data-lst="${k}" aria-pressed="${l.status === k}">${t}</button>`).join("")}</div>
    <div class="card"><div class="row"><h3 style="margin:0;flex:1">Contacts</h3><button class="lnk" id="led" style="color:var(--ink)">Edit details</button></div>
-     <ul class="lst" style="margin-top:6px">${[["WhatsApp", l.whatsapp], ["Phone", l.phone], ["Email", l.email], ["Instagram", ig && "@" + ig], ["Class price", l.price_info], ["Next class", l.next_date]].filter((x) => x[1]).map(([k, v]) => `<li><span class="muted">${k}</span><span>${esc(v)}</span></li>`).join("") || `<li><span class="muted">No contacts saved yet. Tap Edit details to add them.</span></li>`}</ul>
+     <ul class="lst" style="margin-top:6px">${[["WhatsApp", l.whatsapp], ["Phone", l.phone], ["Email", l.email], ["Instagram", ig && "@" + ig], ["Their prices", l.price_info], ["Timing", l.next_date]].filter((x) => x[1]).map(([k, v]) => `<li><span class="muted">${k}</span><span>${esc(v)}</span></li>`).join("") || `<li><span class="muted">No contacts saved yet. Tap Edit details to add them.</span></li>`}</ul>
      ${links ? `<div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap">${links}</div>` : ""}
      ${l.about ? `<p class="muted" style="font-size:12.5px;margin:10px 0 0">${esc(l.about)}</p>` : ""}</div>
-   <div class="card" style="margin-top:12px"><h3>Proposal</h3>
+   <div class="card" style="margin-top:12px"><h3>Partnership proposal</h3>
    ${P ? `<div class="rcp" style="grid-template-columns:120px minmax(0,1fr)">${l.has_pdf ? `<img src="/p/${l.token}/preview.jpg?v=${encodeURIComponent(l.proposal_at || "")}" alt="Proposal" id="ppv" style="width:120px">` : `<span></span>`}<div><p style="margin:0 0 8px;font-size:13px"><b>Tailored for ${esc(l.name)}</b><br><span class="muted">${l.has_pdf ? "Branded PDF and proposal page ready." : "PDF not made yet."}</span></p>
-       <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn o sm" id="pview">${I.eye}View</button>${l.has_pdf ? `<a class="btn o sm" href="/p/${l.token}/proposal.pdf?v=${encodeURIComponent(l.proposal_at || "")}" target="_blank" rel="noopener">PDF</a>` : ""}</div></div></div>
+       <div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn o sm" id="pview">${I.eye}View</button>${l.has_pdf ? `<a class="btn o sm" href="/p/${l.token}/proposal.pdf?v=${encodeURIComponent(l.proposal_at || "")}" target="_blank" rel="noopener">PDF</a>` : `<button class="btn o sm" id="pmkpdf">Make PDF</button>`}</div></div></div>
      <p style="margin:14px 0 6px;font-weight:700;font-size:13px">Send it to ${esc(l.name)}</p>
      <div class="sendrow" style="grid-template-columns:repeat(${[num, l.email, true].filter(Boolean).length + (ig ? 1 : 0)},1fr)">${num ? send("whatsapp", `${I.wa}WhatsApp`, waLink(num, fill(P.whatsapp, l)), "g") : ""}${l.email ? send("email", "Email", `mailto:${l.email}?subject=${encodeURIComponent(P.emailSubject)}&body=${encodeURIComponent(fill(P.emailBody, l))}`) : ""}${ig ? send("instagram", "Instagram", `https://ig.me/m/${ig}`) : ""}${send("copy", `${I.copy}Copy`)}</div>
      ${num ? `<div class="row" style="margin-top:6px;gap:8px">${send("text", `${I.sms}Text message`, smsLink(l.phone || l.whatsapp, fill(P.whatsapp, l)))}${l.email ? `<button class="btn o" id="cpe" style="flex:1">${I.copy}Copy email</button>` : ""}</div>` : ""}
      ${ig ? `<p class="hint">Instagram: the message is copied first, then paste it in their DM.</p>` : ""}
      <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;font-size:13px">Edit the messages and PDF text</summary>
-       <label class="f">Opening of the proposal</label><textarea id="pi">${esc(P.intro)}</textarea>
-       <label class="f">Why we fit together</label><textarea id="pf">${esc(P.fit)}</textarea>
+       <label class="f">Opening line of the proposal (keep it short)</label><textarea id="pi">${esc(P.intro)}</textarea>
        <label class="f">WhatsApp / text / Instagram message ({link} becomes the proposal link)</label><textarea id="pw" style="min-height:160px">${esc(P.whatsapp)}</textarea>
        <label class="f">Email subject</label><input type="text" id="pes" value="${esc(P.emailSubject)}">
        <label class="f">Email message</label><textarea id="peb" style="min-height:220px">${esc(P.emailBody)}</textarea>
        <button class="btn w" id="psv" style="margin-top:10px">Save &amp; update PDF</button></details>
      <button class="lnk" id="prw">Write a fresh proposal</button>`
-   : `<p class="muted" style="margin:0 0 10px">We'll write a proposal tailored to ${esc(l.name)}, make a branded PDF, and give you ready messages for WhatsApp, email, text and Instagram.</p><button class="btn g w" id="pmk">Write tailored proposal</button>`}</div>
-   <div class="card" style="margin-top:12px"><label class="f" for="lnt" style="margin-top:0">Notes (only you see these)</label><textarea id="lnt" placeholder="e.g. Spoke to Ada, class of 15 in January, wants 3 cartons">${esc(l.notes || "")}</textarea>
+   : `<p class="muted" style="margin:0 0 10px">We'll write a partnership proposal tailored to ${esc(l.name)}, make a branded PDF, and give you ready messages for WhatsApp, email, text and Instagram.</p><button class="btn g w" id="pmk">Write tailored proposal</button>`}</div>
+   <div class="card" style="margin-top:12px"><label class="f" for="lnt" style="margin-top:0">Notes (only you see these)</label><textarea id="lnt" placeholder="e.g. Spoke to Ada, makes about 20 units a week, wants mesh caps monthly">${esc(l.notes || "")}</textarea>
      <div class="row" style="margin-top:10px"><button class="btn" id="lsn">Save notes</button><span style="flex:1"></span><button class="btn r" id="ldel">Remove</button></div></div>`);
   const D = $("#dpn");
   $$("[data-lst]", D).forEach((b) => (b.onclick = () => patchLead(l.id, { status: b.dataset.lst }, `Marked ${LST[b.dataset.lst].toLowerCase()}`)));
@@ -830,12 +841,13 @@ function openLead(id) {
   $("#lsn", D).onclick = () => patchLead(l.id, { notes: $("#lnt").value }, "Notes saved");
   $("#ldel", D).onclick = () => { if (confirm(`Remove ${l.name} from Partners? You can undo this in Activity.`)) patchLead(l.id, { deleted: true }, "Removed", true); };
   $("#pmk", D) && ($("#pmk", D).onclick = () => makeProposal(l.id));
+  $("#pmkpdf", D) && ($("#pmkpdf", D).onclick = async () => { try { toast("Making the PDF…"); await buildPdf(l.id); openLead(l.id); } catch (e) { toast(e.message); } });
   $("#prw", D) && ($("#prw", D).onclick = () => { if (confirm("Write a completely new proposal? Your edits to this one will be replaced.")) makeProposal(l.id); });
   $("#pview", D) && ($("#pview", D).onclick = () => openSheet(`<div class="row" style="margin-bottom:10px"><h3 style="margin:0;flex:1">What ${esc(l.name)} sees</h3><button class="btn o sm" data-sclose>Close</button></div><iframe class="rframe" src="/p/${l.token}?t=${Date.now()}" title="Proposal"></iframe>`));
   $("#ppv", D) && ($("#ppv", D).onclick = () => $("#pview").click());
   $("#cpe", D) && ($("#cpe", D).onclick = async () => { if (await copyText(`${P.emailSubject}\n\n${fill(P.emailBody, l)}`)) leadSent(l.id, "email"); });
-  $("#psv", D) && ($("#psv", D).onclick = async () => { const np = { intro: $("#pi").value, fit: $("#pf").value, whatsapp: $("#pw").value, emailSubject: $("#pes").value, emailBody: $("#peb").value };
-    try { const d = await api("leads/" + l.id, { method: "PATCH", body: { proposal: np } }); putLead(d.lead); await buildPdf(l.id); toast("Saved · PDF updated"); } catch (e) { toast(e.message); } });
+  $("#psv", D) && ($("#psv", D).onclick = async () => { const np = { ...P, intro: $("#pi").value, whatsapp: $("#pw").value, emailSubject: $("#pes").value, emailBody: $("#peb").value };
+    try { const d = await api("leads/" + l.id, { method: "PATCH", body: { proposal: np } }); putLead(d.lead); await buildPdf(l.id); openLead(l.id); toast("Saved · PDF updated"); } catch (e) { toast(e.message); } });
   $$("[data-lsend]", D).forEach((a) => (a.onclick = async (e) => { const ch = a.dataset.lsend;
     if (ch === "copy") { e.preventDefault(); if (await copyText(fill(P.whatsapp, l))) leadSent(l.id, "copy"); return; }
     if (ch === "instagram") { await copyText(fill(P.whatsapp, l)); }
@@ -850,72 +862,94 @@ async function makeProposal(id) {
 }
 let jspdfP;
 const loadJsPDF = () => jspdfP || (jspdfP = new Promise((res, rej) => { if (window.jspdf) return res(window.jspdf); const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"; s.onload = () => res(window.jspdf); s.onerror = () => { jspdfP = null; rej(new Error("Couldn't load the PDF maker, check your internet")); }; document.head.appendChild(s); }));
+function icon(x, k, cx, cy, size, col) { x.save(); x.translate(cx - size / 2, cy - size / 2); x.scale(size / 24, size / 24); x.strokeStyle = col; x.lineWidth = 2; x.lineCap = "round"; x.lineJoin = "round"; x.stroke(new Path2D(PICO[k])); x.restore(); }
 async function buildPdf(id) {
-  const l = S.leads.find((x) => x.id === id), P = l.proposal, cfg = S.pcfg || (await api("partner-config"));
-  if (!S.catalog) S.catalog = await api("catalog");
-  const cat = S.catalog.products;
-  await Promise.all(["800 40px Poppins", "600 30px Poppins", "400 30px Poppins"].map((f) => document.fonts.load(f))).catch(() => {});
-  const [logo, icon, i1, i2, i3] = await Promise.all(["/img/au-logo-reverse.png", "/img/au-icon-white.png", "/img/p/making-cap-diy-mesh.jpg", "/img/p/making-cap-stretch-mesh.jpg", "/img/p/wearing-cap-black.jpg"].map(loadImg));
-  const W = 1240, PX = 84, F = "Poppins, Arial, sans-serif", N = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
-  const prods = [[i1, "DIY Mesh Dome Cap", "Cool mesh spandex, high & tight band, breathable net, full size. Pin it to the block and build full wigs on it.", `${N(cat.diy.dz)} / dozen  ·  ${N(cat.diy.bulk * 50)} / carton of 50 dozen`],
-    [i2, "Stretch Mesh Dome Cap", "Stretch dome fit, lightweight band, breathable and quick-drying. Ideal for closure and U-part wigs.", `${N(cat.stretch.dz)} / dozen  ·  ${N(cat.stretch.bulk * 50)} / carton of 50 dozen`],
-    [i3, "Regular Wig Cap", "Thin sheer stocking cap worn under wigs for a flat, smooth install. Available in 11 colours.", `${N(cat.regular.dz)} / dozen  ·  ${N(cat.regular.bulk * 100)} / bag of 100 dozen`]];
+  const D = (await api(`leads/${id}/doc`)).doc;
+  await Promise.all(["800 40px Poppins", "700 30px Poppins", "600 30px Poppins", "500 30px Poppins", "400 30px Poppins"].map((f) => document.fonts.load(f))).catch(() => {});
+  const [logo, iconW, ...pimg] = await Promise.all(["/img/au-logo-reverse.png", "/img/au-icon-white.png", ...D.products.map((p) => p.img)].map(loadImg));
+  const W = 1240, PX = 72, CW = W - PX * 2, F = "Poppins, Arial, sans-serif";
+  const date = new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" });
   const lay = (x, draw) => {
     const T = (txt, px, py, font, col, maxW, lh, align) => { x.font = font; const ls = wrap(x, txt, maxW); if (draw) { x.fillStyle = col; x.textAlign = align || "left"; ls.forEach((t, i) => x.fillText(t, px, py + i * lh)); x.textAlign = "left"; } return ls.length * lh; };
-    // header
-    x.font = `800 60px ${F}`; const tl = wrap(x, `Wig caps for ${l.name}`, W - PX * 2).length; x.font = `400 27px ${F}`; const il = wrap(x, P.intro, W - PX * 2 - 40).length;
-    const HH = 300 + tl * 70 + il * 42;
+    const rr = (px, py, w, h, r, fill) => { if (draw) { x.fillStyle = fill; x.beginPath(); x.roundRect(px, py, w, h, r); x.fill(); } };
+    // 1. hero
+    x.font = `800 64px ${F}`; const tl = wrap(x, `${D.name} × AU Hair Accessories`, CW).length; x.font = `400 31px ${F}`; const il = wrap(x, D.intro, CW - 60).length;
+    const HH = 290 + tl * 76 + 24 + il * 46 + 140;
     if (draw) { const g = x.createRadialGradient(W * .85, 0, 40, W * .6, HH * .5, W); g.addColorStop(0, "#7A1577"); g.addColorStop(.55, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.fillRect(0, 0, W, HH);
-      x.globalAlpha = .07; x.drawImage(icon, W - 380, HH - 300, 440, 440 * icon.height / icon.width); x.globalAlpha = 1; x.drawImage(logo, PX, 70, 92 * logo.width / logo.height, 92);
-      x.fillStyle = "#E58BE3"; x.font = `700 24px ${F}`; x.letterSpacing = "5px"; x.fillText("PARTNERSHIP PROPOSAL", PX, 236); x.letterSpacing = "0px";
-      x.fillStyle = "#E9CFE8"; x.font = `500 22px ${F}`; x.textAlign = "right"; x.fillText(new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }), W - PX, 236); x.textAlign = "left"; }
-    T(`Wig caps for ${l.name}`, PX, 310, `800 60px ${F}`, "#fff", W - PX * 2, 70);
-    T(P.intro, PX, 310 + tl * 70 + 6, `400 27px ${F}`, "#F2DDF1", W - PX * 2 - 40, 42);
-    let y = HH + 64;
-    // fit box
-    x.font = `500 27px ${F}`; const fl = wrap(x, P.fit, W - PX * 2 - 60).length, FB = fl * 42 + 50;
-    if (draw) { x.fillStyle = "#FFE7FF"; x.beginPath(); x.roundRect(PX, y, W - PX * 2, FB, 24); x.fill(); }
-    T(P.fit, PX + 30, y + 52, `500 27px ${F}`, "#410440", W - PX * 2 - 60, 42); y += FB + 66;
-    const lab = (t) => { if (draw) { x.fillStyle = "#A0229E"; x.font = `700 23px ${F}`; x.letterSpacing = "4px"; x.fillText(t, PX, y); x.letterSpacing = "0px"; } y += 42; };
-    lab("WHAT WE'D SUPPLY");
-    for (const [im, nm, ds, pr] of prods) { const IH = 190, IW = 152;
-      if (draw) { x.save(); x.beginPath(); x.roundRect(PX, y, IW, IH, 16); x.clip(); const sc = Math.max(IW / im.width, IH / im.height); x.drawImage(im, PX + (IW - im.width * sc) / 2, y + (IH - im.height * sc) / 2, im.width * sc, im.height * sc); x.restore(); }
-      const tx = PX + IW + 32, tw = W - PX - tx;
-      T(nm, tx, y + 44, `700 32px ${F}`, "#24021F", tw, 40);
-      const dh = T(ds, tx, y + 88, `400 24px ${F}`, "#7A6479", tw, 34);
-      T(pr, tx, y + 88 + dh + 10, `700 24px ${F}`, "#410440", tw, 34);
-      y += Math.max(IH, 88 + dh + 50) + 26; }
-    if (draw) { x.fillStyle = "#7A6479"; x.font = `400 21px ${F}`; x.fillText("Prices exclude logistics.", PX, y + 4); } y += 64;
-    lab("OUR PARTNER OFFER");
-    for (const o of cfg.offer) { x.font = `500 26px ${F}`; const ls = wrap(x, o, W - PX * 2 - 60);
-      if (draw) { x.fillStyle = "#1E9E5A"; x.beginPath(); x.arc(PX + 17, y + 2, 17, 0, Math.PI * 2); x.fill(); x.strokeStyle = "#fff"; x.lineWidth = 4; x.beginPath(); x.moveTo(PX + 9, y + 2); x.lineTo(PX + 15, y + 9); x.lineTo(PX + 26, y - 5); x.stroke(); }
-      T(o, PX + 56, y + 11, `500 26px ${F}`, "#24021F", W - PX * 2 - 60, 38); y += ls.length * 38 + 24; }
-    y += 34; lab("HOW IT WORKS");
-    const steps = ["Tell us your class dates and how many students you expect.", "We deliver the caps to your venue before the class starts.", "Your students restock from us after class, with your code."], bw = (W - PX * 2 - 40) / 3;
-    x.font = `500 23px ${F}`; const sh = Math.max(...steps.map((t) => wrap(x, t, bw - 44).length)) * 33 + 100;
-    steps.forEach((t, i) => { const bx = PX + i * (bw + 20); if (draw) { x.fillStyle = "#F7F1F7"; x.beginPath(); x.roundRect(bx, y, bw, sh, 20); x.fill(); x.fillStyle = "#A0229E"; x.font = `800 40px ${F}`; x.fillText(String(i + 1), bx + 22, y + 58); } T(t, bx + 22, y + 96, `500 23px ${F}`, "#24021F", bw - 44, 33); });
-    y += sh + 70;
-    const FH = 230;
-    if (draw) { x.fillStyle = "#24021F"; x.fillRect(0, y, W, FH); x.fillStyle = "#fff"; x.font = `700 30px ${F}`; x.fillText(`AU Hair Accessories  ·  ${cfg.yourName}`, PX, y + 66);
-      x.fillStyle = "#E9CFE8"; x.font = `400 24px ${F}`; x.fillText(SHOP.address, PX, y + 108); x.fillText(`WhatsApp ${SHOP.phone}  ·  ${SHOP.ig}  ·  ${SHOP.web}`, PX, y + 146);
-      x.fillStyle = "#E58BE3"; x.font = `600 25px ${F}`; x.fillText("Let's build better wig makers together.", PX, y + 194); }
-    return y + FH;
+      x.globalAlpha = .07; x.drawImage(iconW, W - 400, HH - 360, 460, 460 * iconW.height / iconW.width); x.globalAlpha = 1; x.drawImage(logo, PX, 66, 92 * logo.width / logo.height, 92);
+      x.fillStyle = "#E58BE3"; x.font = `700 23px ${F}`; x.letterSpacing = "5px"; x.fillText("BUSINESS PARTNERSHIP PROPOSAL", PX, 236); x.letterSpacing = "0px";
+      x.fillStyle = "#E9CFE8"; x.font = `500 22px ${F}`; x.textAlign = "right"; x.fillText(date, W - PX, 236); x.textAlign = "left"; }
+    x.font = `800 64px ${F}`; if (draw) { const ls = wrap(x, `${D.name} × AU Hair Accessories`, CW); ls.forEach((t, i) => { const yy = 316 + i * 76; const k = t.indexOf("×"); x.fillStyle = "#fff"; if (k < 0) x.fillText(t, PX, yy); else { const a = t.slice(0, k), b = t.slice(k + 1); x.fillText(a, PX, yy); const wa = x.measureText(a).width; x.fillStyle = "#E58BE3"; x.fillText("×", PX + wa, yy); x.fillStyle = "#fff"; x.fillText(b, PX + wa + x.measureText("×").width, yy); } }); }
+    T(D.intro, PX, 316 + tl * 76 + 30, `400 31px ${F}`, "#F2DDF1", CW - 60, 46);
+    // 2. stats overlapping
+    let y = HH - 90; const sw = (CW - 40) / 3;
+    D.stats.forEach((s, i) => { const sx = PX + i * (sw + 20); if (draw) { x.save(); x.shadowColor = "rgba(65,4,64,.18)"; x.shadowBlur = 40; x.shadowOffsetY = 12; rr(sx, y, sw, 170, 26, "#fff"); x.restore(); }
+      T(s[0], sx + sw / 2, y + 82, `800 46px ${F}`, "#410440", sw - 20, 50, "center"); T(s[1], sx + sw / 2, y + 128, `500 22px ${F}`, "#7A6479", sw - 30, 28, "center"); });
+    y += 170 + 90;
+    const head = (lb, h) => { if (draw) { x.fillStyle = "#A0229E"; x.font = `700 22px ${F}`; x.letterSpacing = "5px"; x.fillText(lb, PX, y); x.letterSpacing = "0px"; } y += 56; T(h, PX, y, `800 44px ${F}`, "#24021F", CW, 52); y += 50; };
+    // 3. products
+    head("WHAT WE SUPPLY", "The caps behind every wig you make");
+    const pw = (CW - 48) / 3, IH = 400;
+    const ph = Math.max(...D.products.map((p) => { x.font = `700 30px ${F}`; return wrap(x, p.name, pw - 40).length * 38; })) ;
+    const cardH = IH + 34 + ph + 70 + 3 * 36 + 100;
+    D.products.forEach((p, i) => { const cx = PX + i * (pw + 24), im = pimg[i];
+      if (draw) { x.save(); x.beginPath(); x.roundRect(cx, y, pw, cardH, 26); x.fillStyle = "#fff"; x.fill(); x.strokeStyle = "#F0E3EF"; x.lineWidth = 3; x.stroke(); x.clip();
+        const sc = Math.max(pw / im.width, IH / im.height); x.drawImage(im, cx + (pw - im.width * sc) / 2, y + (IH - im.height * sc) / 2, im.width * sc, im.height * sc); x.restore(); }
+      let yy = y + IH + 50; T(p.name, cx + 22, yy, `700 30px ${F}`, "#24021F", pw - 40, 38); yy += ph + 8;
+      x.font = `700 20px ${F}`; const tw = Math.min(pw - 44, x.measureText(p.tag).width + 30); rr(cx + 22, yy - 4, tw, 40, 20, "#FFE7FF"); if (draw) { x.fillStyle = "#A0229E"; x.fillText(p.tag, cx + 37, yy + 23, pw - 70); } yy += 70;
+      p.pts.forEach((t) => { if (draw) { x.fillStyle = "#1E9E5A"; x.font = `800 22px ${F}`; x.fillText("✓", cx + 22, yy); x.fillStyle = "#7A6479"; x.font = `400 22px ${F}`; x.fillText(t, cx + 52, yy, pw - 70); } yy += 36; });
+      yy = y + cardH - 40; if (draw) { x.fillStyle = "#410440"; x.font = `800 40px ${F}`; x.fillText(p.price, cx + 22, yy); const w2 = x.measureText(p.price).width; x.fillStyle = "#7A6479"; x.font = `500 20px ${F}`; x.fillText(" " + p.unit, cx + 22 + w2, yy); } });
+    y += cardH + 100;
+    // 4. perks
+    head("AS OUR PARTNER", "What you get");
+    const kw = (CW - 24) / 2;
+    for (let i = 0; i < D.perks.length; i += 2) {
+      const row = D.perks.slice(i, i + 2), hs = row.map((k) => { x.font = `400 22px ${F}`; return 50 + wrap(x, k.d, kw - 140).length * 31; }), rh = Math.max(130, ...hs) + 34;
+      row.forEach((k, j) => { const kx = PX + j * (kw + 24); rr(kx, y, kw, rh, 24, "#F7F1F7"); rr(kx + 24, y + 26, 72, 72, 20, "#410440"); if (draw) icon(x, PERK_I[i + j], kx + 60, y + 62, 38, "#fff");
+        T(k.t, kx + 120, y + 56, `700 27px ${F}`, "#24021F", kw - 140, 34); T(k.d, kx + 120, y + 92, `400 22px ${F}`, "#7A6479", kw - 140, 31); });
+      y += rh + 20; }
+    if (D.classPerk) { x.font = `400 23px ${F}`; const cl = wrap(x, D.classPerk.d, CW - 170).length; const ch = 110 + cl * 32;
+      if (draw) { const g = x.createLinearGradient(PX, y, PX + CW, y + ch); g.addColorStop(0, "#FFE7FF"); g.addColorStop(1, "#F1E2FF"); x.fillStyle = g; x.beginPath(); x.roundRect(PX, y, CW, ch, 26); x.fill(); x.fillStyle = "#A0229E"; x.beginPath(); x.arc(PX + 64, y + ch / 2, 38, 0, Math.PI * 2); x.fill(); icon(x, "grad", PX + 64, y + ch / 2, 40, "#fff"); }
+      T(`You teach wig making too? ${D.classPerk.t}`, PX + 128, y + 54, `700 27px ${F}`, "#24021F", CW - 150, 34); T(D.classPerk.d, PX + 128, y + 92, `400 23px ${F}`, "#5A3D58", CW - 170, 32); y += ch + 20; }
+    y += 80;
+    // 5. price sheet
+    head("PRICES", "Your price sheet");
+    const cols = [PX, PX + 430, PX + 650, PX + 900];
+    if (draw) { x.fillStyle = "#7A6479"; x.font = `600 21px ${F}`; x.fillText("Cap", cols[0], y); x.textAlign = "right"; x.fillText("Per dozen", cols[2] - 20, y); x.fillText("Bulk pack", cols[3] - 20, y); x.fillText("Works out to", W - PX, y); x.textAlign = "left"; x.fillStyle = "#F0E3EF"; x.fillRect(PX, y + 18, CW, 3); }
+    y += 26;
+    D.prices.forEach((r, i) => { const ry = y + 58; if (draw) { if (i % 2 === 0) rr(PX, y + 6, CW, 96, 16, "#FBF6FB"); x.fillStyle = "#24021F"; x.font = `700 25px ${F}`; x.fillText(r[0], cols[0] + 14, ry); x.textAlign = "right"; x.font = `500 25px ${F}`; x.fillText(r[1], cols[2] - 20, ry); x.fillText(r[3], cols[3] - 20, ry - 10); x.fillStyle = "#7A6479"; x.font = `400 18px ${F}`; x.fillText(r[2], cols[3] - 20, ry + 20); x.fillStyle = "#410440"; x.font = `800 27px ${F}`; x.fillText(r[4] + "/dz", W - PX - 14, ry); x.textAlign = "left"; } y += 104; });
+    if (draw) { x.fillStyle = "#7A6479"; x.font = `400 20px ${F}`; x.fillText("Prices exclude logistics.", PX, y + 28); } y += 130;
+    // 6. how it works
+    head("HOW IT WORKS", "Partnering is simple");
+    const stw = CW / 3; if (draw) { x.strokeStyle = "#E58BE3"; x.lineWidth = 4; x.setLineDash([12, 10]); x.beginPath(); x.moveTo(PX + stw / 2, y + 44); x.lineTo(PX + stw * 2.5, y + 44); x.stroke(); x.setLineDash([]); }
+    let sh = 0; D.steps.forEach((s, i) => { const sx = PX + i * stw + stw / 2; if (draw) { x.fillStyle = "#C73CC5"; x.beginPath(); x.arc(sx, y + 44, 44, 0, Math.PI * 2); x.fill(); x.fillStyle = "#fff"; x.font = `800 36px ${F}`; x.textAlign = "center"; x.fillText(String(i + 1), sx, y + 57); x.textAlign = "left"; }
+      T(s[0], sx, y + 136, `700 27px ${F}`, "#24021F", stw - 30, 34, "center"); const h2 = T(s[1], sx, y + 174, `400 22px ${F}`, "#7A6479", stw - 50, 30, "center"); sh = Math.max(sh, h2); });
+    y += 174 + sh + 80;
+    // 7. CTA
+    const CH = 280; if (draw) { const g = x.createRadialGradient(PX + CW * .9, y, 30, PX + CW * .5, y + CH / 2, CW); g.addColorStop(0, "#7A1577"); g.addColorStop(.6, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.beginPath(); x.roundRect(PX, y, CW, CH, 32); x.fill(); }
+    T("Let's start with a free sample pack", W / 2, y + 82, `800 42px ${F}`, "#fff", CW - 80, 50, "center");
+    T(`Reply and we'll send it to ${D.name} this week.`, W / 2, y + 132, `400 25px ${F}`, "#F2DDF1", CW - 80, 32, "center");
+    if (draw) { x.font = `700 28px ${F}`; const bt = `WhatsApp ${D.shop.phone}`, bw2 = x.measureText(bt).width + 80; x.fillStyle = "#1DAA61"; x.beginPath(); x.roundRect(W / 2 - bw2 / 2, y + 168, bw2, 72, 36); x.fill(); x.fillStyle = "#fff"; x.textAlign = "center"; x.fillText(bt, W / 2, y + 214); x.textAlign = "left"; }
+    y += CH + 60;
+    T(`AU Hair Accessories  ·  ${D.yourName}`, W / 2, y, `700 25px ${F}`, "#24021F", CW, 32, "center");
+    T(D.shop.address, W / 2, y + 40, `400 21px ${F}`, "#7A6479", CW, 30, "center");
+    T(`${D.shop.ig}  ·  ${D.shop.web}`, W / 2, y + 76, `400 21px ${F}`, "#7A6479", CW, 30, "center");
+    return y + 130;
   };
   const H = lay(document.createElement("canvas").getContext("2d"), false);
   const c = document.createElement("canvas"); c.width = W; c.height = H; const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H); lay(ctx, true);
   // link preview 1200x630
   const p = document.createElement("canvas"); p.width = 1200; p.height = 630; const x = p.getContext("2d");
   const g = x.createRadialGradient(1000, 60, 40, 700, 300, 1100); g.addColorStop(0, "#7A1577"); g.addColorStop(.5, "#410440"); g.addColorStop(1, "#24021F"); x.fillStyle = g; x.fillRect(0, 0, 1200, 630);
-  [[i1, 800, 120, -0.06], [i2, 940, 160, 0.07]].forEach(([im, px, py, r]) => { x.save(); x.translate(px + 110, py + 140); x.rotate(r); x.shadowColor = "rgba(0,0,0,.4)"; x.shadowBlur = 30; x.beginPath(); x.roundRect(-110, -140, 220, 280, 18); x.fillStyle = "#fff"; x.fill(); x.shadowBlur = 0; x.clip(); x.drawImage(im, -110, -140, 220, 280); x.restore(); });
+  [[pimg[0], 790, 110, -0.07], [pimg[1], 930, 150, 0.07]].forEach(([im, px, py, r]) => { x.save(); x.translate(px + 110, py + 140); x.rotate(r); x.shadowColor = "rgba(0,0,0,.4)"; x.shadowBlur = 30; x.beginPath(); x.roundRect(-110, -140, 220, 280, 18); x.fillStyle = "#fff"; x.fill(); x.shadowBlur = 0; x.clip(); const sc = Math.max(220 / im.width, 280 / im.height); x.drawImage(im, -im.width * sc / 2, -im.height * sc / 2, im.width * sc, im.height * sc); x.restore(); });
   x.drawImage(logo, 70, 60, 80 * logo.width / logo.height, 80);
-  x.fillStyle = "#E58BE3"; x.font = `700 26px ${F}`; x.letterSpacing = "5px"; x.fillText("PARTNERSHIP PROPOSAL", 72, 250); x.letterSpacing = "0px";
-  x.fillStyle = "#fff"; x.font = `800 62px ${F}`; wrap(x, `Wig caps for ${l.name}`, 660).slice(0, 3).forEach((t, i) => x.fillText(t, 70, 330 + i * 72));
+  x.fillStyle = "#E58BE3"; x.font = `700 24px ${F}`; x.letterSpacing = "5px"; x.fillText("BUSINESS PARTNERSHIP PROPOSAL", 72, 240); x.letterSpacing = "0px";
+  x.fillStyle = "#fff"; x.font = `800 56px ${F}`; wrap(x, `${D.name} × AU Hair Accessories`, 660).slice(0, 3).forEach((t, i) => x.fillText(t, 70, 316 + i * 66));
   x.fillStyle = "#fff"; x.beginPath(); x.roundRect(72, 528, 380, 62, 31); x.fill(); x.fillStyle = "#410440"; x.font = `700 26px ${F}`; x.fillText("Tap to view proposal", 108, 569);
   const { jsPDF } = await loadJsPDF();
   const doc = new jsPDF({ unit: "pt", format: [595.28, 595.28 * H / W], compress: true });
   doc.addImage(c.toDataURL("image/jpeg", 0.88), "JPEG", 0, 0, 595.28, 595.28 * H / W);
-  const pdf = doc.output("datauristring");
-  const d = await api(`leads/${id}/pdf`, { method: "POST", body: { pdf, og: p.toDataURL("image/jpeg", 0.86) } });
+  const d = await api(`leads/${id}/pdf`, { method: "POST", body: { pdf: doc.output("datauristring"), og: p.toDataURL("image/jpeg", 0.86) } });
   putLead(d.lead); return d.lead;
 }
 
@@ -998,9 +1032,10 @@ async function settings() {
     <p class="hint">Events sent: page view, product view (colour picked), add to cart, checkout started (cart opened), lead (order sent on WhatsApp), contact (WhatsApp tapped).</p>
     <button class="btn" id="spx" style="margin-top:12px">Save &amp; publish</button></div>
   <div class="card" style="margin-top:12px"><h3>Links</h3><ul class="lst"><li><span>Store</span><a href="/" target="_blank">auhairaccessories.com</a></li><li><span>Orders export</span><a href="/api/admin/export/orders.csv">Download CSV</a></li><li><span>Visitor export</span><a href="/api/admin/export/events.csv">Download CSV</a></li></ul></div>
-  <div class="card" style="margin-top:12px"><h3>Partner proposals</h3><p class="muted" style="margin:-4px 0 8px">Used in every proposal you send to wig-making classes.</p>
+  <div class="card" style="margin-top:12px"><h3>Partner proposals</h3><p class="muted" style="margin:-4px 0 8px">Used in every partnership proposal you send to wig businesses.</p>
     <label class="f" for="pyn">Your name (signs the messages)</label><input type="text" id="pyn">
-    <label class="f" for="pof">What you offer partners (one point per line)</label><textarea id="pof" style="min-height:150px"></textarea>
+    <label class="f" for="pof">What partners get (one per line, as Title: short description)</label><textarea id="pof" style="min-height:170px"></textarea>
+    <label class="f" for="pcl">Extra for businesses that also teach (Title: short description)</label><input type="text" id="pcl">
     <label class="f" for="psk">Web search key (Brave Search API)</label><input type="password" id="psk" placeholder="Paste key to turn on live search" autocomplete="off"><p class="hint" id="pskh"></p>
     <button class="btn" id="psave" style="margin-top:12px">Save</button></div>
   <div class="card" style="margin-top:12px"><h3>Change password</h3><p class="muted" style="margin:-4px 0 8px">Changing it signs out every other phone or computer using the dashboard.</p>
@@ -1010,8 +1045,8 @@ async function settings() {
     <label class="tog" style="margin-top:10px"><input type="checkbox" id="pwshow">Show passwords</label>
     <button class="btn" id="pwsave" style="margin-top:12px;display:flex">Update password</button></div>
   <div class="card" style="margin-top:12px"><h3>Account</h3><button class="btn r" id="out">Sign out</button></div>`;
-  api("partner-config").then((pc) => { $("#pyn").value = pc.yourName; $("#pof").value = pc.offer.join("\n"); $("#pskh").textContent = pc.hasSearchKey ? "A key is saved. Paste a new one only to replace it." : "No key yet, so Partners search is off. Get a free key at api-dashboard.search.brave.com, then paste it here."; }).catch(() => {});
-  $("#psave").onclick = async () => { const b = { yourName: $("#pyn").value, offer: $("#pof").value.split("\n") }; if ($("#psk").value.trim()) b.searchKey = $("#psk").value.trim();
+  api("partner-config").then((pc) => { $("#pyn").value = pc.yourName; $("#pof").value = pc.offer.join("\n"); $("#pcl").value = pc.classOffer || ""; $("#pskh").textContent = pc.hasSearchKey ? "A key is saved. Paste a new one only to replace it." : "No key yet, so Partners search is off. Get a free key at api-dashboard.search.brave.com, then paste it here."; }).catch(() => {});
+  $("#psave").onclick = async () => { const b = { yourName: $("#pyn").value, offer: $("#pof").value.split("\n"), classOffer: $("#pcl").value }; if ($("#psk").value.trim()) b.searchKey = $("#psk").value.trim();
     try { const r = await api("partner-config", { method: "PUT", body: b }); S.pcfg = r; $("#psk").value = ""; $("#pskh").textContent = r.hasSearchKey ? "A key is saved. Paste a new one only to replace it." : "No key yet."; toast("Saved"); } catch (e) { toast(e.message); } };
   $("#pwshow").onchange = () => ["#pw0", "#pw1", "#pw2"].forEach((k) => ($(k).type = $("#pwshow").checked ? "text" : "password"));
   $("#pwsave").onclick = async () => {
