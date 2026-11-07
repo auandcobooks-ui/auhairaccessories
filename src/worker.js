@@ -238,7 +238,7 @@ async function adminApi(req, env, url) {
     const ordRows = r(await q("SELECT items FROM orders WHERE deleted=0 AND status != 'cancelled' AND created_at >= ?", since).all());
     const prod = {};
     for (const o of ordRows) for (const i of JSON.parse(o.items || "[]")) {
-      const k = `${i.name}${i.colourName && i.id === "regular" ? " – " + i.colourName : ""}`;
+      const k = `${i.name}${i.colourName && (i.id === "regular" || i.id === "mixmesh") ? " – " + i.colourName : ""}`;
       prod[k] = prod[k] || { item: k, dozens: 0, value: 0, orders: 0 }; prod[k].dozens += i.dozens || 0; prod[k].value += i.line || 0; prod[k].orders += 1;
     }
     return json({
@@ -782,7 +782,7 @@ hr{border:0;border-top:1.5px dashed #EADCEA;margin:16px 0}
 <h1>${paid ? "Payment receipt" : "Order summary"}</h1><p>${hx(o.ref)} · ${hx(lagosDate(o.confirmed_at || o.created_at))}</p></div>
 <div class="bd"><p class="lb">BILLED TO</p><div class="kv"><span>Name</span><b>${hx(o.name || "—")}</b><span>Phone</span><b>${hx(o.phone || "—")}</b>
 ${o.state ? `<span>State</span><b>${hx(o.state)}${o.lga ? ", " + hx(o.lga) : ""}</b>` : ""}${o.park ? `<span>Waybill park</span><b>${hx(o.park)}</b>` : ""}${o.address ? `<span>Address</span><b>${hx(o.address)}</b>` : ""}</div>
-<hr><p class="lb">ITEMS</p>${o.items.map((i) => `<div class="it"><span>${hx(i.name)}${i.colourName && i.id === "regular" ? " – " + hx(i.colourName) : ""}<br><small>${i.qty} ${i.unit === "big" ? hx(i.unitName || "bag") + (i.qty > 1 ? "s" : "") + (i.dozens ? " (" + i.dozens + " dozen)" : "") : "dozen"} × ${ngn(i.price)}</small></span><b>${ngn(i.line)}</b></div>`).join("")}
+<hr><p class="lb">ITEMS</p>${o.items.map((i) => `<div class="it"><span>${hx(i.name)}${i.colourName && (i.id === "regular" || i.id === "mixmesh") ? " – " + hx(i.colourName) : ""}<br><small>${i.qty} ${i.unit === "big" ? hx(i.unitName || "bag") + (i.qty > 1 ? "s" : "") + (i.dozens ? " (" + i.dozens + " dozen)" : "") : "dozen"} × ${ngn(i.price)}</small></span><b>${ngn(i.line)}</b></div>`).join("")}
 <div class="tot"><span><small>Total ${paid ? "paid" : ""}</small><small>Excluding logistics</small></span><b>${ngn(o.total)}</b></div>
 <hr><p class="lb">ORDER PROGRESS</p><div class="tr">${o.status === "cancelled" ? `<div class="s"><i style="background:#C22F3B">×</i><span><b>Order cancelled</b><small>${hx(lagosDate(o.cancelled_at))}</small></span></div>` : steps.map((x, i) => `<div class="s ${i <= cur ? "on" : ""}"><i>${i <= cur ? "✓" : ""}</i><span><b>${x[1]}</b>${i <= cur && x[2] ? `<small>${hx(lagosDate(x[2]))}</small>` : ""}</span></div>`).join("")}</div></div>
 <div class="ft"><b>AU Hair Accessories</b><br>${hx(SHOP.address)}<br>WhatsApp ${hx(SHOP.phone)} · ${hx(SHOP.ig)} · ${hx(SHOP.web)}<br>Thank you for shopping with us 💜</div></div>

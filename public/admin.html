@@ -343,6 +343,7 @@ async function overview() {
     <div class="sub">${num(sold.n)} paid order${sold.n === 1 ? "" : "s"} · ${naira(d.allSold?.v)} confirmed since you started</div>
     <div class="hrow"><div><b>${num(d.customers?.active)}</b><span>Customers</span></div><div><b>${num(d.customers?.new)}</b><span>New</span></div><div><b>${num(d.customers?.returning)}</b><span>Came back</span></div></div>
   </div>
+  <button class="btn g w" id="qsale" style="margin-top:12px;padding:13px">+ Record a sale (Instagram, WhatsApp, walk-in)</button>
   <div class="grid kpis" style="margin-top:12px">
     <div class="card kpi"><span class="ic">${I.eye}</span><small>Store visitors</small><b>${num(v)}</b><span>${num(d.today?.v)} today</span></div>
     <div class="card kpi"><span class="ic">${I.send}</span><small>Orders sent to WhatsApp</small><b>${num(ord)}</b><span>${conv ? conv.toFixed(conv < 10 ? 1 : 0) : 0}% of visitors ordered</span></div>
@@ -368,6 +369,7 @@ async function overview() {
   <p class="hint" style="text-align:center;margin-top:16px">Confirmed sales are orders you've marked as paid. "Waiting for you" are orders sent to WhatsApp that you haven't confirmed yet. More detail is in Insights.</p>`;
   $$(".att", m).forEach((a) => (a.onclick = () => openOrder(a.dataset.ref)));
   $("#kwait").onclick = () => { S.status = "new"; go("orders"); };
+  $("#qsale").onclick = () => orderForm();
   $("#allatt") && ($("#allatt").onclick = () => { S.status = ""; go("orders"); });
 }
 
@@ -414,14 +416,14 @@ async function visitors() {
 
 // ---------- orders ----------
 function dots(o) { const i = o.status === "cancelled" ? -1 : STEPS.indexOf(o.status); return `<span class="dots">${STEPS.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span>`; }
-function itemsLine(o) { return o.items.map((i) => `${i.qty} ${i.unit === "big" ? i.unitName || "bag" : "dz"} ${i.name}${i.colourName && i.id === "regular" ? " (" + i.colourName + ")" : ""}`).join(" · "); }
+function itemsLine(o) { return o.items.map((i) => `${i.qty} ${i.unit === "big" ? i.unitName || "bag" : "dz"} ${i.name}${i.colourName && (i.id === "regular" || i.id === "mixmesh") ? " (" + i.colourName + ")" : ""}`).join(" · "); }
 function orderCard(o) {
   return `<div class="card order" data-ref="${esc(o.ref)}"><div><b>${esc(o.name || "No name")}</b> <span class="muted">· ${esc(o.ref)}</span><br><span class="muted">${esc([o.state, o.lga].filter(Boolean).join(", "))} · ${when(o.created_at)}</span><br><span style="font-size:12.5px">${esc(itemsLine(o))}</span></div>
     <div style="text-align:right"><b>${naira(o.total)}</b><br><span class="pill s-${o.status}">${SLABEL[o.status] || o.status}</span><br><span style="display:inline-block;margin-top:6px">${dots(o)}</span>${o.receipt_sent ? `<br><span class="sent" style="font-size:11px">Receipt sent</span>` : ""}</div></div>`;
 }
 async function orders() {
   const m = $("#main");
-  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Orders</h2><button class="btn o sm" id="exp">${I.dl}CSV</button><button class="btn sm" id="add">+ Add order</button></div>
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Orders</h2><button class="btn o sm" id="exp">${I.dl}CSV</button><button class="btn sm g" id="add">+ Record a sale</button></div>
   <div class="chips" style="margin-top:12px">${[["", "All"], ...["new", "confirmed", "dispatched", "delivered", "cancelled"].map((s) => [s, SLABEL[s]]), ["deleted", "Deleted"]].map(([k, l]) => `<button data-st="${k}" aria-pressed="${S.status === k}">${l}</button>`).join("")}</div>
   <input type="search" id="q" placeholder="Search order no., name, phone, state…" value="${esc(S.q)}" style="margin-bottom:12px">
   <div id="olist"><p class="muted">Loading…</p></div>`;
@@ -479,7 +481,7 @@ async function openOrder(ref, fresh) {
        <button class="lnk" id="remk">Remake receipt</button></div></div>
        <p style="margin:12px 0 6px;font-weight:700;font-size:13px">Send receipt to ${esc(first(o.name))}</p>${sendRow(o, "receipt")}` : `<p class="muted" style="margin:0 0 10px">No receipt yet for this order.</p><button class="btn g w" id="mkr">Make receipt</button>`}</div>` : ""}
    <div class="card" style="margin-top:12px"><table class="items"><colgroup><col><col style="width:22%"><col style="width:22%"><col style="width:24%"></colgroup><tr><th>Item</th><th class="n">Qty</th><th class="n">Price</th><th class="n">Total</th></tr>
-     ${o.items.map((i) => `<tr><td>${esc(i.name)}${i.colourName && i.id === "regular" ? `<br><span class="muted">${esc(i.colourName)}</span>` : ""}</td><td class="n">${i.qty} ${i.unit === "big" ? esc(i.unitName || "bag") : "dz"}${i.dozens && i.unit === "big" ? `<br><span class="muted">${i.dozens} dz</span>` : ""}</td><td class="n">${naira(i.price)}</td><td class="n">${naira(i.line)}</td></tr>`).join("")}
+     ${o.items.map((i) => `<tr><td>${esc(i.name)}${i.colourName && (i.id === "regular" || i.id === "mixmesh") ? `<br><span class="muted">${esc(i.colourName)}</span>` : ""}</td><td class="n">${i.qty} ${i.unit === "big" ? esc(i.unitName || "bag") : "dz"}${i.dozens && i.unit === "big" ? `<br><span class="muted">${i.dozens} dz</span>` : ""}</td><td class="n">${naira(i.price)}</td><td class="n">${naira(i.line)}</td></tr>`).join("")}
      <tr><td colspan="3"><b>Total</b> <span class="muted">(excluding logistics)</span></td><td class="n"><b>${naira(o.total)}</b></td></tr></table></div>
    <div class="card" style="margin-top:12px"><div class="row"><h3 style="margin:0;flex:1">Customer</h3>${o.customer ? `<button class="lnk" id="tocust" style="color:var(--ink)">Open in customer book →</button>` : ""}</div><ul class="lst" style="margin-top:6px">
      <li><span class="muted">Phone</span><span>${esc(o.phone || "—")}</span></li><li><span class="muted">State</span><span>${esc(o.state || "—")}</span></li><li><span class="muted">LGA</span><span>${esc(o.lga || "—")}</span></li>
@@ -589,7 +591,7 @@ async function drawReceipt(o) {
     if (o.address) kv("Address", o.address);
     dash(); label("ITEMS");
     for (const i of o.items) {
-      ctx.font = `600 32px ${F}`; const nm = wrap(ctx, `${i.name}${i.colourName && i.id === "regular" ? " – " + i.colourName : ""}`, W - PX * 2 - 260);
+      ctx.font = `600 32px ${F}`; const nm = wrap(ctx, `${i.name}${i.colourName && (i.id === "regular" || i.id === "mixmesh") ? " – " + i.colourName : ""}`, W - PX * 2 - 260);
       const sub = `${i.qty} ${i.unit === "big" ? (i.unitName || "bag") + (i.qty > 1 ? "s" : "") + (i.dozens ? ` (${i.dozens} dozen)` : "") : "dozen"} × ${naira(i.price)}`;
       if (draw) { ctx.fillStyle = "#24021F"; nm.forEach((l, k) => ctx.fillText(l, PX, y + k * 42)); ctx.textAlign = "right"; ctx.font = `700 32px ${F}`; ctx.fillText(naira(i.line), W - PX, y); ctx.textAlign = "left"; ctx.fillStyle = "#7A6479"; ctx.font = `400 27px ${F}`; ctx.fillText(sub, PX, y + nm.length * 42); }
       y += nm.length * 42 + 58;
@@ -648,25 +650,63 @@ function readySheet(o, img) {
   prefetchImage(o);
 }
 
-function orderForm() {
-  const opts = Object.entries(PRODUCTS).map(([k, p]) => `<option value="${k}">${p.name}</option>`).join("");
-  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button></div><h2 style="margin:14px 0 4px">Add an order</h2><p class="muted" style="margin:0 0 10px">For orders that came in by WhatsApp, phone or walk-in, so all your sales are in one place.</p>
-  <div class="card"><label class="f">Customer name</label><input type="text" id="o-name"><label class="f">Phone</label><input type="tel" id="o-phone">
-  <div class="grid two"><div><label class="f">State</label><input type="text" id="o-state"></div><div><label class="f">LGA</label><input type="text" id="o-lga"></div></div>
-  <label class="f">Address / waybill park</label><input type="text" id="o-address">
-  <label class="f">Where did this order come from?</label><select id="o-source"><option value="whatsapp">WhatsApp</option><option value="walk-in">Walk-in</option><option value="phone">Phone call</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="tiktok">TikTok</option><option value="other">Other</option></select></div>
-  <div class="card" style="margin-top:12px"><h3>Items</h3><div id="o-items"></div><button class="btn o" id="o-addi" style="margin-top:8px">+ Add item</button><p id="o-tot" style="font-weight:800;margin:12px 0 0"></p></div>
-  <div class="card" style="margin-top:12px"><label class="f">Stage</label><select id="o-status">${["new", "confirmed", "dispatched", "delivered"].map((s) => `<option value="${s}">${s === "new" ? "New (not paid yet)" : s === "confirmed" ? "Confirmed (paid)" : SLABEL[s]}</option>`).join("")}</select><label class="f">Notes</label><textarea id="o-notes"></textarea></div>
-  <button class="btn w" id="o-save" style="margin-top:12px">Save order</button>`);
-  const row = () => { const d = document.createElement("div"); d.className = "card"; d.style.cssText = "padding:10px;margin-bottom:8px;display:grid;gap:6px;grid-template-columns:1fr 1fr";
-    d.innerHTML = `<select class="i-p" style="grid-column:1/-1">${opts}</select><select class="i-c">${COLOURS.map((c) => `<option value="${c[0]}">${c[1]}</option>`).join("")}<option value="mixed">Mixed (10 colours)</option></select><select class="i-u"><option value="dozen">Dozen</option><option value="big">Bag / carton</option></select><input type="number" class="i-q" min="1" value="1" placeholder="Qty"><input type="number" class="i-pr" min="0" placeholder="Price each (₦)">`;
-    $("#o-items").appendChild(d); d.oninput = tot; d.onchange = tot; };
-  const items = () => $$("#o-items > div").map((d) => { const id = $(".i-p", d).value, unit = $(".i-u", d).value, qty = Number($(".i-q", d).value) || 1, price = Number($(".i-pr", d).value) || 0, c = $(".i-c", d).value;
-    return { id, name: PRODUCTS[id].name, colour: c, colourName: (COLOURS.find((x) => x[0] === c) || [, "Mixed"])[1], unit, unitName: unit === "big" ? PRODUCTS[id].big : "dozen", qty, price, line: qty * price, dozens: unit === "big" ? qty * PRODUCTS[id].bigDz : qty }; });
-  const tot = () => ($("#o-tot").textContent = "Total: " + naira(items().reduce((a, i) => a + i.line, 0)));
-  row(); tot(); $("#o-addi").onclick = row;
-  $("#o-save").onclick = async () => { try { const b = { name: $("#o-name").value, phone: $("#o-phone").value, state: $("#o-state").value, lga: $("#o-lga").value, address: $("#o-address").value, source: $("#o-source").value, status: $("#o-status").value, notes: $("#o-notes").value, items: items() };
-    if (!b.items.length) return toast("Add at least one item"); const d = await api("orders", { method: "POST", body: b }); putOrder(d.order); toast("Order added"); await openOrder(d.order.ref); afterChange(); } catch (e) { toast(e.message); } };
+const SALE_PRODUCTS = { regular: { name: "Regular Wig Cap", big: "bag", bigDz: 100 }, mixed: { name: "Mixed Colour Bag", big: "bag", bigDz: 100, bigOnly: true }, diy: { name: "DIY Mesh Dome Cap", big: "carton", bigDz: 50 }, stretch: { name: "Stretch Mesh Dome Cap", big: "carton", bigDz: 50 }, mixmesh: { name: "Mixed Mesh Carton", big: "carton", bigDz: 50, bigOnly: true } };
+async function orderForm() {
+  try { if (!S.catalog) S.catalog = await api("catalog"); if (!S.customers.length) S.customers = (await api("customers")).customers; } catch {}
+  const cat = (S.catalog && S.catalog.products) || {};
+  const pr = (id) => cat[id] || {};
+  openDrawer(`<div class="row"><button class="btn o sm" data-close>← Back</button></div><h2 style="margin:14px 0 4px">Record a sale</h2><p class="muted" style="margin:0 0 10px">For sales that didn't come through the website: Instagram, WhatsApp, phone calls or walk-ins. Prices fill in for you.</p>
+  <div class="card"><label class="f" for="o-find" style="margin-top:0">Returning customer? Search to fill in their details</label><input type="search" id="o-find" list="o-custs" placeholder="Type a name or phone number" autocomplete="off">
+    <datalist id="o-custs">${S.customers.map((c) => `<option value="${esc(c.name)} · ${esc(c.phone)}">`).join("")}</datalist>
+    <label class="f">Customer name</label><input type="text" id="o-name"><label class="f">Phone</label><input type="tel" id="o-phone">
+    <div class="grid two"><div><label class="f">State</label><input type="text" id="o-state"></div><div><label class="f">LGA</label><input type="text" id="o-lga"></div></div>
+    <label class="f">Address / waybill park</label><input type="text" id="o-address">
+    <label class="f">Where did this sale come from?</label><select id="o-source"><option value="instagram">Instagram</option><option value="whatsapp">WhatsApp</option><option value="walk-in">Walk-in at the shop</option><option value="phone">Phone call</option><option value="facebook">Facebook</option><option value="tiktok">TikTok</option><option value="other">Other</option></select></div>
+  <div class="card" style="margin-top:12px"><h3>What they bought</h3><div id="o-items"></div><button class="btn o" id="o-addi" style="margin-top:4px">+ Add another item</button>
+    <div class="row" style="justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><span class="muted">Total (excluding logistics)</span><b id="o-tot" style="font-size:20px"></b></div></div>
+  <div class="card" style="margin-top:12px"><label class="f" style="margin-top:0">Stage</label><select id="o-status">${["confirmed", "new", "dispatched", "delivered"].map((s) => `<option value="${s}">${s === "new" ? "New (not paid yet)" : s === "confirmed" ? "Confirmed (paid)" : SLABEL[s] + " (paid)"}</option>`).join("")}</select>
+    <label class="f">Notes</label><textarea id="o-notes" placeholder="e.g. Paid by transfer, logistics ₦5,000 paid separately"></textarea></div>
+  <button class="btn w g" id="o-save" style="margin-top:12px;padding:14px">Save sale</button>`);
+  $("#o-find").oninput = () => { const v = $("#o-find").value, ph = v.split(" · ").pop(); const c = S.customers.find((x) => x.phone && x.phone === ph);
+    if (!c) return; [["name", c.name], ["phone", c.phone], ["state", c.state], ["lga", c.lga], ["address", c.address || c.park]].forEach(([k, val]) => ($("#o-" + k).value = val || "")); toast(`Filled in ${first(c.name)}'s details`); };
+  const priceFor = (d) => { const id = $(".i-p", d).value, unit = $(".i-u", d).value, P = SALE_PRODUCTS[id];
+    if (id === "mixmesh") { const dd = Number($(".i-mx", d).value) || 25; return { normal: pr("diy").bulk * dd + pr("stretch").bulk * (50 - dd) }; }
+    if (unit === "big") return { normal: (pr(id).bulk || 0) * P.bigDz };
+    return { normal: pr(id).dz || 0, bulk: pr(id).bulk || 0 }; };
+  const setup = (d, keepPrice) => {
+    const id = $(".i-p", d).value, P = SALE_PRODUCTS[id];
+    $(".i-cw", d).style.display = id === "regular" ? "" : "none";
+    $(".i-mxw", d).style.display = id === "mixmesh" ? "" : "none";
+    const u = $(".i-u", d); u.innerHTML = (P.bigOnly ? "" : `<option value="dozen">Dozen</option>`) + `<option value="big">${P.big[0].toUpperCase() + P.big.slice(1)} (${P.bigDz} dozen)</option>`; if (P.bigOnly) u.value = "big";
+    if (!keepPrice) applyPrice(d, "normal");
+  };
+  const applyPrice = (d, which) => { const p = priceFor(d); $(".i-pr", d).value = p[which] || p.normal || 0;
+    $(".i-chips", d).innerHTML = p.bulk ? `<button type="button" class="btn o sm" data-pp="normal">${naira(p.normal)} normal</button><button type="button" class="btn o sm" data-pp="bulk">${naira(p.bulk)} bulk rate</button>` : ""; tot(); };
+  const row = () => { const d = document.createElement("div"); d.className = "card"; d.style.cssText = "padding:12px;margin-bottom:10px;display:grid;gap:4px;background:#FBF6FB";
+    d.innerHTML = `<label class="f" style="margin-top:0">Product</label><select class="i-p">${Object.entries(SALE_PRODUCTS).map(([k, p]) => `<option value="${k}">${p.name}</option>`).join("")}</select>
+      <div class="i-cw"><label class="f">Colour</label><select class="i-c">${COLOURS.map((c) => `<option value="${c[0]}">${c[1]}</option>`).join("")}</select></div>
+      <div class="i-mxw" style="display:none"><label class="f">Split of the 50 dozen</label><div class="row" style="gap:8px"><input type="number" class="i-mx" min="5" max="45" step="5" value="25" style="flex:1"><span class="muted i-mxl" style="flex:2;font-size:13px">dozen DIY + 25 dozen Stretch</span></div></div>
+      <div class="grid two" style="gap:8px"><div><label class="f">Buy by</label><select class="i-u"></select></div><div><label class="f">How many</label><input type="number" class="i-q" min="1" value="1"></div></div>
+      <label class="f">Price each (₦)</label><input type="number" class="i-pr" min="0"><div class="i-chips row" style="gap:6px;flex-wrap:wrap;margin-top:4px"></div>
+      <div class="row" style="justify-content:space-between;margin-top:6px"><b class="i-line" style="color:var(--plum)"></b><button type="button" class="lnk i-rm" style="color:var(--bad)">Remove</button></div>`;
+    $("#o-items").appendChild(d); setup(d);
+    d.onchange = (e) => { if (e.target.matches(".i-p")) setup(d); else if (e.target.matches(".i-u") || e.target.matches(".i-mx")) { if (e.target.matches(".i-mx")) { let v = Math.round((Number(e.target.value) || 25) / 5) * 5; v = Math.min(45, Math.max(5, v)); e.target.value = v; $(".i-mxl", d).textContent = `dozen DIY + ${50 - v} dozen Stretch`; } applyPrice(d, "normal"); } tot(); };
+    d.oninput = (e) => { if (e.target.matches(".i-mx")) $(".i-mxl", d).textContent = `dozen DIY + ${50 - (Number(e.target.value) || 0)} dozen Stretch`; tot(); };
+    d.onclick = (e) => { const b = e.target.closest("[data-pp]"); if (b) applyPrice(d, b.dataset.pp); if (e.target.closest(".i-rm")) { d.remove(); tot(); } };
+  };
+  const items = () => $$("#o-items > div").map((d) => { const id = $(".i-p", d).value, P = SALE_PRODUCTS[id], unit = $(".i-u", d).value, qty = Math.max(1, Number($(".i-q", d).value) || 1), price = Number($(".i-pr", d).value) || 0;
+    const c = id === "regular" ? $(".i-c", d).value : id === "mixed" ? "mixed" : id === "mixmesh" ? String($(".i-mx", d).value || 25) : "black";
+    const colourName = id === "regular" ? COLOURS.find((x) => x[0] === c)[1] : id === "mixed" ? "10 colours" : id === "mixmesh" ? `${c} dz DIY + ${50 - Number(c)} dz Stretch` : "Black";
+    return { id, name: P.name, colour: c, colourName, unit, unitName: unit === "big" ? P.big : "dozen", qty, price, line: qty * price, dozens: unit === "big" ? qty * P.bigDz : qty }; });
+  const tot = () => { const its = items(); $$("#o-items > div").forEach((d, i) => { const it = its[i]; if (it) $(".i-line", d).textContent = `${it.qty} × ${naira(it.price)} = ${naira(it.line)}`; }); $("#o-tot").textContent = naira(its.reduce((a, i) => a + i.line, 0)); };
+  row(); $("#o-addi").onclick = row;
+  $("#o-save").onclick = async () => { const btn = $("#o-save");
+    try { const b = { name: $("#o-name").value.trim(), phone: $("#o-phone").value.trim(), state: $("#o-state").value.trim(), lga: $("#o-lga").value.trim(), address: $("#o-address").value.trim(), source: $("#o-source").value, status: $("#o-status").value, notes: $("#o-notes").value, items: items() };
+      if (!b.name) return toast("Add the customer's name"); if (!b.items.length) return toast("Add at least one item"); if (b.items.some((i) => !i.price)) return toast("One item has no price");
+      btn.disabled = true; btn.textContent = "Saving…";
+      const d = await api("orders", { method: "POST", body: b }); putOrder(d.order); S.customers = []; toast("Sale recorded · undo in Activity"); afterChange();
+      if (b.status !== "new" && b.phone) await makeReceipt(d.order.ref, true); else await openOrder(d.order.ref);
+    } catch (e) { toast(e.message); btn.disabled = false; btn.textContent = "Save sale"; } };
 }
 
 // ---------- customer book ----------

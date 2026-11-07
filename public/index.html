@@ -267,6 +267,7 @@ form.co input:focus,form.co select:focus,form.co textarea:focus{outline:2px soli
     <div class="prow2"><div><b>Regular Wig Cap</b><span>1 bag · 100 dozen</span></div><strong>₦140,000</strong></div>
     <div class="prow2"><div><b>Mixed Colour Bag</b><span>Regular wig cap · 10 colours · 100 dozen</span></div><strong>₦140,000</strong></div>
     <div class="prow2"><div><b>Wig-Making Mesh Dome Cap</b><span>Black · 1 carton · 50 dozen</span></div><strong>₦260,000</strong></div>
+    <div class="prow2"><div><b>Mixed Mesh Carton</b><span>DIY + Stretch, split your way · 50 dozen</span></div><strong>₦260,000</strong></div>
     <p class="pnote">By the dozen: Regular ₦1,500 · Wig-making ₦5,500</p>
   </div>
 </div></div></section>
@@ -388,9 +389,16 @@ const PRODUCTS = [
   { id: "stretch", name: "Stretch Mesh Dome Cap", kind: "Wig-making cap", tagline: "A.U. Collection black stretch mesh dome cap for building closure and U-part wigs. Lightweight, tight band. Not for wearing under a wig.",
     big: "carton", bigDz: 50, dz: 5500, bulk: 5200, colours: [["black","Black","#161616"]],
     views: [["head","On block"],["howto","How to make a wig"],["pack","Pack"]], img: (c, v) => `img/p/making-cap-stretch-mesh${v === "head" ? "-3d" : v === "howto" ? "-howto" : ""}.jpg` },
+  { id: "mixmesh", name: "Mixed Mesh Carton", kind: "Wig-making caps · carton", tagline: "One carton of 50 dozen, split your way between DIY Mesh and Stretch Mesh Dome Caps, at the full carton price.",
+    big: "carton", bigDz: 50, dz: null, bulk: 5200, colours: [["25", "25 DIY + 25 Stretch", ""]], bigOnly: true, mix: true,
+    views: [["pack","Carton"]], img: () => "img/p/mixed-mesh-carton.jpg" },
 ];
+// Mixed Mesh Carton: "colour" holds the number of DIY dozens; the rest of the 50 are Stretch
+const mixLabel = (d) => `${d} dz DIY + ${50 - Number(d)} dz Stretch`;
+const colOf = (p, c) => (p.mix ? [String(c), mixLabel(c), ""] : p.colours.find((x) => x[0] === c));
 const bigPrice = (p) => p.bulk * p.bigDz;
-const bigOK = (p, colour) => p.avail ? !!(p.avail[colour] && p.avail[colour].big) : (!p.bigColours || p.bigColours.includes(colour));
+const mixOK = () => { const d = PRODUCTS.find((x) => x.id === "diy"), st = PRODUCTS.find((x) => x.id === "stretch"); return !d.hidden && !st.hidden && bigOK(d, "black") && bigOK(st, "black"); };
+const bigOK = (p, colour) => p.mix ? mixOK() : p.avail ? !!(p.avail[colour] && p.avail[colour].big) : (!p.bigColours || p.bigColours.includes(colour));
 const dozenOK = (p, colour) => !p.bigOnly && (p.avail ? !!(p.avail[colour] && p.avail[colour].dozen) : true);
 const anyOK = (p, colour) => bigOK(p, colour) || dozenOK(p, colour);
 const maxQty = (p, id) => { if (!p.stock) return 999; const inCart = cart.filter((i) => i.id === id).reduce((a, i) => a + i.qty, 0); return Math.max(0, p.stock - inCart); };
@@ -402,14 +410,22 @@ const unitPrice = (p, unit) => (unit === "big" ? bigPrice(p) : p.dz);
 const unitName = (p, unit) => (unit === "big" ? p.big : "dozen");
 
 function cardHTML(p) {
-  const s = state[p.id], col = p.colours.find((c) => c[0] === s.colour), price = unitPrice(p, s.unit);
+  const s = state[p.id], col = colOf(p, s.colour), price = unitPrice(p, s.unit);
+  const dd = Number(s.colour);
   return `<article class="card" data-id="${p.id}">
     <div class="ph"${p.turn && s.view !== "pack" ? ' data-turn' : ""}><img src="${p.img(s.colour, s.view)}" draggable="false" alt="${esc(p.name)}${p.colours.length > 1 ? " in " + esc(col[1]) : ""}" loading="lazy">
       <span class="tag ${p.id === "regular" ? "" : "dark"}">${esc(p.kind)}</span>
       ${p.turn && s.view !== "pack" ? `<span class="turnhint" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0115.5-6.2M21 12a9 9 0 01-15.5 6.2"/><path d="M18 2v4h-4M6 22v-4h4"/></svg>Drag to turn</span>` : ""}
+      ${p.mix ? `<span style="position:absolute;left:10px;bottom:10px;background:rgba(36,2,31,.82);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px">DIY Mesh</span><span style="position:absolute;right:10px;bottom:10px;background:rgba(36,2,31,.82);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px">Stretch Mesh</span>` : ""}
       ${p.views.length > 1 ? `<div class="view-tog" role="group" aria-label="Photo">${p.views.map(([k, l]) => `<button type="button" data-view="${k}" aria-pressed="${s.view === k || (k === "front" && s.view === "angle")}">${l}</button>`).join("")}</div>` : ""}</div>
     <div class="bd">
       <div><h3>${esc(p.name)}</h3><p class="tg">${esc(p.tagline)}</p></div>
+      ${p.mix ? `<div><div class="lbl" style="margin-bottom:8px">Your split · <span class="sw-name">${dd} dozen DIY + ${50 - dd} dozen Stretch</span></div>
+        <div style="display:flex;height:12px;border-radius:999px;overflow:hidden;background:#EADCEA;margin-bottom:10px"><i style="width:${dd * 2}%;background:var(--plum)"></i><i style="width:${100 - dd * 2}%;background:var(--orchid)"></i></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="qty" style="justify-content:space-between"><button type="button" data-mx="-5" aria-label="Less DIY">−</button><span style="font-size:13px;font-weight:700;text-align:center;line-height:1.2">DIY<br>${dd} dz</span><button type="button" data-mx="5" aria-label="More DIY">+</button></div>
+          <div class="qty" style="justify-content:space-between"><button type="button" data-mx="5" aria-label="Less Stretch">−</button><span style="font-size:13px;font-weight:700;text-align:center;line-height:1.2">Stretch<br>${50 - dd} dz</span><button type="button" data-mx="-5" aria-label="More Stretch">+</button></div>
+        </div></div>` : ""}
       ${p.colours.length > 1 ? `<div><div class="lbl" style="margin-bottom:8px">Colour · <span class="sw-name">${esc(col[1])}</span></div><div class="swatches">${p.colours.map((c) => `<button type="button" class="sw" data-c="${c[0]}" style="background:${c[2]}" aria-label="${esc(c[1])}${anyOK(p, c[0]) ? "" : " (out of stock)"}" aria-pressed="${c[0] === s.colour}"${anyOK(p, c[0]) ? "" : " data-oos"}></button>`).join("")}</div></div>` : p.bigOnly ? "" : `<div class="lbl">Colour · <span class="sw-name">Black only</span></div>`}
       <div><div class="lbl" style="margin-bottom:8px">Buy by</div>
       <div class="unitseg">${p.bigOnly ? "" : dozenOK(p, s.colour) ? `<button type="button" data-unit="dozen" aria-pressed="${s.unit === "dozen"}">Dozen<b>${naira(p.dz)}</b>per dozen</button>` : `<button type="button" disabled aria-disabled="true" style="opacity:.55;cursor:not-allowed">Dozen<b>Out of stock</b>${p.colours.length > 1 ? "in " + esc(col[1]) : "right now"}</button>`}
@@ -447,7 +463,8 @@ $("#grid").addEventListener("click", (e) => {
   const card = e.target.closest(".card"); if (!card) return;
   const id = card.dataset.id, p = PRODUCTS.find((x) => x.id === id), s = state[id];
   const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.c) { s.colour = b.dataset.c; fixUnit(p, s); renderCard(id); preload(id); track("select_colour", { id, colour: s.colour }); }
+  if (b.dataset.mx) { s.colour = String(Math.min(45, Math.max(5, Number(s.colour) + Number(b.dataset.mx)))); renderCard(id); }
+  else if (b.dataset.c) { s.colour = b.dataset.c; fixUnit(p, s); renderCard(id); preload(id); track("select_colour", { id, colour: s.colour }); }
   else if (b.dataset.view) { s.view = b.dataset.view; renderCard(id); }
   else if (b.dataset.unit) { if (s.unit !== b.dataset.unit) { s.unit = b.dataset.unit; s.qty = 1; track("select_unit", { id, unit: s.unit }); } renderCard(id); }
   else if (b.dataset.q) { s.qty = Math.min(Math.max(1, maxQty(p, id)), Math.max(1, s.qty + Number(b.dataset.q))); renderCard(id); }
@@ -456,8 +473,8 @@ $("#grid").addEventListener("click", (e) => {
     if (p.stock) { const left = maxQty(p, id); if (left <= 0) { toast(`All ${p.stock} ${p.name}s are already in your cart`); return; } s.qty = Math.min(s.qty, left); }
     const ex = cart.find((i) => i.id === id && i.colour === s.colour && i.unit === s.unit);
     if (ex) ex.qty = Math.min(999, ex.qty + s.qty); else cart.push({ id, colour: s.colour, unit: s.unit, qty: s.qty });
-    const col = p.colours.length > 1 ? p.colours.find((c) => c[0] === s.colour)[1] + " " : "";
-    toast(`Added ${s.unit === "big" ? plural(s.qty, p.big) : s.qty + " dozen"} · ${col}${p.name}`);
+    const col = p.mix ? "" : p.colours.length > 1 ? p.colours.find((c) => c[0] === s.colour)[1] + " " : "";
+    toast(`Added ${s.unit === "big" ? plural(s.qty, p.big) : s.qty + " dozen"} · ${col}${p.name}${p.mix ? " (" + mixLabel(s.colour) + ")" : ""}`);
     track("add_to_cart", { id, colour: s.colour, unit: s.unit, qty: s.qty, value: unitPrice(p, s.unit) * s.qty });
     s.qty = 1; renderCard(id); updateBar(true);
   }
@@ -469,14 +486,14 @@ $("#grid").addEventListener("change", (e) => {
 });
 $("#grid").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-qin]")) e.target.blur(); });
 
-function lines() { return cart.map((i, idx) => { const p = PRODUCTS.find((x) => x.id === i.id); const col = p.colours.find((c) => c[0] === i.colour); const price = unitPrice(p, i.unit); return { ...i, idx, p, col, price, line: price * i.qty, dz: i.unit === "big" ? i.qty * p.bigDz : i.qty }; }); }
+function lines() { return cart.map((i, idx) => { const p = PRODUCTS.find((x) => x.id === i.id); const col = colOf(p, i.colour); const price = unitPrice(p, i.unit); return { ...i, idx, p, col, price, line: price * i.qty, dz: i.unit === "big" ? i.qty * p.bigDz : i.qty }; }); }
 function updateBar(bump) {
   const L = lines(), tot = L.reduce((a, l) => a + l.line, 0), n = L.length;
   $("#cartN").textContent = L.reduce((a, l) => a + l.qty, 0); $("#barItems").textContent = `${n} item${n === 1 ? "" : "s"} in cart`; $("#barTotal").textContent = naira(tot);
   $("#cartbar").classList.toggle("on", n > 0);
   if (bump) { const b = $("#barBtn"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
 }
-const lineLabel = (l) => `${l.p.name}${l.p.colours.length > 1 ? " – " + l.col[1] : ""}`;
+const lineLabel = (l) => `${l.p.name}${l.p.mix ? " (" + l.col[1] + ")" : l.p.colours.length > 1 ? " – " + l.col[1] : ""}`;
 const qtyLabel = (l) => (l.unit === "big" ? `${plural(l.qty, l.p.big)} (${l.dz} dozen)` : `${l.qty} dozen`);
 function waMessage(L, tot, f) {
   return "Hello AU Hair Accessories, I'd like to order:\n\n" + L.map((l) => `• ${lineLabel(l)}: ${qtyLabel(l)} × ${naira(l.price)} = ${naira(l.line)}`).join("\n") +
@@ -491,7 +508,7 @@ function renderCart() {
   $("#cSheet").innerHTML = `<div class="sh-top"><h3>Your cart</h3><button class="x" type="button" aria-label="Close">×</button></div>
   <div class="sh-body">${!L.length ? '<div class="empty">Your cart is empty.<br><br><button class="btn btn-plum" type="button" data-close>Shop wig caps</button></div>' :
     L.map((l) => `<div class="line"><img src="${l.p.img(l.colour, "pack")}" alt="">
-      <div style="min-width:0"><h4>${esc(l.p.name)}</h4><small>${l.p.colours.length > 1 ? esc(l.col[1]) + " · " : ""}${naira(l.price)} per ${unitName(l.p, l.unit)}${l.unit === "big" ? ` (${l.p.bigDz} dz)` : ""}</small>
+      <div style="min-width:0"><h4>${esc(l.p.name)}</h4><small>${l.p.mix || l.p.colours.length > 1 ? esc(l.col[1]) + " · " : ""}${naira(l.price)} per ${unitName(l.p, l.unit)}${l.unit === "big" ? ` (${l.p.bigDz} dz)` : ""}</small>
       <div class="ctl"><div class="qty"><button type="button" data-l="${l.idx}" data-d="-1" aria-label="Fewer">−</button><output>${l.qty}</output><button type="button" data-l="${l.idx}" data-d="1" aria-label="More">+</button></div><span style="font-size:12px;color:var(--muted)">${l.unit === "big" ? l.p.big + (l.qty === 1 ? "" : "s") : "dozen"}</span><button class="rm" type="button" data-rm="${l.idx}">Remove</button></div></div>
       <b style="color:var(--plum);font-variant-numeric:tabular-nums">${naira(l.line)}</b></div>`).join("") +
     `<div class="tot"><span>Total <small style="font-weight:500;opacity:.7">(excluding logistics)</small></span><span>${naira(tot)}</span></div>
@@ -553,6 +570,8 @@ fetch("/api/catalog", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null
     p.stock = cp.stockBig == null ? null : Number(cp.stockBig); p.avail = cp.colours || null;
     fixUnit(p, state[p.id]);
   }
+  const dP = PRODUCTS.find((x) => x.id === "diy"), sP = PRODUCTS.find((x) => x.id === "stretch"), mP = PRODUCTS.find((x) => x.id === "mixmesh");
+  mP.bulk = Math.min(dP.bulk, sP.bulk); mP.hidden = !mixOK() || !!(c.products.mixmesh && c.products.mixmesh.hidden);
   if (c.store && c.store.whatsapp) WHATSAPP = String(c.store.whatsapp).replace(/\D/g, "");
   if (c.store) loadPixels(c.store);
   const ann = c.store && c.store.announcement && String(c.store.announcement).trim();
