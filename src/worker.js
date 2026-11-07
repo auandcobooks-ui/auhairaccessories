@@ -160,9 +160,9 @@ async function publicApi(req, env, url, ctx) {
     if (!items.length) return json({ error: "No items" }, 400);
     const total = items.reduce((a, i) => a + i.line, 0);
     let ref = /^AU-[A-Z0-9]{4,8}$/.test(b.ref || "") ? b.ref : "AU-" + Math.random().toString(36).slice(2, 7).toUpperCase();
-    const ins = (r) => env.DB.prepare("INSERT INTO orders (ref, created_at, updated_at, name, phone, state, lga, park, address, items, total, status, visitor, source) VALUES (?,?,?,?,?,?,?,?,?,?,?, 'new', ?, ?)")
+    const ins = (r) => env.DB.prepare("INSERT INTO orders (ref, created_at, updated_at, name, phone, state, lga, park, address, items, total, status, visitor, source, notes) VALUES (?,?,?,?,?,?,?,?,?,?,?, 'new', ?, ?, ?)")
       .bind(r, nowISO(), nowISO(), clampStr(c.name, 100), clampStr(c.phone, 30), clampStr(c.state, 40), clampStr(c.lga, 60), clampStr(c.park, 120), clampStr(c.address, 300),
-        JSON.stringify(items), total, clampStr(b.visitor, 40), clampStr(b.source, 40) || "website").run();
+        JSON.stringify(items), total, clampStr(b.visitor, 40), clampStr(b.source, 40) || "website", (b.notes ? "Customer note: " + clampStr(b.notes, 500) : "")).run();
     try { await ins(ref); } catch (e) { ref = ref + "-" + Math.random().toString(36).slice(2, 4).toUpperCase(); await ins(ref); }
     return json({ ok: true, ref });
   }

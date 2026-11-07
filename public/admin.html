@@ -323,7 +323,7 @@ function visitChart(daily, dailyOrders, days) {
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Daily visitors and orders">${barsSvg}<polyline points="${pts}" fill="none" stroke="#410440" stroke-width="2.5"/>${keys.map((k, i) => map[k].n ? `<circle cx="${P + i * bw + bw / 2}" cy="${H - 24 - (map[k].n / mo) * (H - 50)}" r="3.5" fill="#410440"/>` : "").join("")}${lbl}</svg>
   <div class="row muted" style="font-size:12px;gap:16px;flex-wrap:wrap"><span><i style="display:inline-block;width:10px;height:10px;background:#E58BE3;border-radius:3px"></i> Visitors (max ${mv})</span><span><i style="display:inline-block;width:14px;height:3px;background:#410440;vertical-align:middle"></i> Orders (max ${mo})</span></div>`;
 }
-const SRCNAME = (s) => ({ direct: "Direct / typed link", facebook: "Facebook", instagram: "Instagram", whatsapp: "WhatsApp", tiktok: "TikTok", google: "Google", website: "Website", manual: "Added by you", "walk-in": "Walk-in", phone: "Phone call", x: "X (Twitter)" }[s] || s);
+const SRCNAME = (s) => /^order-form/i.test(s || "") ? "Order form link" + (String(s).includes(":") ? " · " + String(s).split(":").slice(1).join(":").replace(/\b\w/g, (c) => c.toUpperCase()) : "") : ({ direct: "Direct / typed link", facebook: "Facebook", instagram: "Instagram", whatsapp: "WhatsApp", tiktok: "TikTok", google: "Google", website: "Website", manual: "Added by you", "walk-in": "Walk-in", phone: "Phone call", x: "X (Twitter)" }[s] || s);
 
 // ---------- overview ----------
 async function overview() {
@@ -344,6 +344,7 @@ async function overview() {
     <div class="hrow"><div><b>${num(d.customers?.active)}</b><span>Customers</span></div><div><b>${num(d.customers?.new)}</b><span>New</span></div><div><b>${num(d.customers?.returning)}</b><span>Came back</span></div></div>
   </div>
   <button class="btn g w" id="qsale" style="margin-top:12px;padding:13px">+ Record a sale (Instagram, WhatsApp, walk-in)</button>
+  <button class="btn o w" id="qlink" style="margin-top:8px;padding:13px">${I.share}Order form link to send customers</button>
   <div class="grid kpis" style="margin-top:12px">
     <div class="card kpi"><span class="ic">${I.eye}</span><small>Store visitors</small><b>${num(v)}</b><span>${num(d.today?.v)} today</span></div>
     <div class="card kpi"><span class="ic">${I.send}</span><small>Orders sent to WhatsApp</small><b>${num(ord)}</b><span>${conv ? conv.toFixed(conv < 10 ? 1 : 0) : 0}% of visitors ordered</span></div>
@@ -370,6 +371,7 @@ async function overview() {
   $$(".att", m).forEach((a) => (a.onclick = () => openOrder(a.dataset.ref)));
   $("#kwait").onclick = () => { S.status = "new"; go("orders"); };
   $("#qsale").onclick = () => orderForm();
+  $("#qlink").onclick = () => linkSheet();
   $("#allatt") && ($("#allatt").onclick = () => { S.status = ""; go("orders"); });
 }
 
@@ -423,7 +425,7 @@ function orderCard(o) {
 }
 async function orders() {
   const m = $("#main");
-  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Orders</h2><button class="btn o sm" id="exp">${I.dl}CSV</button><button class="btn sm g" id="add">+ Record a sale</button></div>
+  m.innerHTML = `<div class="row" style="flex-wrap:wrap"><h2 style="margin:0;flex:1">Orders</h2><button class="btn o sm" id="exp">${I.dl}CSV</button><button class="btn o sm" id="olink">${I.share}Order link</button><button class="btn sm g" id="add">+ Record a sale</button></div>
   <div class="chips" style="margin-top:12px">${[["", "All"], ...["new", "confirmed", "dispatched", "delivered", "cancelled"].map((s) => [s, SLABEL[s]]), ["deleted", "Deleted"]].map(([k, l]) => `<button data-st="${k}" aria-pressed="${S.status === k}">${l}</button>`).join("")}</div>
   <input type="search" id="q" placeholder="Search order no., name, phone, state…" value="${esc(S.q)}" style="margin-bottom:12px">
   <div id="olist"><p class="muted">Loading…</p></div>`;
@@ -431,6 +433,7 @@ async function orders() {
   let t; $("#q").oninput = () => { clearTimeout(t); t = setTimeout(() => { S.q = $("#q").value; loadOrders(); }, 250); };
   $("#exp").onclick = () => (location.href = "/api/admin/export/orders.csv");
   $("#add").onclick = () => orderForm();
+  $("#olink").onclick = () => linkSheet();
   await loadOrders();
 }
 async function loadOrders() {
@@ -517,6 +520,30 @@ function afterChange() { if (S.tab === "orders") loadOrders(); else if (S.tab ==
 async function markSent(ref) { try { const d = await api(`orders/${ref}/receipt/sent`, { method: "POST" }); putOrder(d.order); setTimeout(() => S.openRef === ref && openOrder(ref), 800); } catch {} }
 const imgCache = {};
 async function prefetchImage(o) { const k = o.receipt_token + o.receipt_at; if (imgCache[k]) return imgCache[k]; try { const b = await (await fetch(`/r/${o.receipt_token}/receipt.jpg?v=${encodeURIComponent(o.receipt_at || "")}`)).blob(); imgCache[k] = new File([b], `AU-receipt-${o.ref}.jpg`, { type: "image/jpeg" }); } catch {} return imgCache[k]; }
+// ---- shareable order form: auhairaccessories.com/order (optionally ?by=Name to see who brought the buyer)
+const ORDER_LINK = location.origin.replace(/\/$/, "") + "/order";
+const linkFor = (by) => ORDER_LINK + (by ? "?by=" + encodeURIComponent(by) : "");
+const linkMsg = (u) => `Hello! You can place your order with AU Hair Accessories here. Pick what you want, fill in your details and send it to us on WhatsApp:\n${u}`;
+function linkBlock(u, id) {
+  return `<div class="card" style="margin:10px 0 0;padding:12px;background:#FBF3FB;box-shadow:none"><div style="font-weight:700;color:var(--plum);word-break:break-all;font-size:14px">${esc(u)}</div>
+    <div class="sendrow" style="margin-top:10px"><button class="btn o" type="button" data-lcopy="${esc(u)}">${I.copy}Copy link</button><a class="btn g" href="https://wa.me/?text=${encodeURIComponent(linkMsg(u))}" target="_blank" rel="noopener">${I.wa}WhatsApp</a><a class="btn o" href="${esc(u)}" target="_blank" rel="noopener">Open</a></div>
+    <button class="btn o w sm" type="button" data-lmsg="${esc(u)}" style="margin-top:8px">${I.copy}Copy link with a message</button></div>`;
+}
+function linkSheet() {
+  openSheet(`<div class="row" style="margin-bottom:4px"><h3 style="margin:0;flex:1">Order form link</h3><button class="btn o sm" data-sclose>Done</button></div>
+    <p class="muted" style="margin:0">Send this to anyone who wants to buy. They pick their caps, see the price (excluding logistics), add their name, number and address, then tap Send order. It lands here in Orders and opens WhatsApp with the full order.</p>
+    ${linkBlock(linkFor(""))}
+    <h3 style="margin:18px 0 2px">A link for each team member</h3>
+    <p class="muted" style="margin:0 0 8px">Give your social media manager or secretary their own link. Orders from it show who brought the buyer.</p>
+    <div class="row"><input id="lk-by" placeholder="Their name, e.g. Ada" maxlength="24" style="flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;font-size:16px;background:#fff;font-family:inherit"><button class="btn g sm" id="lk-make" type="button">Make link</button></div>
+    <div id="lk-out"></div>`);
+  const make = () => { const by = $("#lk-by").value.replace(/[^\w .'-]/g, "").trim(); if (!by) return toast("Type their name first"); $("#lk-out").innerHTML = linkBlock(linkFor(by)); };
+  $("#lk-make").onclick = make; $("#lk-by").onkeydown = (e) => { if (e.key === "Enter") make(); };
+}
+document.addEventListener("click", (e) => {
+  const c = e.target.closest("[data-lcopy]"), m = e.target.closest("[data-lmsg]");
+  if (c) copyText(c.dataset.lcopy); else if (m) copyText(linkMsg(m.dataset.lmsg));
+});
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 function smsLink(phone, text) { return `sms:${String(phone || "").replace(/[^\d+]/g, "")}${isIOS ? "&" : "?"}body=${encodeURIComponent(text)}`; }
 function sendRow(o, kind) {

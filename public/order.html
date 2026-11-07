@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#410440">
+<meta name="robots" content="noindex">
+<title>Order form · AU Hair Accessories</title>
+<meta name="description" content="Order wig caps and mesh dome caps from AU Hair Accessories. Pick what you want, fill your details and send your order on WhatsApp.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AU Hair Accessories">
+<meta property="og:title" content="AU Hair Accessories · Order form">
+<meta property="og:description" content="Pick your wig caps, fill your details and send your order on WhatsApp. Prices exclude logistics.">
+<meta property="og:url" content="https://auhairaccessories.com/order">
+<meta property="og:image" content="https://auhairaccessories.com/og.jpg?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@1,600&display=swap">
+<style>
+:root{--plum:#410440;--orchid:#C73CC5;--orchid-ink:#A0229E;--blush:#FFE7FF;--night:#24021F;--white:#FFFFFF;--ink:#2A0429;--muted:#6E4A6C;--line:#EBD6EA;--wa:#1C8D4E;--bg:#FBF3FB;
+--sans:"Poppins",system-ui,-apple-system,"Segoe UI",sans-serif;--accent:"Cormorant Garamond",Georgia,serif;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+img{max-width:100%;display:block}
+.wrap{max-width:620px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+header{background:var(--plum);color:#fff;padding:calc(18px + env(safe-area-inset-top,0px)) 0 54px;position:relative;overflow:hidden}
+header .wm{position:absolute;right:-30px;bottom:-40px;width:200px;opacity:.07;pointer-events:none}
+header .logo{width:150px;height:auto}
+header h1{margin:22px 0 4px;font-size:30px;line-height:1.15;font-weight:700}
+header h1 i{font-family:var(--accent);font-weight:600;color:#F2A9F0}
+header p{margin:0;opacity:.85;font-size:14px;max-width:440px}
+.steps{display:flex;gap:6px;margin-top:16px;flex-wrap:wrap}
+.steps span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600}
+main{margin-top:-34px;position:relative}
+.card{background:var(--white);border-radius:22px;box-shadow:0 10px 30px rgba(65,4,64,.08);padding:18px;margin-bottom:14px}
+.card h2{margin:0 0 2px;font-size:18px;display:flex;align-items:center;gap:10px}
+.card h2 .n{width:26px;height:26px;border-radius:50%;background:var(--plum);color:#fff;display:grid;place-items:center;font-size:13px;flex:none}
+.card .sub{margin:0 0 14px 36px;font-size:13px;color:var(--muted)}
+.prod{border:1.5px solid var(--line);border-radius:16px;margin-top:10px;overflow:hidden;background:#fff}
+.prod.open{border-color:var(--orchid)}
+.ptop{display:flex;gap:12px;align-items:center;padding:10px;width:100%;background:none;border:0;text-align:left;cursor:pointer}
+.ptop img{width:64px;height:64px;border-radius:12px;object-fit:cover;flex:none;background:var(--blush)}
+.ptop .t{flex:1;min-width:0}
+.ptop b{display:block;font-size:15px;line-height:1.3}
+.ptop small{display:block;color:var(--muted);font-size:12.5px;line-height:1.35;margin-top:2px}
+.ptop .chev{width:30px;height:30px;border-radius:50%;background:var(--blush);color:var(--plum);display:grid;place-items:center;flex:none;font-weight:700;font-size:18px;transition:transform .2s}
+.prod.open .chev{transform:rotate(45deg);background:var(--plum);color:#fff}
+.pbody{display:none;padding:4px 12px 14px;border-top:1px solid var(--line)}
+.prod.open .pbody{display:grid;gap:12px}
+.lbl{font-size:12.5px;font-weight:600;color:var(--muted);margin:8px 0 6px}
+.lbl span{color:var(--ink)}
+.sws{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--line);cursor:pointer;padding:0;position:relative}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--plum)}
+.sw[data-oos]{opacity:.3}
+.sw[data-oos]::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:var(--plum);transform:rotate(45deg)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px;text-align:left;cursor:pointer;font-size:12.5px;color:var(--muted);line-height:1.35}
+.seg button b{display:block;color:var(--ink);font-size:14px}
+.seg button[aria-pressed="true"]{border-color:var(--plum);background:var(--blush)}
+.seg button[disabled]{opacity:.5;cursor:not-allowed}
+.seg .full{grid-column:1/-1}
+.qrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.qty{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:999px;background:#fff}
+.qty button{border:0;background:transparent;width:42px;height:42px;font-size:20px;cursor:pointer;color:var(--plum)}
+.qty input{width:52px;text-align:center;font-weight:700;border:0;background:transparent;font-size:16px;-moz-appearance:textfield}
+.qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.qty output{min-width:40px;text-align:center;font-weight:700;font-size:13px;line-height:1.2}
+.qrow .ql{font-size:12px;color:var(--muted);line-height:1.3}
+.bar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:#EADCEA}
+.bar i{display:block}
+.mx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.mx .qty{justify-content:space-between}
+.addrow{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
+.addrow .v{font-size:12.5px;color:var(--muted);line-height:1.3}
+.addrow .v b{display:block;font-size:18px;color:var(--plum)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:12px 20px;font-weight:600;font-size:15px;border:1.5px solid transparent;cursor:pointer;text-decoration:none;min-height:46px}
+.btn:active{transform:scale(.97)}
+.btn-plum{background:var(--plum);color:#fff}
+.btn-line{background:#fff;border-color:var(--line);color:var(--ink)}
+.btn-wa{background:var(--wa);color:#fff}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.w{width:100%}
+.empty{border:1.5px dashed var(--line);border-radius:16px;padding:18px;text-align:center;color:var(--muted);font-size:13.5px}
+.line{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.line:last-of-type{border-bottom:0}
+.line img{width:48px;height:48px;border-radius:10px;object-fit:cover;background:var(--blush)}
+.line h4{margin:0;font-size:14px;line-height:1.3}
+.line small{display:block;color:var(--muted);font-size:12px;line-height:1.35}
+.line .ctl{display:flex;align-items:center;gap:8px;margin-top:6px}
+.line .qty button{width:32px;height:32px;font-size:16px}
+.line .rm{border:0;background:none;color:var(--orchid-ink);font-size:12.5px;font-weight:600;cursor:pointer;padding:4px}
+.line .amt{font-weight:700;color:var(--plum);font-variant-numeric:tabular-nums;font-size:14px}
+.tot{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--blush);border-radius:14px;padding:12px 14px;margin-top:12px;font-weight:700}
+.tot small{font-weight:500;color:var(--muted)}
+.tot .big{font-size:20px;color:var(--plum)}
+.f{display:grid;gap:12px}
+.f label{font-size:13px;font-weight:600;display:grid;gap:6px}
+.f input,.f select,.f textarea{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:16px;background:#fff;width:100%}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--orchid);outline-offset:1px;border-color:transparent}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:380px){.row2{grid-template-columns:1fr}}
+.hint{font-size:12px;font-weight:400;color:var(--muted)}
+.note{background:#F6EEF6;border-radius:14px;padding:12px 14px;font-size:12.5px;color:var(--muted);display:grid;gap:4px}
+.note b{color:var(--ink)}
+.err{color:#B3202E;font-size:13.5px;font-weight:600;min-height:0}
+.err:empty{display:none}
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px))}
+.sticky .wrap{display:flex;align-items:center;gap:12px}
+.sticky .s{flex:1;min-width:0;line-height:1.25}
+.sticky .s small{display:block;font-size:12px;color:var(--muted)}
+.sticky .s b{font-size:19px;color:var(--plum);font-variant-numeric:tabular-nums}
+.done{text-align:center;padding:26px 18px}
+.done .tick{width:64px;height:64px;border-radius:50%;background:#E3F4EA;color:var(--wa);display:grid;place-items:center;margin:0 auto 12px}
+.done h2{display:block;font-size:22px;margin:0 0 6px}
+.done .ref{display:inline-block;background:var(--blush);color:var(--plum);font-weight:700;border-radius:999px;padding:6px 14px;margin:6px 0 14px;letter-spacing:.04em}
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--night);color:#fff;padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:8px 16px 24px}
+footer a{color:var(--plum);font-weight:600}
+:focus-visible{outline:2px solid var(--orchid);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <img class="wm" src="img/au-icon-white.png" alt="">
+  <div class="wrap">
+    <img class="logo" src="img/au-logo-reverse.png" alt="AU Hair Accessories" width="153" height="42">
+    <h1>Order <i>form</i></h1>
+    <p>Pick what you want, add your details, then send your order to us on WhatsApp.</p>
+    <div class="steps"><span>1 · Pick items</span><span>2 · Your details</span><span>3 · Send on WhatsApp</span></div>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <section class="card" id="pick">
+    <h2><span class="n">1</span>What would you like?</h2>
+    <p class="sub">Tap a product, choose how many, then add it to your order.</p>
+    <div id="prods"></div>
+  </section>
+
+  <section class="card" id="sumCard">
+    <h2><span class="n">2</span>Your order</h2>
+    <p class="sub">Prices exclude logistics.</p>
+    <div id="lines"></div>
+  </section>
+
+  <section class="card" id="details">
+    <h2><span class="n">3</span>Your details</h2>
+    <p class="sub">So we can confirm your order and send it to you.</p>
+    <form class="f" id="form" novalidate>
+      <label for="f-name">Full name<input id="f-name" name="name" autocomplete="name" placeholder="e.g. Chioma Okafor"></label>
+      <label for="f-phone">Phone number (WhatsApp if you have it)<input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="080..."></label>
+      <div class="row2">
+        <label for="f-state">State<select id="f-state" name="state"><option value="">Choose state</option></select></label>
+        <label for="f-lga">Local government<select id="f-lga" name="lga" disabled><option value="">Pick state first</option></select></label>
+      </div>
+      <label for="f-park" id="parkWrap" hidden>Motor park for waybill pickup<input id="f-park" name="park" placeholder="e.g. Peace Park, Mile 1"><span class="hint">Outside Lagos we send by waybill to a motor park near you, not to your home or office.</span></label>
+      <label for="f-addr"><span id="addrLbl">Delivery address</span><textarea id="f-addr" name="address" rows="2" autocomplete="street-address" placeholder="House number, street, area, landmark"></textarea></label>
+      <label for="f-note">Anything else? <span class="hint">(optional)</span><textarea id="f-note" name="note" rows="2" placeholder="e.g. Please call before delivery"></textarea></label>
+      <div class="note"><b>How delivery works</b><span><b>Lagos:</b> a dispatch rider brings it to your address.</span><span><b>Other states:</b> sent by waybill to a motor park in your area.</span><span>Logistics is not included in the total. We'll tell you the cost on WhatsApp.</span></div>
+      <div class="tot" id="formTot"><span>Total <small>(excluding logistics)</small></span><span class="big">₦0</span></div>
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn btn-wa w" id="sendBtn" type="submit"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.3-.4.3-.4.8-1.4a.5.5 0 000-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 001.8-1.3 2.2 2.2 0 00.2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Send order on WhatsApp</button>
+    </form>
+  </section>
+</main>
+
+<footer>AU Hair Accessories · Shop A1, by Bayelsa Plaza, BBA Trade Fair Complex, Lagos<br><a href="/">See the full store</a></footer>
+
+<div class="sticky" id="sticky"><div class="wrap">
+  <div class="s"><small id="stN">No items yet</small><b id="stT">₦0</b> <small style="display:inline">excl. logistics</small></div>
+  <button class="btn btn-plum" id="stBtn" type="button">Pick items</button>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const naira = (n) => "₦" + Math.round(n || 0).toLocaleString("en-NG");
+const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove("on"), 2000); };
+const qs = new URLSearchParams(location.search);
+// ?by=Name tags every order from this link with the person who shared it
+const BY = (qs.get("by") || "").replace(/[^\w .'-]/g, "").trim().slice(0, 24);
+const SOURCE = "order-form" + (BY ? ":" + BY : "");
+let WHATSAPP = "2349126433425";
+let LGAS = {};
+const rid = () => Array.from(crypto.getRandomValues(new Uint8Array(8)), (x) => x.toString(16).padStart(2, "0")).join("");
+const keep = (k, area) => { try { let v = area.getItem(k); if (!v) { v = rid(); area.setItem(k, v); } return v; } catch { return rid(); } };
+const VID = keep("au_vid", window.localStorage), SID = keep("au_sid", window.sessionStorage);
+function sendJSON(url, body) { const s = JSON.stringify(body); try { if (navigator.sendBeacon && navigator.sendBeacon(url, new Blob([s], { type: "application/json" }))) return; } catch {} fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: s, keepalive: true }).catch(() => {}); }
+function track(type, data) { sendJSON("/api/event", { type, path: "/order", referrer: document.referrer, utm: SOURCE, visitor: VID, session: SID, data }); if (window.fbq && type === "order_sent") window.fbq("track", "Lead", { currency: "NGN", value: data.value }, { eventID: data.ref }); }
+track("page_view", null);
+
+const PRODUCTS = [
+  { id: "regular", name: "Regular Wig Cap", note: "Wear under your wig · 2 caps per pack", big: "bag", bigDz: 100, dz: 1500, bulk: 1400, bigColours: ["black"],
+    colours: [["black","Black","#161616"],["brown","Brown","#4A4033"],["dark-brown","Dark Brown","#3A2A1F"],["nude","Nude","#A98B6B"],["wine","Wine","#4E1C2E"],["red","Red","#B3202E"],["pink","Pink","#C3307F"],["purple","Purple","#3B1BA0"],["royal-blue","Royal Blue","#1B3CC6"],["sky-blue","Sky Blue","#4FA6E6"],["white","White","#ECEAE6"]],
+    img: (c) => `img/p/wearing-cap-${c}.jpg` },
+  { id: "mixed", name: "Mixed Colour Bag", note: "10 dozen each of 10 colours (no black)", big: "bag", bigDz: 100, dz: null, bulk: 1400, colours: [["mixed","10 colours",""]], bigOnly: true, stock: 2,
+    img: () => "img/p/wearing-cap-mixed-bag.jpg" },
+  { id: "diy", name: "DIY Mesh Dome Cap", note: "Black spandex dome cap for making wigs", big: "carton", bigDz: 50, dz: 5500, bulk: 5200, colours: [["black","Black","#161616"]],
+    img: () => "img/p/making-cap-diy-mesh.jpg" },
+  { id: "stretch", name: "Stretch Mesh Dome Cap", note: "Black stretch mesh for closure & U-part wigs", big: "carton", bigDz: 50, dz: 5500, bulk: 5200, colours: [["black","Black","#161616"]],
+    img: () => "img/p/making-cap-stretch-mesh.jpg" },
+  { id: "mixmesh", name: "Mixed Mesh Carton", note: "50 dozen, split between DIY and Stretch", big: "carton", bigDz: 50, dz: null, bulk: 5200, colours: [["25","",""]], bigOnly: true, mix: true,
+    img: () => "img/p/mixed-mesh-carton.jpg" },
+];
+const P = (id) => PRODUCTS.find((x) => x.id === id);
+const mixLabel = (d) => `${d} dz DIY + ${50 - Number(d)} dz Stretch`;
+const colOf = (p, c) => (p.mix ? [String(c), mixLabel(c), ""] : p.colours.find((x) => x[0] === c) || p.colours[0]);
+const bigPrice = (p) => p.bulk * p.bigDz;
+const mixOK = () => !P("diy").hidden && !P("stretch").hidden && bigOK(P("diy"), "black") && bigOK(P("stretch"), "black");
+const bigOK = (p, c) => p.mix ? mixOK() : p.avail ? !!(p.avail[c] && p.avail[c].big) : (!p.bigColours || p.bigColours.includes(c));
+const dozenOK = (p, c) => !p.bigOnly && (p.avail ? !!(p.avail[c] && p.avail[c].dozen) : true);
+const anyOK = (p, c) => bigOK(p, c) || dozenOK(p, c);
+const unitPrice = (p, u) => (u === "big" ? bigPrice(p) : p.dz);
+const cap = (w) => w[0].toUpperCase() + w.slice(1);
+const inOrder = (id) => cart.filter((i) => i.id === id && i.unit === "big").reduce((a, i) => a + i.qty, 0);
+const left = (p) => (p.stock == null ? 999 : Math.max(0, p.stock - inOrder(p.id)));
+const st = Object.fromEntries(PRODUCTS.map((p) => [p.id, { colour: p.colours[0][0], unit: p.bigOnly ? "big" : "dozen", qty: 1 }]));
+let cart = [], open = null;
+
+function fix(p, s) {
+  if (!anyOK(p, s.colour)) { const c = p.colours.find((x) => anyOK(p, x[0])); if (c) s.colour = c[0]; }
+  if (s.unit === "big" && !bigOK(p, s.colour) && dozenOK(p, s.colour)) s.unit = "dozen";
+  else if (s.unit === "dozen" && !dozenOK(p, s.colour) && bigOK(p, s.colour)) s.unit = "big";
+}
+function priceLine(p) {
+  const a = [];
+  if (p.dz && !p.bigOnly) a.push(`${naira(p.dz)} per dozen`);
+  a.push(`${naira(bigPrice(p))} per ${p.big} of ${p.bigDz} dozen`);
+  return a.join(" · ");
+}
+function prodHTML(p) {
+  const s = st[p.id], col = colOf(p, s.colour), price = unitPrice(p, s.unit), isOpen = open === p.id, dd = Number(s.colour);
+  const soldOut = p.stock != null && left(p) <= 0 && s.unit === "big";
+  return `<div class="prod${isOpen ? " open" : ""}" data-id="${p.id}">
+    <button type="button" class="ptop" data-toggle aria-expanded="${isOpen}"><img src="${p.img(p.mix ? "" : s.colour)}" alt="" loading="lazy"><span class="t"><b>${esc(p.name)}</b><small>${esc(p.note)}</small><small style="color:var(--plum);font-weight:600">${priceLine(p)}</small></span><span class="chev" aria-hidden="true">+</span></button>
+    <div class="pbody">
+      ${p.colours.length > 1 ? `<div><div class="lbl">Colour · <span>${esc(col[1])}</span></div><div class="sws">${p.colours.map((c) => `<button type="button" class="sw" data-c="${c[0]}" style="background:${c[2]}" aria-label="${esc(c[1])}${anyOK(p, c[0]) ? "" : " (out of stock)"}" aria-pressed="${c[0] === s.colour}"${anyOK(p, c[0]) ? "" : " data-oos disabled"}></button>`).join("")}</div></div>` : ""}
+      ${p.mix ? `<div><div class="lbl">Your split · <span>${dd} dozen DIY + ${50 - dd} dozen Stretch</span></div>
+        <div class="bar"><i style="width:${dd * 2}%;background:var(--plum)"></i><i style="width:${100 - dd * 2}%;background:var(--orchid)"></i></div>
+        <div class="mx"><div class="qty"><button type="button" data-mx="-5" aria-label="Less DIY">−</button><output>DIY<br>${dd} dz</output><button type="button" data-mx="5" aria-label="More DIY">+</button></div>
+        <div class="qty"><button type="button" data-mx="5" aria-label="Less Stretch">−</button><output>Stretch<br>${50 - dd} dz</output><button type="button" data-mx="-5" aria-label="More Stretch">+</button></div></div></div>` : ""}
+      <div><div class="lbl">Buy by</div><div class="seg">
+        ${p.bigOnly ? "" : `<button type="button" data-unit="dozen" aria-pressed="${s.unit === "dozen"}"${dozenOK(p, s.colour) ? "" : " disabled"}><b>Dozen</b>${dozenOK(p, s.colour) ? naira(p.dz) + " per dozen" : "Out of stock"}</button>`}
+        <button type="button" data-unit="big" aria-pressed="${s.unit === "big"}"${bigOK(p, s.colour) ? "" : " disabled"}${p.bigOnly ? ' class="full"' : ""}><b>${cap(p.big)} · ${p.bigDz} dozen</b>${bigOK(p, s.colour) ? `${naira(bigPrice(p))} (${naira(p.bulk)} per dozen)` : `Out of stock${p.colours.length > 1 ? " in " + esc(col[1]) : ""}`}</button>
+      </div>${p.id === "regular" && !bigOK(p, s.colour) ? `<p class="hint" style="margin:6px 0 0">Full bags come in Black only. For other colours by the bag, see the Mixed Colour Bag.</p>` : ""}
+      ${p.stock != null ? `<p style="margin:6px 0 0;font-size:12.5px;font-weight:700;color:#B3202E">Only ${p.stock} ${p.big}${p.stock === 1 ? "" : "s"} left${inOrder(p.id) ? ` · ${left(p)} more available` : ""}</p>` : ""}</div>
+      <div class="qrow"><div class="qty"><button type="button" data-q="-1" aria-label="Fewer">−</button><input type="number" inputmode="numeric" min="1" max="999" value="${s.qty}" data-qin aria-label="How many"><button type="button" data-q="1" aria-label="More">+</button></div>
+        <span class="ql">${s.unit === "big" ? `${p.big}${s.qty === 1 ? "" : "s"}<br>${(s.qty * p.bigDz).toLocaleString()} dozen in total` : "dozen"}</span></div>
+      <div class="addrow"><span class="v">${s.qty} × ${naira(price)}<b>${naira(price * s.qty)}</b></span>
+        <button type="button" class="btn btn-plum" data-add${anyOK(p, s.colour) && !soldOut ? "" : " disabled"}>${soldOut ? "All in your order" : "Add to order"}</button></div>
+    </div></div>`;
+}
+function renderProds() { $("#prods").innerHTML = PRODUCTS.filter((p) => !p.hidden).map(prodHTML).join(""); }
+function rerender(id) { const el = document.querySelector(`.prod[data-id="${id}"]`); if (el) el.outerHTML = prodHTML(P(id)); }
+
+function lines() { return cart.map((i, idx) => { const p = P(i.id), col = colOf(p, i.colour), price = unitPrice(p, i.unit); return { ...i, idx, p, col, price, line: price * i.qty, dz: i.unit === "big" ? i.qty * p.bigDz : i.qty }; }); }
+const lineLabel = (l) => `${l.p.name}${l.p.mix ? " (" + l.col[1] + ")" : l.p.colours.length > 1 ? " – " + l.col[1] : ""}`;
+const qtyLabel = (l) => (l.unit === "big" ? `${l.qty} ${l.p.big}${l.qty === 1 ? "" : "s"} (${l.dz} dozen)` : `${l.qty} dozen`);
+function renderLines() {
+  const L = lines(), tot = L.reduce((a, l) => a + l.line, 0), n = L.reduce((a, l) => a + l.qty, 0);
+  $("#lines").innerHTML = !L.length ? `<div class="empty">Nothing added yet. Pick something above.</div>` :
+    L.map((l) => `<div class="line"><img src="${l.p.img(l.p.mix ? "" : l.colour)}" alt="">
+      <div style="min-width:0"><h4>${esc(l.p.name)}</h4><small>${l.p.mix || l.p.colours.length > 1 ? esc(l.col[1]) + " · " : ""}${naira(l.price)} per ${l.unit === "big" ? l.p.big + ` (${l.p.bigDz} dz)` : "dozen"}</small>
+      <div class="ctl"><div class="qty"><button type="button" data-l="${l.idx}" data-d="-1" aria-label="Fewer">−</button><output>${l.qty}</output><button type="button" data-l="${l.idx}" data-d="1" aria-label="More">+</button></div><span class="hint">${l.unit === "big" ? l.p.big + (l.qty === 1 ? "" : "s") : "dozen"}</span><button class="rm" type="button" data-rm="${l.idx}">Remove</button></div></div>
+      <span class="amt">${naira(l.line)}</span></div>`).join("") +
+    `<div class="tot"><span>Total <small>(excluding logistics)</small></span><span class="big">${naira(tot)}</span></div>`;
+  $("#formTot .big").textContent = naira(tot);
+  $("#stT").textContent = naira(tot);
+  $("#stN").textContent = L.length ? `${L.length} item${L.length === 1 ? "" : "s"} · ${n} ${n === 1 ? "unit" : "units"}` : "No items yet";
+  $("#stBtn").textContent = L.length ? "Your details" : "Pick items";
+}
+
+$("#prods").addEventListener("click", (e) => {
+  const card = e.target.closest(".prod"); if (!card) return;
+  const id = card.dataset.id, p = P(id), s = st[id], b = e.target.closest("button"); if (!b || b.disabled) return;
+  if (b.hasAttribute("data-toggle")) { const was = open; open = open === id ? null : id; if (was && was !== id) rerender(was); rerender(id); if (open) document.querySelector(`.prod[data-id="${id}"]`).scrollIntoView({ block: "nearest", behavior: "smooth" }); return; }
+  if (b.dataset.c) { s.colour = b.dataset.c; fix(p, s); }
+  else if (b.dataset.mx) s.colour = String(Math.min(45, Math.max(5, Number(s.colour) + Number(b.dataset.mx))));
+  else if (b.dataset.unit) { if (s.unit !== b.dataset.unit) { s.unit = b.dataset.unit; s.qty = 1; } }
+  else if (b.dataset.q) s.qty = Math.min(s.unit === "big" ? Math.max(1, left(p)) : 999, Math.max(1, s.qty + Number(b.dataset.q)));
+  else if (b.hasAttribute("data-add")) {
+    if (s.unit === "big" ? !bigOK(p, s.colour) : !dozenOK(p, s.colour)) return;
+    let q = s.qty; if (s.unit === "big" && p.stock != null) { q = Math.min(q, left(p)); if (q <= 0) return toast(`Only ${p.stock} left, all in your order`); }
+    const ex = cart.find((i) => i.id === id && i.colour === s.colour && i.unit === s.unit);
+    if (ex) ex.qty = Math.min(999, ex.qty + q); else cart.push({ id, colour: s.colour, unit: s.unit, qty: q });
+    toast(`Added ${s.unit === "big" ? q + " " + p.big + (q === 1 ? "" : "s") : q + " dozen"} · ${p.mix ? mixLabel(s.colour) : p.colours.length > 1 ? colOf(p, s.colour)[1] + " " + p.name : p.name}`);
+    track("add_to_cart", { id, colour: s.colour, unit: s.unit, qty: q, value: unitPrice(p, s.unit) * q });
+    s.qty = 1; renderLines();
+  }
+  rerender(id);
+});
+$("#prods").addEventListener("change", (e) => {
+  if (!e.target.matches("[data-qin]")) return; const id = e.target.closest(".prod").dataset.id, p = P(id), s = st[id];
+  s.qty = Math.min(s.unit === "big" ? Math.max(1, left(p)) : 999, Math.max(1, parseInt(e.target.value) || 1)); rerender(id);
+});
+$("#prods").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.matches("[data-qin]")) { e.preventDefault(); e.target.blur(); } });
+$("#lines").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.rm) cart.splice(Number(b.dataset.rm), 1);
+  if (b.dataset.l) { const i = cart[Number(b.dataset.l)], p = P(i.id); const max = i.unit === "big" && p.stock != null ? i.qty + left(p) : 999; i.qty = Math.min(max, Math.max(1, i.qty + Number(b.dataset.d))); }
+  renderLines(); if (open) rerender(open);
+});
+$("#stBtn").onclick = () => (cart.length ? $("#details") : $("#pick")).scrollIntoView({ behavior: "smooth", block: "start" });
+
+// ---- details form
+const F = () => ({ name: $("#f-name").value.trim(), phone: $("#f-phone").value.trim(), state: $("#f-state").value, lga: $("#f-lga").value, park: $("#f-park").value.trim(), address: $("#f-addr").value.trim(), note: $("#f-note").value.trim() });
+function fillStates() { const sel = $("#f-state"), cur = sel.value; sel.innerHTML = `<option value="">Choose state</option>` + Object.keys(LGAS).map((x) => `<option ${x === cur ? "selected" : ""}>${esc(x)}</option>`).join(""); }
+function onState() {
+  const s = $("#f-state").value, l = LGAS[s] || [], sel = $("#f-lga");
+  sel.innerHTML = `<option value="">${s ? "Choose LGA" : "Pick state first"}</option>` + l.map((x) => `<option>${esc(x)}</option>`).join(""); sel.disabled = !l.length;
+  const out = s && s !== "Lagos"; $("#parkWrap").hidden = !out; $("#addrLbl").textContent = out ? "Your address (for our records)" : "Delivery address";
+}
+$("#f-state").addEventListener("change", onState);
+fetch("lgas.json").then((r) => r.json()).then((d) => { LGAS = d; fillStates(); }).catch(() => {});
+
+function waMessage(L, tot, f, ref) {
+  return `Order ${ref}\nHello AU Hair Accessories, I'd like to order:\n\n` + L.map((l) => `• ${lineLabel(l)}: ${qtyLabel(l)} × ${naira(l.price)} = ${naira(l.line)}`).join("\n") +
+    `\n\nTotal: ${naira(tot)} (excluding logistics)\n\nMy details\nName: ${f.name}\nPhone: ${f.phone}\nState: ${f.state}\nLocal government: ${f.lga}\n` +
+    (f.state === "Lagos" ? `Delivery address: ${f.address}` : `Waybill to motor park: ${f.park}\nAddress: ${f.address}`) + (f.note ? `\nNote: ${f.note}` : "");
+}
+let sent = null;
+$("#form").addEventListener("submit", async (e) => {
+  e.preventDefault(); const err = $("#err"), f = F();
+  if (!cart.length) { err.textContent = "Add at least one item to your order."; $("#pick").scrollIntoView({ behavior: "smooth" }); return; }
+  if (f.name.length < 2) return (err.textContent = "Enter your full name.");
+  if (f.phone.replace(/\D/g, "").length < 10) return (err.textContent = "Enter a phone number we can reach you on.");
+  if (!f.state) return (err.textContent = "Choose your state.");
+  if (!f.lga) return (err.textContent = "Choose your local government.");
+  if (f.state !== "Lagos" && f.park.length < 3) return (err.textContent = "Enter the motor park where you'll pick up your waybill.");
+  if (f.address.length < 5) return (err.textContent = "Enter your address.");
+  err.textContent = "";
+  const L = lines(), tot = L.reduce((a, l) => a + l.line, 0);
+  const ref = "AU-" + Array.from(crypto.getRandomValues(new Uint8Array(5)), (x) => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[x % 32]).join("");
+  const body = { ref, visitor: VID, source: SOURCE, notes: f.note, customer: { name: f.name, phone: f.phone, state: f.state, lga: f.lga, park: f.park, address: f.address },
+    items: L.map((l) => ({ id: l.p.id, name: l.p.name, colour: l.colour, colourName: l.col ? l.col[1] : "", unit: l.unit, unitName: l.unit === "big" ? l.p.big : "dozen", qty: l.qty, dozens: l.dz, price: l.price, line: l.line })) };
+  sendJSON("/api/order", body);
+  track("order_sent", { ref, value: tot, items: L.length });
+  const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(waMessage(L, tot, f, ref))}`;
+  sent = { ref, url, tot, name: f.name };
+  const a = document.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+  showDone();
+});
+function showDone() {
+  $("#app").innerHTML = `<section class="card done">
+    <div class="tick"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2>Thank you, ${esc(sent.name.split(" ")[0])}!</h2>
+    <p style="margin:0;color:var(--muted)">Your order has reached us. Tap send in WhatsApp so we can confirm it and tell you the logistics cost.</p>
+    <div class="ref">Order ${esc(sent.ref)} · ${naira(sent.tot)}</div>
+    <a class="btn btn-wa w" href="${esc(sent.url)}" target="_blank" rel="noopener">WhatsApp didn't open? Tap here</a>
+    <a class="btn btn-line w" href="/" style="margin-top:10px">See the full store</a>
+  </section>`;
+  $("#toast").classList.remove("on"); $("#sticky").remove(); document.body.style.paddingBottom = "0"; window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+renderProds(); renderLines();
+fetch("/api/catalog", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((c) => {
+  if (!c || !c.products) return;
+  for (const p of PRODUCTS) {
+    const cp = c.products[p.id]; if (!cp) continue;
+    p.hidden = !!cp.hidden; if (cp.dz != null) p.dz = cp.dz; if (cp.bulk != null) p.bulk = cp.bulk;
+    p.stock = cp.stockBig == null ? null : Number(cp.stockBig); p.avail = cp.colours || null; fix(p, st[p.id]);
+  }
+  const m = P("mixmesh"); m.bulk = Math.min(P("diy").bulk, P("stretch").bulk); m.hidden = !mixOK() || !!(c.products.mixmesh && c.products.mixmesh.hidden);
+  if (c.store && c.store.whatsapp) WHATSAPP = String(c.store.whatsapp).replace(/\D/g, "");
+  const px = c.store && String(c.store.metaPixel || "").trim();
+  if (/^\d{8,20}$/.test(px) && !window.fbq) {
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");
+    window.fbq("init", px); window.fbq("track", "PageView");
+  }
+  cart = cart.filter((i) => !P(i.id).hidden);
+  renderProds(); renderLines();
+}).catch(() => {});
+})();
+</script>
+</body>
+</html>
