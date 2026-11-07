@@ -162,8 +162,8 @@ footer a{color:var(--plum);font-weight:600}
         <label for="f-state">State<select id="f-state" name="state"><option value="">Choose state</option></select></label>
         <label for="f-lga">Local government<select id="f-lga" name="lga" disabled><option value="">Pick state first</option></select></label>
       </div>
-      <label for="f-park" id="parkWrap" hidden>Motor park for waybill pickup<input id="f-park" name="park" placeholder="e.g. Peace Park, Mile 1"><span class="hint">Outside Lagos we send by waybill to a motor park near you, not to your home or office.</span></label>
-      <label for="f-addr"><span id="addrLbl">Delivery address</span><textarea id="f-addr" name="address" rows="2" autocomplete="street-address" placeholder="House number, street, area, landmark"></textarea></label>
+      <label for="f-park" id="parkWrap" hidden>Motor park for waybill pickup <span class="hint">(optional)</span><input id="f-park" name="park" placeholder="e.g. Peace Park, Mile 1"><span class="hint">Outside Lagos we send by waybill to a motor park near you, not to your home or office.</span></label>
+      <label for="f-addr"><span><span id="addrLbl">Delivery address</span> <span class="hint">(optional)</span></span><textarea id="f-addr" name="address" rows="2" autocomplete="street-address" placeholder="House number, street, area, landmark"></textarea></label>
       <label for="f-note">Anything else? <span class="hint">(optional)</span><textarea id="f-note" name="note" rows="2" placeholder="e.g. Please call before delivery"></textarea></label>
       <div class="note"><b>How delivery works</b><span><b>Lagos:</b> a dispatch rider brings it to your address.</span><span><b>Other states:</b> sent by waybill to a motor park in your area.</span><span>Logistics is not included in the total. We'll tell you the cost on WhatsApp.</span></div>
       <div class="tot" id="formTot"><span>Total <small>(excluding logistics)</small></span><span class="big">₦0</span></div>
@@ -327,7 +327,7 @@ fetch("lgas.json").then((r) => r.json()).then((d) => { LGAS = d; fillStates(); }
 function waMessage(L, tot, f, ref) {
   return `Order ${ref}\nHello AU Hair Accessories, I'd like to order:\n\n` + L.map((l) => `• ${lineLabel(l)}: ${qtyLabel(l)} × ${naira(l.price)} = ${naira(l.line)}`).join("\n") +
     `\n\nTotal: ${naira(tot)} (excluding logistics)\n\nMy details\nName: ${f.name}\nPhone: ${f.phone}\nState: ${f.state}\nLocal government: ${f.lga}\n` +
-    (f.state === "Lagos" ? `Delivery address: ${f.address}` : `Waybill to motor park: ${f.park}\nAddress: ${f.address}`) + (f.note ? `\nNote: ${f.note}` : "");
+    (f.park ? `Waybill to motor park: ${f.park}\n` : "") + (f.address ? `${f.state === "Lagos" ? "Delivery address" : "Address"}: ${f.address}\n` : "") + (f.note ? `Note: ${f.note}` : "");
 }
 let sent = null;
 $("#form").addEventListener("submit", async (e) => {
@@ -337,8 +337,6 @@ $("#form").addEventListener("submit", async (e) => {
   if (f.phone.replace(/\D/g, "").length < 10) return (err.textContent = "Enter a phone number we can reach you on.");
   if (!f.state) return (err.textContent = "Choose your state.");
   if (!f.lga) return (err.textContent = "Choose your local government.");
-  if (f.state !== "Lagos" && f.park.length < 3) return (err.textContent = "Enter the motor park where you'll pick up your waybill.");
-  if (f.address.length < 5) return (err.textContent = "Enter your address.");
   err.textContent = "";
   const L = lines(), tot = L.reduce((a, l) => a + l.line, 0);
   const ref = "AU-" + Array.from(crypto.getRandomValues(new Uint8Array(5)), (x) => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[x % 32]).join("");
